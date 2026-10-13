@@ -1,3 +1,4 @@
+using System.Globalization;
 using Sprocket.Media;
 using Sprocket.Playback;
 
@@ -38,5 +39,5 @@ public static class StatusBarFormat
     /// framework/runtime text (UI.md §3.7).
     /// </summary>
     public static string Telemetry(double fps, int width, int height, string durationText) =>
-        $"{fps:0.##} fps · {width}×{height} · {durationText}";
+        string.Format(CultureInfo.InvariantCulture, "{0:0.##} fps · {1}×{2} · {3}", fps, width, height, durationText);
 }

@@ -106,12 +106,16 @@ public static class MixerFormat
     /// <summary>A loudness value as a one-decimal LUFS label (<c>"-14.2 LUFS"</c>), or <c>"-∞ LUFS"</c> for
     /// silence / not-yet-measured.</summary>
     public static string LufsLabel(double lufs) =>
-        double.IsNegativeInfinity(lufs) || double.IsNaN(lufs) ? $"{NegInf} LUFS" : $"{lufs:0.0} LUFS";
+        double.IsNegativeInfinity(lufs) || double.IsNaN(lufs)
+            ? $"{NegInf} LUFS"
+            : string.Format(CultureInfo.InvariantCulture, "{0:0.0} LUFS", lufs);
 
     /// <summary>A true-peak value as a one-decimal dBTP label (<c>"-1.0 dBTP"</c>), or <c>"-∞ dBTP"</c> for
     /// silence.</summary>
     public static string DbtpLabel(double dbtp) =>
-        double.IsNegativeInfinity(dbtp) || double.IsNaN(dbtp) ? $"{NegInf} dBTP" : $"{dbtp:0.0} dBTP";
+        double.IsNegativeInfinity(dbtp) || double.IsNaN(dbtp)
+            ? $"{NegInf} dBTP"
+            : string.Format(CultureInfo.InvariantCulture, "{0:0.0} dBTP", dbtp);
 
     /// <summary>
     /// Maps a level in dB(FS) to a 0–1 meter fill between <paramref name="floorDb"/> (0) and
@@ -139,6 +143,6 @@ public static class MixerFormat
     {
         // Round to one decimal first so a tiny negative doesn't render as "-0.0".
         double r = Math.Round(value, 1);
-        return (r > 0 ? "+" : r < 0 ? "-" : "") + Math.Abs(r).ToString("0.0");
+        return (r > 0 ? "+" : r < 0 ? "-" : "") + Math.Abs(r).ToString("0.0", CultureInfo.InvariantCulture);
     }
 }

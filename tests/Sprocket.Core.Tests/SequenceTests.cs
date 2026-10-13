@@ -1,3 +1,4 @@
+using System.Globalization;
 using Sprocket.Core.Commands;
 using Sprocket.Core.Model;
 using Sprocket.Core.Rendering;
@@ -237,7 +238,7 @@ public class NestedSequenceExecutorTests
         public string ApplyTransition(string from, string to, ResolvedTransition t) =>
             $"[{from}>{t.TransitionTypeId}>{to}]";
         public void Composite(string surface, string layer, double opacity, BlendMode blend) =>
-            CompositeLog.Add($"{layer}@{opacity:0.##}/{blend}");
+            CompositeLog.Add(string.Format(CultureInfo.InvariantCulture, "{0}@{1:0.##}/{2}", layer, opacity, blend));
         public string Snapshot(string surface) => surface + "]";
     }
 

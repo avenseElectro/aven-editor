@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -786,7 +787,8 @@ internal static class SequenceSettingsDialog
         heightBox.TextChanged += SnapToCustom;
 
         double fps = format.FrameRate.Den > 0 ? (double)format.FrameRate.Num / format.FrameRate.Den : 0;
-        string fixedFormat = $"{fps:0.##} fps  ·  {format.SampleRate / 1000.0:0.#} kHz  (fixed)";
+        string fixedFormat = string.Format(
+            CultureInfo.InvariantCulture, "{0:0.##} fps  ·  {1:0.#} kHz  (fixed)", fps, format.SampleRate / 1000.0);
 
         var apply = new Button
         {
@@ -1034,7 +1036,8 @@ internal static class ExportSettingsDialog
             // Reseed the bitrate watermark to the output size's recommended default ("Same as sequence" frame rate
             // seeds at the 30 fps baseline; the exporter recomputes with the actual rate when the box is left empty).
             Rational fps = FrameRates[Math.Max(0, fpsBox.SelectedIndex)].Value ?? new Rational(30, 1);
-            bitrateBox.PlaceholderText = $"{ExportCodecs.DefaultTargetBitrate(ow, oh, fps) / 1_000_000.0:0.#} (recommended)";
+            bitrateBox.PlaceholderText = string.Format(
+                CultureInfo.InvariantCulture, "{0:0.#} (recommended)", ExportCodecs.DefaultTargetBitrate(ow, oh, fps) / 1_000_000.0);
         }
         UpdateResText();
 
@@ -1151,8 +1154,10 @@ internal static class ExportSettingsDialog
                 crfSlider.Value = p.Crf > 0
                     ? Math.Clamp(p.Crf, (int)crfSlider.Minimum, (int)crfSlider.Maximum)
                     : ExportCodecs.CrfFor(p.Format.VideoCodec, p.Quality);
-                bitrateBox.Text = p.VideoBitRate > 0 ? (p.VideoBitRate / 1_000_000.0).ToString("0.##") : "";
-                maxRateBox.Text = p.MaxBitRate > 0 ? (p.MaxBitRate / 1_000_000.0).ToString("0.##") : "";
+                bitrateBox.Text = p.VideoBitRate > 0
+                    ? (p.VideoBitRate / 1_000_000.0).ToString("0.##", CultureInfo.InvariantCulture) : "";
+                maxRateBox.Text = p.MaxBitRate > 0
+                    ? (p.MaxBitRate / 1_000_000.0).ToString("0.##", CultureInfo.InvariantCulture) : "";
                 resolutionBox.SelectedIndex = Math.Max(0, IndexOfResolution(p.Resolution));
                 fpsBox.SelectedIndex = Math.Max(0, IndexOfFrameRate(p.FrameRate));
                 modeBox.SelectedIndex = 0; // unlock Encoding before applying the preset's choice
@@ -1374,7 +1379,7 @@ internal static class ExportSettingsDialog
         (ExportRateControl Mode, int Crf, long BitRate, long MaxRate) BuildRateControl()
         {
             static long ParseMbps(TextBox box) =>
-                double.TryParse((box.Text ?? string.Empty).Trim(), out double mbps) && mbps > 0
+                double.TryParse((box.Text ?? string.Empty).Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out double mbps) && mbps > 0
                     ? (long)Math.Round(mbps * 1_000_000)
                     : 0;
             return rateControlBox.SelectedIndex == 1

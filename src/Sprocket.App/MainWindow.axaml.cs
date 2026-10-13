@@ -1549,7 +1549,8 @@ public partial class MainWindow : Window
         double fps = Fps(timeline.FrameRate);
         (int w, int h) = (timeline.Resolution.Width, timeline.Resolution.Height);
         string resLabel = h switch { 2160 => "4K", 1080 => "1080p", 720 => "720p", _ => $"{w}×{h}" };
-        this.FindControl<TextBlock>("SequenceBadge")!.Text = $"{_project.ActiveSequence.Name} · {resLabel} · {fps:0.##}";
+        this.FindControl<TextBlock>("SequenceBadge")!.Text =
+            string.Format(CultureInfo.InvariantCulture, "{0} · {1} · {2:0.##}", _project.ActiveSequence.Name, resLabel, fps);
     }
 
     /// <summary>The status-bar telemetry at rest: the sequence's <em>nominal</em> rate · resolution · duration
@@ -3267,7 +3268,8 @@ public partial class MainWindow : Window
         double gain = LoudnessNormalization.ComputeGainDb(m.IntegratedLufs, m.TruePeakDbtp, target);
         _history.Execute(SetPropertyCommand<double>.Create(
             "Normalize clip audio", () => clip.GainDb, v => clip.GainDb = v, gain));
-        SetStatus($"Normalized clip to {target:0.#} LUFS ({MixerFormat.GainDbLabel(gain)}).");
+        SetStatus(string.Format(
+            CultureInfo.InvariantCulture, "Normalized clip to {0:0.#} LUFS ({1}).", target, MixerFormat.GainDbLabel(gain)));
     }
 
     /// <summary>Rebuilds the Effects menu for the current selection: only the effects relevant to the selected
@@ -3305,7 +3307,8 @@ public partial class MainWindow : Window
         if (result is { } r)
         {
             timeline.SetSelectedClipSpeed(r.Speed, r.Reverse);
-            SetStatus($"Clip speed set to {(r.Speed.ToDouble() * 100):0.##}%{(r.Reverse ? ", reversed" : "")}.");
+            SetStatus(string.Format(
+                CultureInfo.InvariantCulture, "Clip speed set to {0:0.##}%{1}.", r.Speed.ToDouble() * 100, r.Reverse ? ", reversed" : ""));
         }
     }
 
@@ -3338,7 +3341,8 @@ public partial class MainWindow : Window
         if (clip.IsHeld && clip.HoldFrameAt == result.HoldAt)
             return; // nothing changed — keep the undo history clean
         timeline.HoldSelectedClip(result.HoldAt);
-        SetStatus($"Clip held on the frame at {result.HoldAt.ToSeconds():0.###} s.");
+        SetStatus(string.Format(
+            CultureInfo.InvariantCulture, "Clip held on the frame at {0:0.###} s.", result.HoldAt.ToSeconds()));
     }
 
     private void RefreshViewMenu()

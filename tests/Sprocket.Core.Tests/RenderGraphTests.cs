@@ -1,3 +1,4 @@
+using System.Globalization;
 using Sprocket.Core.Audio;
 using Sprocket.Core.Model;
 using Sprocket.Core.Rendering;
@@ -174,10 +175,11 @@ public class RenderGraphExecutorTests
             $"{frame}+{effect.EffectTypeId}";
 
         public string ApplyTransition(string from, string to, ResolvedTransition transition) =>
-            $"[{from}>{transition.TransitionTypeId}@{transition.Progress:0.##}>{to}]";
+            string.Format(CultureInfo.InvariantCulture, "[{0}>{1}@{2:0.##}>{3}]",
+                from, transition.TransitionTypeId, transition.Progress, to);
 
         public void Composite(string surface, string layer, double opacity, BlendMode blendMode) =>
-            CompositeLog.Add($"{layer}@{opacity:0.##}/{blendMode}");
+            CompositeLog.Add(string.Format(CultureInfo.InvariantCulture, "{0}@{1:0.##}/{2}", layer, opacity, blendMode));
 
         public string Snapshot(string surface) => surface + "]";
     }

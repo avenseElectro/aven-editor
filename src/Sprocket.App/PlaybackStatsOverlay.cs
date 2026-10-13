@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
@@ -256,7 +257,7 @@ internal sealed class PlaybackStatsOverlay : Window
         }
 
         double target = Fps(engine.FrameRate);
-        _targetFps.Text = $"{target:0.##} fps";
+        _targetFps.Text = string.Format(CultureInfo.InvariantCulture, "{0:0.##} fps", target);
 
         PlaybackStatistics stats = engine.GetStatistics();
         _presented.Text = stats.FramesPresented.ToString("N0");

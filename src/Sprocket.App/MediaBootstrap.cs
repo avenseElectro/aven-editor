@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using Sprocket.App.Proxy;
 using Sprocket.App.Stabilization;
@@ -102,8 +103,10 @@ internal static class MediaBootstrap
 
     /// <summary>A status line summarising an opened media file: name · resolution · fps · duration.</summary>
     private static string DescribeMedia(string path, Timeline timeline) =>
-        $"{Path.GetFileName(path)}  ·  {timeline.Resolution.Width}×{timeline.Resolution.Height}  ·  " +
-        $"{Fps(timeline.FrameRate):0.##} fps  ·  {timeline.Duration.ToSeconds():0.0}s";
+        string.Format(
+            CultureInfo.InvariantCulture, "{0}  ·  {1}×{2}  ·  {3:0.##} fps  ·  {4:0.0}s",
+            Path.GetFileName(path), timeline.Resolution.Width, timeline.Resolution.Height,
+            Fps(timeline.FrameRate), timeline.Duration.ToSeconds());
 
     /// <summary>
     /// The bundled demo clip copied next to the executable (Sprocket.App.csproj <c>Content</c>), or
