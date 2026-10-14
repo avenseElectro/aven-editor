@@ -65,8 +65,8 @@ public class GeneratorTests
 
         Assert.Equal(ClipKind.Generator, clip.Kind);
         Assert.Equal(GeneratorTypeIds.Title, clip.Generator!.GeneratorTypeId);
-        Assert.Equal("Title", clip.Generator.GetString(GeneratorParamNames.Text)); // default text
-        Assert.Equal("Title", GeneratorCatalog.DisplayName(GeneratorTypeIds.Title));
+        Assert.Equal("Título", clip.Generator.GetString(GeneratorParamNames.Text)); // default text
+        Assert.Equal("Título", GeneratorCatalog.DisplayName(GeneratorTypeIds.Title));
     }
 
     [Fact]

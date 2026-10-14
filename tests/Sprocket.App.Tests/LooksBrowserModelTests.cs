@@ -28,8 +28,8 @@ public class LooksBrowserModelTests
     public void Badge_Names_A_Single_Creative_Lut_And_Counts_Everything_Else()
     {
         Assert.Equal("LUT", LooksBrowserModel.Badge(LooksBrowserModel.FromLutFile("/luts/film.cube")));
-        Assert.Equal("1 effect", LooksBrowserModel.Badge(UserLook("One", ColorEntry())));
-        Assert.Equal("2 effects", LooksBrowserModel.Badge(UserLook("Two", ColorEntry(), ColorEntry())));
+        Assert.Equal("1 efeito", LooksBrowserModel.Badge(UserLook("One", ColorEntry())));
+        Assert.Equal("2 efeitos", LooksBrowserModel.Badge(UserLook("Two", ColorEntry(), ColorEntry())));
     }
 
     // ── Matches / Grouped ────────────────────────────────────────────────────────────────────────────
@@ -113,7 +113,7 @@ public class LooksBrowserModelTests
         Assert.Null(result.Command);
         Assert.Empty(clip.Effects);
         Assert.False(history.CanUndo);
-        Assert.StartsWith("Couldn't apply look Ghost", LooksBrowserModel.ApplyStatus(look, result, "a.mp4"));
+        Assert.StartsWith("Não foi possível aplicar o estilo Ghost", LooksBrowserModel.ApplyStatus(look, result, "a.mp4"));
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class LooksBrowserModelTests
         Look look = UserLook("Mixed", ColorEntry(), new LookEntry("plugin.gone", new Dictionary<string, double>()));
         LookApplyResult result = LookApplication.Build(look, NewClip());
 
-        Assert.Equal("Applied look Mixed to a.mp4. Skipped 1 unavailable effect (plugin.gone).",
+        Assert.Equal("Estilo Mixed aplicado a a.mp4. Ignorado 1 efeito indisponível (plugin.gone).",
             LooksBrowserModel.ApplyStatus(look, result, "a.mp4"));
     }
 
@@ -152,6 +152,6 @@ public class LooksBrowserModelTests
         var clip = new Clip(media.Id, Timecode.Zero, Timecode.FromSeconds(1), Timecode.Zero);
 
         Assert.Equal("shot01.mp4", LooksBrowserModel.ClipName(project, clip));
-        Assert.Equal("clip", LooksBrowserModel.ClipName(project, NewClip()));
+        Assert.Equal("clipe", LooksBrowserModel.ClipName(project, NewClip()));
     }
 }

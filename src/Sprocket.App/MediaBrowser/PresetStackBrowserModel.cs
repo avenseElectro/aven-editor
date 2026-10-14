@@ -34,14 +34,14 @@ internal static class PresetStackBrowserModel
     public static string Tooltip(PresetStack stack)
     {
         ArgumentNullException.ThrowIfNull(stack);
-        return $"{stack.Description}\n\nDouble-click to apply {stack.Name} to the selected clip and its linked audio, or drag it onto a clip. Applying again swaps the look instead of stacking it.";
+        return $"{stack.Description}\n\nFaça duplo clique para aplicar {stack.Name} ao clipe selecionado e ao respetivo áudio ligado, ou arraste-o para um clipe. Aplicar de novo troca o estilo em vez de o empilhar.";
     }
 
     /// <summary>The badge on a stack's row: what it adds to picture and sound.</summary>
     public static string Badge(PresetStack stack)
     {
         ArgumentNullException.ThrowIfNull(stack);
-        return stack.AudioEntries.Count == 0 ? "Video" : "Video + Audio";
+        return stack.AudioEntries.Count == 0 ? "Vídeo" : "Vídeo + Áudio";
     }
 
     /// <summary>The status-strip line after applying <paramref name="stack"/> (or failing to), naming anything skipped.</summary>
@@ -50,14 +50,25 @@ internal static class PresetStackBrowserModel
         ArgumentNullException.ThrowIfNull(stack);
         ArgumentNullException.ThrowIfNull(result);
         string skipped = result.Skipped.Count == 0 ? string.Empty
-            : " Skipped " + string.Join(", ", result.Skipped
+            : " Ignorados: " + string.Join(", ", result.Skipped
                 .GroupBy(s => s.Reason)
-                .Select(g => $"{string.Join(" + ", g.Select(s => EffectCatalog.DisplayName(s.EffectTypeId)).Distinct())} ({g.Key})")) + ".";
+                .Select(g => $"{string.Join(" + ", g.Select(s => EffectCatalog.DisplayName(s.EffectTypeId)).Distinct())} ({SkipReason(g.Key)})")) + ".";
         if (result.Command is null)
-            return $"Couldn't apply {stack.Title}.{skipped}";
-        string verb = result.Replaced > 0 ? "Updated" : "Applied";
-        return $"{verb} {stack.Title} on {clipName}.{skipped}";
+            return $"Não foi possível aplicar {stack.Title}.{skipped}";
+        string verb = result.Replaced > 0 ? "Atualizado" : "Aplicado";
+        return $"{verb} {stack.Title} em {clipName}.{skipped}";
     }
+
+    /// <summary>The user-facing form of a skip reason. <see cref="PresetStackApplication"/>'s constants stay English
+    /// (the MCP server surfaces them verbatim in its JSON), so they are localized here, at the UI boundary.</summary>
+    private static string SkipReason(string reason) => reason switch
+    {
+        PresetStackApplication.NoVideoClip => "sem clipe de vídeo",
+        PresetStackApplication.NoAudioClip => "sem clipe de áudio ligado",
+        PresetStackApplication.UnknownEffect => "efeito não disponível",
+        PresetStackApplication.UnknownPreset => "predefinição não disponível",
+        _ => reason,
+    };
 
     /// <summary>
     /// Applies <paramref name="stack"/> to <paramref name="clip"/> and its linked companions as one undoable edit through

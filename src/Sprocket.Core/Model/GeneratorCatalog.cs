@@ -80,9 +80,9 @@ public static class GeneratorCatalog
     public static IReadOnlyList<GeneratorDescriptor> BuiltIns { get; } =
     [
         new GeneratorDescriptor(
-            GeneratorTypeIds.Title, "Title", "Centred text over a transparent background.",
+            GeneratorTypeIds.Title, "Título", "Texto centrado sobre um fundo transparente.",
             () => new GeneratorSpec(GeneratorTypeIds.Title)
-                .SetString(GeneratorParamNames.Text, "Title")
+                .SetString(GeneratorParamNames.Text, "Título")
                 .SetString(GeneratorParamNames.Color, "#FFFFFFFF")
                 .SetString(GeneratorParamNames.BackgroundColor, "#00000000")
                 .Set(GeneratorParamNames.FontSize, 0.12)),
@@ -90,10 +90,10 @@ public static class GeneratorCatalog
         // The step-40 title templates share the Title render path (rich text + scroll); each id is distinct so
         // the browser/timeline label them and their defaults differ (PLAN.md step 40).
         new GeneratorDescriptor(
-            GeneratorTypeIds.LowerThird, "Lower Third", "Name + role over a background bar, lower-left.",
+            GeneratorTypeIds.LowerThird, "Terço inferior", "Nome + função sobre uma barra de fundo, em baixo à esquerda.",
             () => new GeneratorSpec(GeneratorTypeIds.LowerThird)
-                .SetString(GeneratorParamNames.Text, "Name")
-                .SetString(GeneratorParamNames.Text2, "Role")
+                .SetString(GeneratorParamNames.Text, "Nome")
+                .SetString(GeneratorParamNames.Text2, "Função")
                 .SetString(GeneratorParamNames.Color, "#FFFFFFFF")
                 .SetString(GeneratorParamNames.BackgroundColor, "#00000000")
                 .SetString(GeneratorParamNames.BoxColor, "#B4101418")
@@ -105,18 +105,18 @@ public static class GeneratorCatalog
                 .Set(GeneratorParamNames.PositionY, 0.82)),
 
         new GeneratorDescriptor(
-            GeneratorTypeIds.Roll, "Credits Roll", "Multi-line credits scrolling bottom to top.",
+            GeneratorTypeIds.Roll, "Rolagem de créditos", "Créditos multilinha em rolagem de baixo para cima.",
             () => new GeneratorSpec(GeneratorTypeIds.Roll)
-                .SetString(GeneratorParamNames.Text, "Credits\nDirected by\nName\nProduced by\nName")
+                .SetString(GeneratorParamNames.Text, "Créditos\nRealização\nNome\nProdução\nNome")
                 .SetString(GeneratorParamNames.Color, "#FFFFFFFF")
                 .SetString(GeneratorParamNames.BackgroundColor, "#00000000")
                 .SetString(GeneratorParamNames.ScrollMode, TitleScrollModes.Roll)
                 .Set(GeneratorParamNames.FontSize, 0.06)),
 
         new GeneratorDescriptor(
-            GeneratorTypeIds.Crawl, "Crawl", "A single line crawling right to left.",
+            GeneratorTypeIds.Crawl, "Letreiro", "Uma única linha a deslizar da direita para a esquerda.",
             () => new GeneratorSpec(GeneratorTypeIds.Crawl)
-                .SetString(GeneratorParamNames.Text, "Crawl text")
+                .SetString(GeneratorParamNames.Text, "Texto do letreiro")
                 .SetString(GeneratorParamNames.Color, "#FFFFFFFF")
                 .SetString(GeneratorParamNames.BackgroundColor, "#00000000")
                 .SetString(GeneratorParamNames.ScrollMode, TitleScrollModes.Crawl)
@@ -124,7 +124,7 @@ public static class GeneratorCatalog
                 .Set(GeneratorParamNames.PositionY, 0.85)),
 
         new GeneratorDescriptor(
-            GeneratorTypeIds.SolidColor, "Color Matte", "A solid colour fill.",
+            GeneratorTypeIds.SolidColor, "Cor sólida", "Um preenchimento de cor sólida.",
             () => new GeneratorSpec(GeneratorTypeIds.SolidColor)
                 .SetString(GeneratorParamNames.Color, "#FF1E6FFF")),
 
@@ -135,65 +135,65 @@ public static class GeneratorCatalog
         // making each entry read as smoke / fog / dust / embers / sparks. Every default below is stated once
         // here and flows into the spec, the browser, the Inspector and MCP.
 
-        new GeneratorDescriptor(GeneratorTypeIds.Smoke, "Smoke",
-            "Drifting fractal smoke over a transparent frame.")
+        new GeneratorDescriptor(GeneratorTypeIds.Smoke, "Fumo",
+            "Fumo fractal à deriva sobre um fotograma transparente.")
         {
             Parameters = CloudParameters(amount: 0.4, scale: 2.6, speed: 1.0, direction: 75, detail: 0.5,
                 softness: 0.7, falloff: 0.0),
-            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Tint", "#FFB9BEC4")],
+            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Matiz", "#FFB9BEC4")],
         },
 
-        new GeneratorDescriptor(GeneratorTypeIds.Fog, "Fog",
-            "Slow low-lying haze that settles toward the bottom of frame.")
+        new GeneratorDescriptor(GeneratorTypeIds.Fog, "Nevoeiro",
+            "Neblina densa e lenta que assenta no fundo do fotograma.")
         {
             Parameters = CloudParameters(amount: 0.55, scale: 1.6, speed: 0.3, direction: 0, detail: 0.3,
                 softness: 0.85, falloff: 0.6),
-            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Tint", "#FFC8D2DC")],
+            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Matiz", "#FFC8D2DC")],
         },
 
-        new GeneratorDescriptor(GeneratorTypeIds.Dust, "Dust",
-            "Floating dust motes drifting through the air.")
+        new GeneratorDescriptor(GeneratorTypeIds.Dust, "Poeira",
+            "Partículas de poeira suspensas no ar.")
         {
             Parameters = ParticleParameters(amount: 0.4, count: 10, size: 0.0075, speed: 0.15, direction: 200,
                 spread: 0.5, flicker: 0.25, streak: 0.0, falloff: 0.0),
-            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Tint", "#FFF0E4C8")],
+            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Matiz", "#FFF0E4C8")],
         },
 
-        new GeneratorDescriptor(GeneratorTypeIds.Embers, "Embers",
-            "Rising fire embers, warm and flickering.")
+        new GeneratorDescriptor(GeneratorTypeIds.Embers, "Brasas",
+            "Brasas de fogo a subir, quentes e cintilantes.")
         {
             Parameters = ParticleParameters(amount: 0.8, count: 16, size: 0.0075, speed: 0.55, direction: 90,
                 spread: 0.7, flicker: 0.8, streak: 0.35, falloff: 0.8),
-            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Tint", "#FFFF8A2B")],
+            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Matiz", "#FFFF8A2B")],
         },
 
-        new GeneratorDescriptor(GeneratorTypeIds.Sparks, "Sparks",
-            "Fast struck sparks with motion streaks.")
+        new GeneratorDescriptor(GeneratorTypeIds.Sparks, "Faíscas",
+            "Faíscas rápidas de percussão com rastos de movimento.")
         {
             Parameters = ParticleParameters(amount: 0.9, count: 12, size: 0.008, speed: 1.6, direction: 75,
                 spread: 0.6, flicker: 0.5, streak: 0.9, falloff: 0.85),
-            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Tint", "#FFFFD37A")],
+            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Matiz", "#FFFFD37A")],
         },
 
-        new GeneratorDescriptor(GeneratorTypeIds.LightLeak, "Light Leak",
-            "An angled film light leak. Best on an upper track set to Screen.")
+        new GeneratorDescriptor(GeneratorTypeIds.LightLeak, "Fuga de luz",
+            "Uma fuga de luz de filme em ângulo. Melhor numa pista superior definida como Escrita (Screen).")
         {
             Parameters =
             [
                 Amount(0.45),
-                new EffectParameterDescriptor(GeneratorParamNames.Direction, "Direction", 25, 0, 360, 1, "°",
-                    "Angle of the leak band, counter-clockwise from screen right."),
-                new EffectParameterDescriptor(GeneratorParamNames.PositionX, "Position X", 0.85, 0, 1, 0.005,
-                    Description: "Where the leak is centred across the frame."),
-                new EffectParameterDescriptor(GeneratorParamNames.PositionY, "Position Y", 0.3, 0, 1, 0.005,
-                    Description: "Where the leak is centred down the frame."),
-                new EffectParameterDescriptor(GeneratorParamNames.Size, "Width", 0.11, 0.01, 0.8, 0.005,
-                    Description: "Half-width of the band as a fraction of the frame height."),
+                new EffectParameterDescriptor(GeneratorParamNames.Direction, "Direção", 25, 0, 360, 1, "°",
+                    "Ângulo da banda de fuga de luz, no sentido anti-horário a partir da direita do ecrã."),
+                new EffectParameterDescriptor(GeneratorParamNames.PositionX, "Posição X", 0.85, 0, 1, 0.005,
+                    Description: "Onde a fuga está centrada na largura do fotograma."),
+                new EffectParameterDescriptor(GeneratorParamNames.PositionY, "Posição Y", 0.3, 0, 1, 0.005,
+                    Description: "Onde a fuga está centrada na altura do fotograma."),
+                new EffectParameterDescriptor(GeneratorParamNames.Size, "Largura", 0.11, 0.01, 0.8, 0.005,
+                    Description: "Meia-largura da banda como fração da altura do fotograma."),
                 Softness(0.6),
                 Speed(0.5),
                 Seed(),
             ],
-            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Tint", "#FFFF6A28")],
+            Colors = [new GeneratorColorDescriptor(GeneratorParamNames.Color, "Matiz", "#FFFF6A28")],
         },
     ];
 
@@ -203,39 +203,39 @@ public static class GeneratorCatalog
     // second, which is what keeps a generator identical at preview and export resolution (ARCHITECTURE.md 5).
 
     private static EffectParameterDescriptor Amount(double def) =>
-        new(GeneratorParamNames.Amount, "Amount", def, 0, 1, 0.01, "%",
-            "Overall density. 0 renders nothing.") { DisplayScale = 100 };
+        new(GeneratorParamNames.Amount, "Quantidade", def, 0, 1, 0.01, "%",
+            "Densidade global. 0 não renderiza nada.") { DisplayScale = 100 };
 
     private static EffectParameterDescriptor Speed(double def) =>
-        new(GeneratorParamNames.Speed, "Speed", def, 0, 4, 0.05,
-            Description: "Animation rate. 0 freezes the look on a still frame.");
+        new(GeneratorParamNames.Speed, "Velocidade", def, 0, 4, 0.05,
+            Description: "Ritmo de animação. 0 congela o aspeto num fotograma imóvel.");
 
     private static EffectParameterDescriptor Direction(double def) =>
-        new(GeneratorParamNames.Direction, "Direction", def, 0, 360, 1, "°",
-            "Flow direction, counter-clockwise from screen right - 90° drifts up the frame.");
+        new(GeneratorParamNames.Direction, "Direção", def, 0, 360, 1, "°",
+            "Direção do fluxo, no sentido anti-horário a partir da direita do ecrã — 90° deriva para cima no fotograma.");
 
     private static EffectParameterDescriptor Softness(double def) =>
-        new(GeneratorParamNames.Softness, "Softness", def, 0, 1, 0.01, "%",
-            "How gradually the edges fall off.") { DisplayScale = 100 };
+        new(GeneratorParamNames.Softness, "Suavidade", def, 0, 1, 0.01, "%",
+            "Com que suavidade as arestas caem.") { DisplayScale = 100 };
 
     private static EffectParameterDescriptor Seed() =>
-        new(GeneratorParamNames.Seed, "Seed", 0, 0, 999, 1,
-            Description: "Re-rolls the random layout without changing anything else.",
+        new(GeneratorParamNames.Seed, "Semente", 0, 0, 999, 1,
+            Description: "Relança a disposição aleatória sem alterar mais nada.",
             Kind: ParameterKind.Integer);
 
     private static EffectParameterDescriptor[] CloudParameters(
         double amount, double scale, double speed, double direction, double detail, double softness, double falloff) =>
     [
         Amount(amount),
-        new EffectParameterDescriptor(GeneratorParamNames.Scale, "Scale", scale, 0.5, 12, 0.1,
-            Description: "Feature size, as cells across the frame height - higher is finer."),
+        new EffectParameterDescriptor(GeneratorParamNames.Scale, "Escala", scale, 0.5, 12, 0.1,
+            Description: "Tamanho dos elementos, em células na altura do fotograma — mais alto é mais fino."),
         Speed(speed),
         Direction(direction),
-        new EffectParameterDescriptor(GeneratorParamNames.Detail, "Detail", detail, 0, 1, 0.01, "%",
-            "Fine fractal detail: low is soft billows, high is wispy.") { DisplayScale = 100 },
+        new EffectParameterDescriptor(GeneratorParamNames.Detail, "Detalhe", detail, 0, 1, 0.01, "%",
+            "Detalhe fractal fino: baixo é fumo macio em rolos, alto é esfumado.") { DisplayScale = 100 },
         Softness(softness),
-        new EffectParameterDescriptor(GeneratorParamNames.Falloff, "Ground bias", falloff, 0, 1, 0.01, "%",
-            "Settles the cloud toward the bottom of frame (ground fog).") { DisplayScale = 100 },
+        new EffectParameterDescriptor(GeneratorParamNames.Falloff, "Tendência para o solo", falloff, 0, 1, 0.01, "%",
+            "Faz a nuvem assentar no fundo do fotograma (nevoeiro de solo).") { DisplayScale = 100 },
         Seed(),
     ];
 
@@ -244,21 +244,21 @@ public static class GeneratorCatalog
         double flicker, double streak, double falloff) =>
     [
         Amount(amount),
-        new EffectParameterDescriptor(GeneratorParamNames.Count, "Count", count, 4, 80, 1,
-            Description: "Particles across the frame height - higher is more and smaller.",
+        new EffectParameterDescriptor(GeneratorParamNames.Count, "Contagem", count, 4, 80, 1,
+            Description: "Partículas na altura do fotograma — mais alto é mais partículas e mais pequenas.",
             Kind: ParameterKind.Integer),
-        new EffectParameterDescriptor(GeneratorParamNames.Size, "Size", size, 0.001, 0.05, 0.001,
-            Description: "Particle radius as a fraction of the frame height."),
+        new EffectParameterDescriptor(GeneratorParamNames.Size, "Tamanho", size, 0.001, 0.05, 0.001,
+            Description: "Raio da partícula como fração da altura do fotograma."),
         Speed(speed),
         Direction(direction),
-        new EffectParameterDescriptor(GeneratorParamNames.Spread, "Spread", spread, 0, 1, 0.01, "%",
-            "How far particles wander sideways off the flow.") { DisplayScale = 100 },
-        new EffectParameterDescriptor(GeneratorParamNames.Flicker, "Flicker", flicker, 0, 1, 0.01, "%",
-            "Per-particle brightness pulsing.") { DisplayScale = 100 },
-        new EffectParameterDescriptor(GeneratorParamNames.Streak, "Streak", streak, 0, 1, 0.01, "%",
-            "Stretches a tail behind each particle.") { DisplayScale = 100 },
-        new EffectParameterDescriptor(GeneratorParamNames.Falloff, "Source bias", falloff, 0, 1, 0.01, "%",
-            "Thins the field the further it has travelled, as embers thin out as they rise.") { DisplayScale = 100 },
+        new EffectParameterDescriptor(GeneratorParamNames.Spread, "Dispersão", spread, 0, 1, 0.01, "%",
+            "Até onde as partículas se desviam lateralmente do fluxo.") { DisplayScale = 100 },
+        new EffectParameterDescriptor(GeneratorParamNames.Flicker, "Cintilação", flicker, 0, 1, 0.01, "%",
+            "Pulsação de brilho por partícula.") { DisplayScale = 100 },
+        new EffectParameterDescriptor(GeneratorParamNames.Streak, "Rasto", streak, 0, 1, 0.01, "%",
+            "Estica uma cauda atrás de cada partícula.") { DisplayScale = 100 },
+        new EffectParameterDescriptor(GeneratorParamNames.Falloff, "Tendência para a origem", falloff, 0, 1, 0.01, "%",
+            "Enfraquece o campo quanto mais viajou, como as brasas rarearem ao subir.") { DisplayScale = 100 },
         Seed(),
     ];
 

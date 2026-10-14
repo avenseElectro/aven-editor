@@ -24,7 +24,7 @@ public static class MediaBadges
             badges.Add(ResolutionTier(info.Width, info.Height));
             // Flag alpha-channel media so the premultiplied compositing path is discoverable (PLAN.md step 26).
             if (info.HasAlpha)
-                badges.Add("Alpha");
+                badges.Add("Alfa");
         }
         else if (info.HasAudio)
         {
@@ -46,7 +46,7 @@ public static class MediaBadges
         IReadOnlyList<string> badges = media.Kind switch
         {
             MediaKind.ImageSequence => [SequenceTag(media), .. baseBadges],
-            MediaKind.Still => ["STILL", .. baseBadges],
+            MediaKind.Still => ["FIXA", .. baseBadges],
             _ => baseBadges,
         };
         return MarkedTag(media) is { } marked ? [.. badges, marked] : badges;
@@ -74,7 +74,7 @@ public static class MediaBadges
         string rate = fps.Den == 1
             ? fps.Num.ToString(System.Globalization.CultureInfo.InvariantCulture)
             : ((double)fps.Num / fps.Den).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
-        return $"SEQ · {count} frames @ {rate}";
+        return $"SEQ · {count} fotogramas @ {rate}";
     }
 
     /// <summary>A coarse, human-friendly resolution label: <c>4K</c>, <c>1080p</c>, <c>720p</c>, else <c>W×H</c>.</summary>
@@ -95,7 +95,7 @@ public static class MediaBadges
     public static string FormatTag(string path)
     {
         string ext = Path.GetExtension(path ?? string.Empty).TrimStart('.');
-        return ext.Length == 0 ? "AUDIO" : ext.ToUpperInvariant();
+        return ext.Length == 0 ? "ÁUDIO" : ext.ToUpperInvariant();
     }
 
     /// <summary>Formats a duration in seconds as <c>m:ss</c> (e.g. 22.4 → <c>0:22</c>, 96 → <c>1:36</c>).</summary>

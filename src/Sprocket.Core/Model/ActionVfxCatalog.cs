@@ -162,7 +162,7 @@ public sealed record ActionVfxDescriptor(
             floor = index; // the next layer stacks above this one, never onto a track this insertion already used
         }
 
-        return new ActionVfxInsertion(new CompositeCommand($"Insert {DisplayName}", commands), clips);
+        return new ActionVfxInsertion(new CompositeCommand($"Inserir {DisplayName}", commands), clips);
     }
 
     private static bool Overlaps(Track track, Timecode start, Timecode end) =>
@@ -185,12 +185,12 @@ public static class ActionVfxCatalog
     public static IReadOnlyList<ActionVfxDescriptor> BuiltIns { get; } =
     [
         new ActionVfxDescriptor(
-            ActionVfxIds.MuzzleFlash, "Muzzle Flash",
-            "A gunshot's interactive light: a two-frame exposure pop with bloom, fringe and a short kick.",
-            "Park the playhead on the firing frame. Layer a stock muzzle-flash plate above it (Screen) and a shot SFX.",
+            ActionVfxIds.MuzzleFlash, "Clarão de disparo",
+            "A luz interativa de um tiro: um pico de exposição de dois fotogramas com resplandecência, franja e um abalo curto.",
+            "Pouse o cursor de leitura no fotograma do disparo. Sobreponha um plano de arquivo de clarão de boca (Escrita/Screen) e um efeito sonoro de tiro.",
             0.5,
             [
-                Adjustment("Flash + kick",
+                Adjustment("Clarão + abalo",
                     Fx(EffectTypeIds.Color, s => (EffectParamNames.Exposure, Pulse(s, 1.4, 0.03, 0.12))),
                     Fx(EffectTypeIds.Glow,
                         s => (EffectParamNames.Threshold, Constant(0.55)),
@@ -202,12 +202,12 @@ public static class ActionVfxCatalog
             ]),
 
         new ActionVfxDescriptor(
-            ActionVfxIds.SmallFireBurst, "Small Fire Burst",
-            "A short flare of flame: embers burst and fall away over flickering firelight and heat haze.",
-            "Park the playhead where the fire ignites. Pair with a stock flame plate and a whoosh SFX.",
+            ActionVfxIds.SmallFireBurst, "Pequena labareda",
+            "Um breve clarão de chama: as brasas rebentam e caem sobre luz de fogo cintilante e bafo de calor.",
+            "Pouse o cursor de leitura onde o fogo acende. Parece com um plano de arquivo de chamas e um efeito sonoro de sopro.",
             2.0,
             [
-                Generator("Embers", GeneratorTypeIds.Embers, BlendMode.Add,
+                Generator("Brasas", GeneratorTypeIds.Embers, BlendMode.Add,
                     (g, s) => g
                         .Set(GeneratorParamNames.Amount, Keys(s, (0, 0), (0.08, 0.95), (1.2, 0.5), (2.0, 0)))
                         .Set(GeneratorParamNames.Count, 22)
@@ -215,7 +215,7 @@ public static class ActionVfxCatalog
                     Fx(EffectTypeIds.Glow,
                         s => (EffectParamNames.Threshold, Constant(0.3)),
                         s => (EffectParamNames.Intensity, Constant(1.5)))),
-                Adjustment("Firelight",
+                Adjustment("Luz de fogo",
                     Fx(EffectTypeIds.Color, s => (EffectParamNames.Exposure, Pulse(s, 0.8, 0.05, 0.4))),
                     Fx(EffectTypeIds.Flicker,
                         s => (EffectParamNames.Amount, Keys(s, (0, 0), (0.08, 0.3), (1.2, 0.2), (2.0, 0))),
@@ -225,30 +225,30 @@ public static class ActionVfxCatalog
             ]),
 
         new ActionVfxDescriptor(
-            ActionVfxIds.GroundExplosion, "Ground Explosion",
-            "A full blast: flash, shockwave, shake, sparks, embers and a smoke column rising off the ground.",
-            "Park the playhead on the detonation frame. Pair with a stock fireball plate (Screen) and a boom SFX.",
+            ActionVfxIds.GroundExplosion, "Explosão terrestre",
+            "Uma explosão completa: clarão, onda de choque, tremor, faíscas, brasas e uma coluna de fumo a erguer-se do solo.",
+            "Pouse o cursor de leitura no fotograma da detonação. Parece com um plano de arquivo de bola de fogo (Escrita/Screen) e um efeito sonoro de estrondo.",
             3.0,
             [
-                Generator("Smoke column", GeneratorTypeIds.Smoke, BlendMode.Normal,
+                Generator("Coluna de fumo", GeneratorTypeIds.Smoke, BlendMode.Normal,
                     (g, s) => g
                         .SetString(GeneratorParamNames.Color, "#FF4A4440")
                         .Set(GeneratorParamNames.Amount, Keys(s, (0, 0), (0.4, 0.7), (3.0, 0.5)))
                         .Set(GeneratorParamNames.Speed, 1.6)
                         .Set(GeneratorParamNames.Direction, 90)
                         .Set(GeneratorParamNames.Falloff, 0.55)),
-                Generator("Sparks", GeneratorTypeIds.Sparks, BlendMode.Add,
+                Generator("Faíscas", GeneratorTypeIds.Sparks, BlendMode.Add,
                     (g, s) => g
                         .Set(GeneratorParamNames.Amount, Decay(s, 1.0, 0.8))
                         .Set(GeneratorParamNames.Speed, 2.2)
                         .Set(GeneratorParamNames.Direction, 90)
                         .Set(GeneratorParamNames.Spread, 0.9)),
-                Generator("Embers", GeneratorTypeIds.Embers, BlendMode.Add,
+                Generator("Brasas", GeneratorTypeIds.Embers, BlendMode.Add,
                     (g, s) => g.Set(GeneratorParamNames.Amount, Keys(s, (0, 0), (0.3, 0.8), (3.0, 0))),
                     Fx(EffectTypeIds.Glow,
                         s => (EffectParamNames.Threshold, Constant(0.3)),
                         s => (EffectParamNames.Intensity, Constant(1.4)))),
-                Adjustment("Blast",
+                Adjustment("Explosão",
                     Fx(EffectTypeIds.Color, s => (EffectParamNames.Exposure, Pulse(s, 2.0, 0.04, 0.3))),
                     Fx(EffectTypeIds.Shockwave,
                         s => (EffectParamNames.Radius, Keys(s, (0, 0), (0.6, 1.2))),
@@ -262,26 +262,26 @@ public static class ActionVfxCatalog
             ]),
 
         new ActionVfxDescriptor(
-            ActionVfxIds.ExplosionAftermath, "Explosion Aftermath",
-            "The lingering after-look of a blast: hanging smoke, drifting embers and dust, heat shimmer.",
-            "Place right after the blast cuts out; trim or extend freely — it holds a steady mood.",
+            ActionVfxIds.ExplosionAftermath, "Sequelas da explosão",
+            "O aspeto persistente após uma explosão: fumo suspenso, brasas e poeira à deriva, cintilação de calor.",
+            "Coloque imediatamente após o corte da explosão; aparre ou estenda à vontade — mantém um ambiente estável.",
             6.0,
             [
-                Generator("Hanging smoke", GeneratorTypeIds.Smoke, BlendMode.Normal,
+                Generator("Fumo suspenso", GeneratorTypeIds.Smoke, BlendMode.Normal,
                     (g, s) => g
                         .SetString(GeneratorParamNames.Color, "#FF5A544E")
                         .Set(GeneratorParamNames.Amount, 0.55)
                         .Set(GeneratorParamNames.Speed, 0.4)
                         .Set(GeneratorParamNames.Direction, 80)
                         .Set(GeneratorParamNames.Falloff, 0.3)),
-                Generator("Dust", GeneratorTypeIds.Dust, BlendMode.Screen,
+                Generator("Poeira", GeneratorTypeIds.Dust, BlendMode.Screen,
                     (g, s) => g.Set(GeneratorParamNames.Amount, 0.35)),
-                Generator("Embers", GeneratorTypeIds.Embers, BlendMode.Add,
+                Generator("Brasas", GeneratorTypeIds.Embers, BlendMode.Add,
                     (g, s) => g
                         .Set(GeneratorParamNames.Amount, 0.5)
                         .Set(GeneratorParamNames.Count, 10)
                         .Set(GeneratorParamNames.Speed, 0.35)),
-                Adjustment("Heat + flicker",
+                Adjustment("Calor + cintilação",
                     Fx(EffectTypeIds.HeatDistortion, s => (EffectParamNames.Amount, Constant(0.004))),
                     Fx(EffectTypeIds.Flicker,
                         s => (EffectParamNames.Amount, Constant(0.12)),
@@ -290,12 +290,12 @@ public static class ActionVfxCatalog
             ]),
 
         new ActionVfxDescriptor(
-            ActionVfxIds.BurningEdge, "Burning Edge",
-            "A fire burning just below frame: a warm edge glow, rising embers and flickering light.",
-            "Use over a shot that should read as near a fire. Move the glow's Position Y to put the fire on another edge.",
+            ActionVfxIds.BurningEdge, "Margem em chamas",
+            "Um fogo a arder mesmo abaixo do fotograma: resplandecência quente na margem, brasas a subir e luz cintilante.",
+            "Use sobre uma tomada que deve ler-se como perto de um fogo. Mova a Posição Y da resplandecência para pôr o fogo noutra margem.",
             5.0,
             [
-                Generator("Edge glow", GeneratorTypeIds.LightLeak, BlendMode.Screen,
+                Generator("Resplandecência da margem", GeneratorTypeIds.LightLeak, BlendMode.Screen,
                     (g, s) => g
                         .SetString(GeneratorParamNames.Color, "#FFFF7A2A")
                         .Set(GeneratorParamNames.Amount, 0.6)
@@ -308,9 +308,9 @@ public static class ActionVfxCatalog
                         s => (EffectParamNames.Amount, Constant(0.35)),
                         s => (EffectParamNames.Frequency, Constant(7)),
                         s => (EffectParamNames.Randomness, Constant(0.9)))),
-                Generator("Embers", GeneratorTypeIds.Embers, BlendMode.Add,
+                Generator("Brasas", GeneratorTypeIds.Embers, BlendMode.Add,
                     (g, s) => g.Set(GeneratorParamNames.Amount, 0.7)),
-                Adjustment("Firelight",
+                Adjustment("Luz de fogo",
                     Fx(EffectTypeIds.Flicker,
                         s => (EffectParamNames.Amount, Constant(0.15)),
                         s => (EffectParamNames.Frequency, Constant(7)),
@@ -319,19 +319,19 @@ public static class ActionVfxCatalog
             ]),
 
         new ActionVfxDescriptor(
-            ActionVfxIds.DustHit, "Dust Hit",
-            "A bullet or body hitting the dirt: a puff of dust and grit with a small camera kick.",
-            "Park the playhead on the impact frame. Pair with a stock debris plate and an impact SFX.",
+            ActionVfxIds.DustHit, "Impacto de poeira",
+            "Uma bala ou corpo a bater na terra: uma nuvem de poeira e detritos com um pequeno abalo de câmara.",
+            "Pouse o cursor de leitura no fotograma do impacto. Parece com um plano de arquivo de detritos e um efeito sonoro de impacto.",
             1.5,
             [
-                Generator("Dust puff", GeneratorTypeIds.Smoke, BlendMode.Normal,
+                Generator("Nuvem de poeira", GeneratorTypeIds.Smoke, BlendMode.Normal,
                     (g, s) => g
                         .SetString(GeneratorParamNames.Color, "#FFB8A88C")
                         .Set(GeneratorParamNames.Amount, Keys(s, (0, 0), (0.15, 0.45), (1.5, 0)))
                         .Set(GeneratorParamNames.Speed, 1.2)
                         .Set(GeneratorParamNames.Direction, 90)
                         .Set(GeneratorParamNames.Falloff, 0.8)),
-                Generator("Grit", GeneratorTypeIds.Dust, BlendMode.Normal,
+                Generator("Detritos", GeneratorTypeIds.Dust, BlendMode.Normal,
                     (g, s) => g
                         .SetString(GeneratorParamNames.Color, "#FFC8B898")
                         .Set(GeneratorParamNames.Amount, Keys(s, (0, 0), (0.1, 0.8), (1.5, 0)))
@@ -339,19 +339,19 @@ public static class ActionVfxCatalog
                         .Set(GeneratorParamNames.Speed, 0.8)
                         .Set(GeneratorParamNames.Direction, 90)
                         .Set(GeneratorParamNames.Spread, 0.9)),
-                Adjustment("Kick",
+                Adjustment("Abalo",
                     Fx(EffectTypeIds.ImpactShake,
                         s => (EffectParamNames.Amount, Decay(s, 0.5, 0.5)),
                         s => (EffectParamNames.Frequency, Constant(12)))),
             ]),
 
         new ActionVfxDescriptor(
-            ActionVfxIds.Aftershock, "Aftershock",
-            "The camera-side reaction to a nearby blast: shockwave, decaying shake, fringe and a punch-in blur.",
-            "Park the playhead on the moment the blast reaches camera — often a few frames after an off-screen boom.",
+            ActionVfxIds.Aftershock, "Réplica",
+            "A reação do lado da câmara a uma explosão próxima: onda de choque, tremor decrescente, franja e uma desfocagem de embate.",
+            "Pouse o cursor de leitura no momento em que a explosão alcança a câmara — muitas vezes alguns fotogramas depois de um estranho fora de campo.",
             1.5,
             [
-                Adjustment("Aftershock",
+                Adjustment("Réplica",
                     Fx(EffectTypeIds.Shockwave,
                         s => (EffectParamNames.Radius, Keys(s, (0, 0), (0.8, 1.4))),
                         s => (EffectParamNames.Amplitude, Constant(0.025))),

@@ -45,9 +45,9 @@ public class PresetStackBrowserModelTests
         foreach (PresetStack stack in ToyCassetteCameraStacks.All)
         {
             string tip = PresetStackBrowserModel.Tooltip(stack);
-            Assert.StartsWith("Inspired by the Fisher-Price PXL 2000", tip);
-            Assert.Contains("Double-click", tip);
-            Assert.Equal("Video + Audio", PresetStackBrowserModel.Badge(stack));
+            Assert.StartsWith("Inspirado na Fisher-Price PXL 2000", tip);
+            Assert.Contains("duplo clique", tip);
+            Assert.Equal("Vídeo + Áudio", PresetStackBrowserModel.Badge(stack));
         }
     }
 
@@ -66,7 +66,7 @@ public class PresetStackBrowserModelTests
 
         string status = PresetStackBrowserModel.ApplyToClip(ToyCassetteCameraStacks.WornTape, audio, project, history);
 
-        Assert.Equal("Applied Toy Cassette Camera ▸ Worn Tape on clip.", status);
+        Assert.Equal("Aplicado Toy Cassette Camera ▸ Worn Tape em clipe.", status);
         Assert.Equal(new[] { EffectTypeIds.PosterizeTime, EffectTypeIds.Echo, EffectTypeIds.ToyCam }, video.Effects.Select(e => e.EffectTypeId));
         Assert.Equal(new[] { EffectTypeIds.AudioCassette }, audio.Effects.Select(e => e.EffectTypeId));
         Assert.Equal(1, history.UndoCount);
@@ -81,11 +81,11 @@ public class PresetStackBrowserModelTests
         Project project = LinkedPair(out Clip video, out Clip audio);
         var history = new EditHistory();
         PresetStackBrowserModel.ApplyToClip(ToyCassetteCameraStacks.Clean, video, project, history);
-        Assert.StartsWith("Updated ", PresetStackBrowserModel.ApplyToClip(ToyCassetteCameraStacks.LowLight, video, project, history));
+        Assert.StartsWith("Atualizado ", PresetStackBrowserModel.ApplyToClip(ToyCassetteCameraStacks.LowLight, video, project, history));
         Assert.Equal(4, video.Effects.Count + audio.Effects.Count);
 
         video.LinkGroupId = null;
         string status = PresetStackBrowserModel.ApplyToClip(ToyCassetteCameraStacks.Clean, video, project, history);
-        Assert.Contains("Skipped Cassette (no linked audio clip)", status);
+        Assert.Contains("Ignorados: Cassete (sem clipe de áudio ligado)", status);
     }
 }

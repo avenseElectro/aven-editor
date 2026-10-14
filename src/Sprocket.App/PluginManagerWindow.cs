@@ -51,9 +51,9 @@ internal sealed class PluginManagerWindow : Window
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Background = Palette.WindowBgBrush;
 
-        _installButton = ToolButton("Install Plugin…", accent: true);
-        _rescanButton = ToolButton("Rescan", accent: false);
-        _openFolderButton = ToolButton("Open Plugins Folder", accent: false);
+        _installButton = ToolButton("Instalar Plugin…", accent: true);
+        _rescanButton = ToolButton("Analisar novamente", accent: false);
+        _openFolderButton = ToolButton("Abrir Pasta de Plugins", accent: false);
         _installButton.Click += (_, _) => _ = InstallAsync();
         _rescanButton.Click += (_, _) => { _manager.Rescan(); Rebuild(); _onChanged(); };
         _openFolderButton.Click += (_, _) => OpenPluginsFolder();
@@ -67,10 +67,11 @@ internal sealed class PluginManagerWindow : Window
             {
                 new TextBlock
                 {
-                    Text = "Effect plugins extend Sprocket with extra video and audio effects. Disable one to stop "
-                        + "loading it, or install a plugin assembly (.dll) into your user plugins folder. Native "
-                        + "LADSPA and LV2 audio plugins and frei0r video filters found on your system's plugin paths "
-                        + "(or in the LADSPA / LV2 / frei0r folders under your user plugins folder) are listed here too.",
+                    Text = "Os plugins de efeitos estendem o Sprocket com efeitos extra de vídeo e áudio. Desative "
+                        + "um para deixar de o carregar, ou instale uma assembly de plugin (.dll) na sua pasta de "
+                        + "plugins do utilizador. Os plugins nativos de áudio LADSPA e LV2 e os filtros de vídeo "
+                        + "frei0r encontrados nos caminhos de plugins do sistema (ou nas pastas LADSPA / LV2 / frei0r "
+                        + "dentro da sua pasta de plugins do utilizador) também são listados aqui.",
                     Foreground = Palette.MutedTextBrush,
                     FontSize = Typography.Body,
                     TextWrapping = TextWrapping.Wrap,
@@ -86,7 +87,7 @@ internal sealed class PluginManagerWindow : Window
 
         _emptyHint = new TextBlock
         {
-            Text = "No plugins found. Install a plugin, or drop its .dll into your user plugins folder and Rescan.",
+            Text = "Nenhum plugin encontrado. Instale um plugin, ou largue o seu .dll na sua pasta de plugins do utilizador e Analise novamente.",
             Foreground = Palette.MutedTextBrush,
             FontSize = Typography.Body,
             TextWrapping = TextWrapping.Wrap,
@@ -128,16 +129,16 @@ internal sealed class PluginManagerWindow : Window
 
         (string statusText, IBrush statusColor) = entry.Status switch
         {
-            PluginStatus.Enabled => ("Enabled", Palette.GoodBrush),
-            PluginStatus.Disabled => ("Disabled", Palette.MutedTextBrush),
-            _ => ("Error", Palette.BadBrush),
+            PluginStatus.Enabled => ("Ativado", Palette.GoodBrush),
+            PluginStatus.Disabled => ("Desativado", Palette.MutedTextBrush),
+            _ => ("Erro", Palette.BadBrush),
         };
         string sourceTag = entry.Format switch
         {
             PluginFormat.Ladspa => " · LADSPA",
             PluginFormat.Lv2 => " · LV2",
             PluginFormat.Frei0r => " · frei0r",
-            _ => entry.IsUserPlugin ? "" : " · Bundled",
+            _ => entry.IsUserPlugin ? "" : " · Incluído",
         };
         var status = new TextBlock
         {
@@ -158,7 +159,7 @@ internal sealed class PluginManagerWindow : Window
         string detailText = entry.Status == PluginStatus.Error && entry.Message is { Length: > 0 }
             ? entry.Message
             : entry.Effects.Count > 0
-                ? "Effects: " + string.Join(", ", entry.Effects.Select(e => e.DisplayName))
+                ? "Efeitos: " + string.Join(", ", entry.Effects.Select(e => e.DisplayName))
                 : entry.Message ?? "";
         var detail = new TextBlock
         {
@@ -174,7 +175,7 @@ internal sealed class PluginManagerWindow : Window
 
         var enableToggle = new CheckBox
         {
-            Content = "Enabled",
+            Content = "Ativado",
             Foreground = Palette.TextBrush,
             IsChecked = entry.Status != PluginStatus.Disabled,
             VerticalAlignment = VerticalAlignment.Center,
@@ -199,7 +200,7 @@ internal sealed class PluginManagerWindow : Window
         };
         if (entry.IsUserPlugin)
         {
-            Button uninstall = RowButton("Uninstall", Palette.MutedTextBrush);
+            Button uninstall = RowButton("Desinstalar", Palette.MutedTextBrush);
             uninstall.Click += (_, _) => _ = UninstallAsync(entry);
             buttons.Children.Add(uninstall);
         }
@@ -231,9 +232,9 @@ internal sealed class PluginManagerWindow : Window
         {
             IReadOnlyList<IStorageFile> files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = "Install Plugin",
+                Title = "Instalar Plugin",
                 AllowMultiple = false,
-                FileTypeFilter = [new FilePickerFileType("Plugin assembly") { Patterns = ["*.dll"] }, FilePickerFileTypes.All],
+                FileTypeFilter = [new FilePickerFileType("Assembly de plugin") { Patterns = ["*.dll"] }, FilePickerFileTypes.All],
             });
             if (files.Count == 0 || files[0].TryGetLocalPath() is not { } picked)
                 return;
@@ -243,7 +244,7 @@ internal sealed class PluginManagerWindow : Window
         {
             // Some Linux storage portals throw on cancel / when unavailable — a swallowed picker failure would
             // leave Install silently doing nothing (the InspectorPanel Browse handler guards the same way).
-            await MessageDialog.Show(this, "Install Plugin", $"The file picker could not be opened: {ex.Message}");
+            await MessageDialog.Show(this, "Instalar Plugin", $"Não foi possível abrir o seletor de ficheiros: {ex.Message}");
             return;
         }
 
@@ -251,16 +252,17 @@ internal sealed class PluginManagerWindow : Window
         Rebuild();
         _onChanged();
         if (error is not null)
-            await MessageDialog.Show(this, "Install Plugin", error);
+            await MessageDialog.Show(this, "Instalar Plugin", error);
     }
 
     /// <summary>Uninstall — confirms, then unloads + deletes a user-installed plugin's file.</summary>
     private async Task UninstallAsync(PluginEntry entry)
     {
-        bool confirmed = await ConfirmDialog.Show(this, "Uninstall Plugin",
-            $"Remove the plugin \"{entry.Name}\"?\n\nIts effects are unloaded and its file is deleted. Any project "
-            + "using them will keep the clips but render those effects as pass-through until the plugin is reinstalled.",
-            "Uninstall", "Cancel");
+        bool confirmed = await ConfirmDialog.Show(this, "Desinstalar Plugin",
+            $"Remover o plugin \"{entry.Name}\"?\n\nOs seus efeitos são descarregados e o seu ficheiro é eliminado. "
+            + "Qualquer projeto que os use mantém os clipes, mas processa esses efeitos como passagem direta até o "
+            + "plugin ser reinstalado.",
+            "Desinstalar", "Cancelar");
         if (!confirmed)
             return;
 
@@ -268,7 +270,7 @@ internal sealed class PluginManagerWindow : Window
         Rebuild();
         _onChanged();
         if (error is not null)
-            await MessageDialog.Show(this, "Uninstall Plugin", error);
+            await MessageDialog.Show(this, "Desinstalar Plugin", error);
     }
 
     /// <summary>Opens the user plugins folder in the OS file manager, creating it first if needed.</summary>

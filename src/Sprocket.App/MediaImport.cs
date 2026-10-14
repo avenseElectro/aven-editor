@@ -90,7 +90,7 @@ internal static class MediaImport
         ArgumentNullException.ThrowIfNull(project);
         ArgumentNullException.ThrowIfNull(history);
         if (frameRate.Num <= 0)
-            return new Result(null, "Invalid sequence frame rate.");
+            return new Result(null, "Cadência de fotogramas da sequência inválida.");
 
         // Already imported? Match on the pattern so the same run isn't added twice.
         foreach (MediaRef existing in project.MediaPool.Items)

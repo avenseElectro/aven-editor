@@ -81,7 +81,7 @@ public sealed partial class SprocketTools
 
             api.History.Execute(commands.Count == 1
                 ? commands[0]
-                : new CompositeCommand("Duplicate clips", commands));
+                : new CompositeCommand("Duplicar clipes", commands));
             api.RefreshPreview();
 
             (Track _, Clip primaryCopy) = copies[0];
@@ -144,7 +144,7 @@ public sealed partial class SprocketTools
                 .Select(c => (IEditCommand)SetPropertyCommand<Guid?>.Create(
                     "Unlink", () => c.LinkGroupId, v => c.LinkGroupId = v, null))
                 .ToList();
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Unlink clips", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Desligar clipes", commands));
             return StateFormatter.HistoryState(api.History, $"unlinked {members.Count} clip(s)");
         });
 
@@ -163,7 +163,7 @@ public sealed partial class SprocketTools
                 .Select(c => (IEditCommand)SetPropertyCommand<Guid?>.Create(
                     "Link", () => c.LinkGroupId, v => c.LinkGroupId = v, group))
                 .ToList();
-            api.History.Execute(new CompositeCommand("Link clips", commands));
+            api.History.Execute(new CompositeCommand("Ligar clipes", commands));
             return new JsonObject
             {
                 ["link_group"] = group.ToString("D"),
@@ -294,7 +294,7 @@ public sealed partial class SprocketTools
             foreach (EffectInstance e in source.Effects)
                 commands.Add(new AddEffectCommand(target, e.CloneShifted(shift)));
 
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Copy effects", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Copiar efeitos", commands));
             api.RefreshPreview();
             return StateFormatter.HistoryState(api.History,
                 $"copied {source.Effects.Count} effect(s) from clip {sourceClipId} to clip {targetClipId}");
@@ -363,7 +363,7 @@ public sealed partial class SprocketTools
                 if (reverse is { } r && r != c.Reverse)
                     commands.Add(new SetClipReverseCommand(c, r));
             }
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Change speed", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Alterar velocidade", commands));
             api.RefreshPreview();
             string direction = reverse is { } dir ? (dir ? ", reversed" : ", forward") : "";
             return ClipResult(api, clip, $"set speed to {numerator}/{denominator}{direction}");
@@ -441,7 +441,7 @@ public sealed partial class SprocketTools
                 commands.Add(new RippleTrimCommand(unit, newIn, newOut, downstream, shift));
             }
 
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Ripple trim", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Aparar em cadeia", commands));
             api.RefreshPreview();
             return ClipResult(api, clip, "ripple trimmed");
         });
@@ -560,9 +560,9 @@ public sealed partial class SprocketTools
                 foreach (Clip d in rtrack.Clips)
                     if (!removedClips.Contains(d) && d.TimelineStart >= end)
                         commands.Add(new SetClipPlacementCommand(
-                            d, d.SourceIn, d.SourceOut, new Timecode(d.TimelineStart.Ticks + shift), "Ripple"));
+                            d, d.SourceIn, d.SourceOut, new Timecode(d.TimelineStart.Ticks + shift), "Deslocar em cadeia"));
             }
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Ripple delete", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Eliminar em cadeia", commands));
             api.RefreshPreview();
             return StateFormatter.HistoryState(api.History, $"ripple-deleted clip {clipId}");
         });

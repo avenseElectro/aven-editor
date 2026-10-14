@@ -233,7 +233,7 @@ public sealed class InspectorPanel : UserControl
         {
             _body.Children.Add(new TextBlock
             {
-                Text = "No clip selected.\nSelect a clip in the timeline to edit its properties.",
+                Text = "Nenhum clipe selecionado.\nSelecione um clipe na linha do tempo para editar as suas propriedades.",
                 FontSize = Typography.Body,
                 Foreground = FaintText,
                 TextWrapping = TextWrapping.Wrap,
@@ -319,7 +319,7 @@ public sealed class InspectorPanel : UserControl
         if (target.Chain.Count == 0)
             _body.Children.Add(new TextBlock
             {
-                Text = "No inserts yet.",
+                Text = "Ainda sem inserções.",
                 FontSize = Typography.Caption,
                 Foreground = FaintText,
                 Margin = new Avalonia.Thickness(16, 10, 16, 0),
@@ -344,26 +344,27 @@ public sealed class InspectorPanel : UserControl
 
     private Control BuildClipSection(Clip clip)
     {
-        string name = Path.GetFileName(_project!.MediaPool.Get(clip.MediaRefId)?.AbsolutePath ?? "clip");
+        string name = Path.GetFileName(_project!.MediaPool.Get(clip.MediaRefId)?.AbsolutePath ?? "clipe");
         var info = new StackPanel { Spacing = 4, Margin = new Avalonia.Thickness(4, 4, 4, 2) };
-        info.Children.Add(InfoRow("Source", name));
-        info.Children.Add(InfoRow("Start", FormatSeconds(clip.TimelineStart)));
-        info.Children.Add(InfoRow("Duration", FormatSeconds(clip.Duration)));
-        info.Children.Add(InfoRow("Trim", $"{FormatSeconds(clip.SourceIn)} – {FormatSeconds(clip.SourceOut)}"));
+        info.Children.Add(InfoRow("Origem", name));
+        info.Children.Add(InfoRow("Início", FormatSeconds(clip.TimelineStart)));
+        info.Children.Add(InfoRow("Duração", FormatSeconds(clip.Duration)));
+        info.Children.Add(InfoRow("Aparagem", $"{FormatSeconds(clip.SourceIn)} – {FormatSeconds(clip.SourceOut)}"));
         info.Children.Add(BuildSpeedRow(clip));
         // A held clip shows its frozen frame + hold span (PLAN.md step 43); the speed above is retained but
         // ignored while held. Edited via Clip ▸ Frame Hold Options / the trim handles.
         if (clip.IsHeld)
-            info.Children.Add(InfoRow("Hold", $"{FormatSeconds(clip.HoldFrameAt!.Value)} for {FormatSeconds(clip.HoldDuration)}"));
-        return Section("Clip", info, expanded: true);
+            info.Children.Add(InfoRow("Fixação", $"{FormatSeconds(clip.HoldFrameAt!.Value)} durante {FormatSeconds(clip.HoldDuration)}"));
+        return Section("Clipe", info, expanded: true);
     }
 
     /// <summary>The Inspector's Speed parameter (retime, PLAN.md step 21): speed as a fraction of normal, shown as a
     /// percentage. Keyframing it authors a speed ramp (Premiere's Time Remapping / Resolve's retime curve).</summary>
     private static readonly EffectParameterDescriptor SpeedDescriptor = new(
-        "speed", "Speed", 1.0, SpeedRamp.MinSpeed, 10.0, 0.01, "%",
-        "Playback speed as a percentage of normal (100% = normal, 50% = half-speed slow motion). Keyframe it for a " +
-        "speed ramp — the clip's duration follows the curve. Reverse flips the direction at the same speed.")
+        "speed", "Velocidade", 1.0, SpeedRamp.MinSpeed, 10.0, 0.01, "%",
+        "Velocidade de reprodução em percentagem do normal (100% = normal, 50% = câmara lenta a meio da velocidade). " +
+        "Adicione fotogramas-chave para uma rampa de velocidade — a duração do clipe segue a curva. Inverter troca o " +
+        "sentido à mesma velocidade.")
     { DisplayScale = 100 };
 
     /// <summary>
@@ -385,7 +386,7 @@ public sealed class InspectorPanel : UserControl
 
         var reverse = new CheckBox
         {
-            Content = "Reverse",
+            Content = "Inverter",
             IsChecked = clip.Reverse,
             IsVisible = clip.SupportsReverse, // a nested sequence can't be reversed (its sub-mix plays forward)
             FontSize = Typography.Caption,
@@ -393,7 +394,7 @@ public sealed class InspectorPanel : UserControl
             MinHeight = 22,
             Padding = new Avalonia.Thickness(4, 0, 0, 0),
         };
-        ToolTip.SetTip(reverse, "Play the clip backwards at the same speed (Reverse Speed)");
+        ToolTip.SetTip(reverse, "Reproduzir o clipe ao contrário à mesma velocidade (velocidade invertida)");
         reverse.IsCheckedChanged += (_, _) =>
         {
             if (_suppress || _project is null)
@@ -405,7 +406,7 @@ public sealed class InspectorPanel : UserControl
             members.AddRange(_project.Timeline.ClipsLinkedTo(clip).Select(l => l.Clip));
             var commands = members.Where(c => c.SupportsReverse || !value)
                 .Select(c => (IEditCommand)new SetClipReverseCommand(c, value)).ToList();
-            ExecuteEdit(commands.Count == 1 ? commands[0] : new CompositeCommand(value ? "Reverse clip" : "Play clip forward", commands), false);
+            ExecuteEdit(commands.Count == 1 ? commands[0] : new CompositeCommand(value ? "Inverter clipe" : "Reproduzir clipe para a frente", commands), false);
         };
 
         var stack = new StackPanel { Spacing = 2 };
@@ -436,7 +437,7 @@ public sealed class InspectorPanel : UserControl
                 commands.Add(new SetClipSpeedCommand(c, SpeedFormat.FromFraction(next.Evaluate(Timecode.Zero))));
             }
         }
-        ExecuteEdit(commands.Count == 1 ? commands[0] : new CompositeCommand("Change speed", commands), coalescing);
+        ExecuteEdit(commands.Count == 1 ? commands[0] : new CompositeCommand("Alterar velocidade", commands), coalescing);
     }
 
     /// <summary>The Multicam section (PLAN.md step 24): the synced source plus one button per camera angle (the
@@ -448,12 +449,12 @@ public sealed class InspectorPanel : UserControl
         MulticamSource? source = clip.SourceMulticamId is { } id ? _project!.GetMulticam(id) : null;
         if (source is null)
         {
-            content.Children.Add(new TextBlock { Text = "Multicam source missing.", FontSize = Typography.Caption, Foreground = FaintText });
-            return Section("Multicam", content, expanded: true);
+            content.Children.Add(new TextBlock { Text = "Fonte multicâmara em falta.", FontSize = Typography.Caption, Foreground = FaintText });
+            return Section("Multicâmara", content, expanded: true);
         }
 
-        content.Children.Add(InfoRow("Source", source.Name));
-        content.Children.Add(new TextBlock { Text = "Active angle", FontSize = Typography.Caption, Foreground = FaintText });
+        content.Children.Add(InfoRow("Origem", source.Name));
+        content.Children.Add(new TextBlock { Text = "Ângulo ativo", FontSize = Typography.Caption, Foreground = FaintText });
 
         var angles = new StackPanel { Spacing = 3 };
         for (int i = 0; i < source.Angles.Count; i++)
@@ -482,7 +483,7 @@ public sealed class InspectorPanel : UserControl
             angles.Children.Add(button);
         }
         content.Children.Add(angles);
-        return Section("Multicam", content, expanded: true);
+        return Section("Multicâmara", content, expanded: true);
     }
 
     // ── Title sections (PLAN.md step 40) ──────────────────────────────────────────────────────────────
@@ -495,34 +496,34 @@ public sealed class InspectorPanel : UserControl
     {
         var rows = new StackPanel { Spacing = 4, Margin = new Avalonia.Thickness(4, 4, 4, 2) };
 
-        rows.Children.Add(BuildTextEntryRow(gen, "Text", GeneratorParamNames.Text, multiline: true));
-        rows.Children.Add(BuildTextEntryRow(gen, "Secondary", GeneratorParamNames.Text2, multiline: false));
+        rows.Children.Add(BuildTextEntryRow(gen, "Texto", GeneratorParamNames.Text, multiline: true));
+        rows.Children.Add(BuildTextEntryRow(gen, "Secundário", GeneratorParamNames.Text2, multiline: false));
         rows.Children.Add(BuildFontRow(gen));
         rows.Children.Add(BuildStyleTogglesRow(gen));
-        rows.Children.Add(BuildColorRow(gen, "Fill", GeneratorParamNames.Color, "#FFFFFFFF"));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.FontSize, "Size", 0.12, 0.02, 0.5, 0.005));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.FontSize2, "Size 2", 0.07, 0.02, 0.5, 0.005));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.Tracking, "Tracking", 0.0, -0.1, 0.5, 0.005));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.Leading, "Leading", 1.2, 0.8, 2.5, 0.05));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.PositionX, "Position X", 0.5, 0.0, 1.0, 0.005));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.PositionY, "Position Y", 0.5, 0.0, 1.0, 0.005));
+        rows.Children.Add(BuildColorRow(gen, "Preenchimento", GeneratorParamNames.Color, "#FFFFFFFF"));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.FontSize, "Tamanho", 0.12, 0.02, 0.5, 0.005));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.FontSize2, "Tamanho 2", 0.07, 0.02, 0.5, 0.005));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.Tracking, "Espaçamento", 0.0, -0.1, 0.5, 0.005));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.Leading, "Entrelinha", 1.2, 0.8, 2.5, 0.05));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.PositionX, "Posição X", 0.5, 0.0, 1.0, 0.005));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.PositionY, "Posição Y", 0.5, 0.0, 1.0, 0.005));
         rows.Children.Add(BuildPresetsRow(clip, gen));
 
-        return Section("Text", rows, expanded: true);
+        return Section("Texto", rows, expanded: true);
     }
 
     private Control BuildTextStyleSection(GeneratorSpec gen)
     {
         var rows = new StackPanel { Spacing = 4, Margin = new Avalonia.Thickness(4, 4, 4, 2) };
-        rows.Children.Add(BuildColorRow(gen, "Stroke", GeneratorParamNames.StrokeColor, "#FF000000"));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.StrokeWidth, "Stroke width", 0.0, 0.0, 0.02, 0.0005));
-        rows.Children.Add(BuildColorRow(gen, "Shadow", GeneratorParamNames.ShadowColor, "#00000000"));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.ShadowOffsetX, "Shadow X", 0.004, -0.05, 0.05, 0.001));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.ShadowOffsetY, "Shadow Y", 0.004, -0.05, 0.05, 0.001));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.ShadowBlur, "Shadow blur", 0.004, 0.0, 0.05, 0.001));
-        rows.Children.Add(BuildColorRow(gen, "Box", GeneratorParamNames.BoxColor, "#00000000"));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.BoxPadding, "Box padding", 0.02, 0.0, 0.1, 0.002));
-        return Section("Text Style", rows, expanded: false);
+        rows.Children.Add(BuildColorRow(gen, "Contorno", GeneratorParamNames.StrokeColor, "#FF000000"));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.StrokeWidth, "Espessura do contorno", 0.0, 0.0, 0.02, 0.0005));
+        rows.Children.Add(BuildColorRow(gen, "Sombra", GeneratorParamNames.ShadowColor, "#00000000"));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.ShadowOffsetX, "Sombra X", 0.004, -0.05, 0.05, 0.001));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.ShadowOffsetY, "Sombra Y", 0.004, -0.05, 0.05, 0.001));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.ShadowBlur, "Desfocagem da sombra", 0.004, 0.0, 0.05, 0.001));
+        rows.Children.Add(BuildColorRow(gen, "Caixa", GeneratorParamNames.BoxColor, "#00000000"));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.BoxPadding, "Espaçamento da caixa", 0.02, 0.0, 0.1, 0.002));
+        return Section("Estilo do texto", rows, expanded: false);
     }
 
     private Control BuildScrollSection(GeneratorSpec gen)
@@ -533,7 +534,7 @@ public sealed class InspectorPanel : UserControl
         // the speed, so there is no speed slider — trim the clip to retime the roll.
         var mode = new ComboBox
         {
-            ItemsSource = new[] { "None", "Roll", "Crawl" },
+            ItemsSource = new[] { "Nenhum", "Rolagem", "Passe" },
             FontSize = Typography.Caption,
             MinHeight = 24,
             Width = 100,
@@ -546,12 +547,12 @@ public sealed class InspectorPanel : UserControl
             string value = mode.SelectedIndex switch { 1 => TitleScrollModes.Roll, 2 => TitleScrollModes.Crawl, _ => "" };
             ExecuteGeneratorString(gen, GeneratorParamNames.ScrollMode, value, coalescing: false);
         };
-        rows.Children.Add(LabeledRow("Mode", mode));
+        rows.Children.Add(LabeledRow("Modo", mode));
 
-        rows.Children.Add(BuildFlagRow(gen, "Ease in", GeneratorParamNames.ScrollEaseIn, defaultOn: false));
-        rows.Children.Add(BuildFlagRow(gen, "Ease out", GeneratorParamNames.ScrollEaseOut, defaultOn: false));
-        rows.Children.Add(BuildFlagRow(gen, "Start / end off-screen", GeneratorParamNames.ScrollOffscreen, defaultOn: true));
-        rows.Children.Add(GenRow(gen, GeneratorParamNames.RevealFraction, "Reveal", 1.0, 0.0, 1.0, 0.01));
+        rows.Children.Add(BuildFlagRow(gen, "Suavizar entrada", GeneratorParamNames.ScrollEaseIn, defaultOn: false));
+        rows.Children.Add(BuildFlagRow(gen, "Suavizar saída", GeneratorParamNames.ScrollEaseOut, defaultOn: false));
+        rows.Children.Add(BuildFlagRow(gen, "Início/fim fora do ecrã", GeneratorParamNames.ScrollOffscreen, defaultOn: true));
+        rows.Children.Add(GenRow(gen, GeneratorParamNames.RevealFraction, "Revelação", 1.0, 0.0, 1.0, 0.01));
 
         _valueRefreshers.Add(() =>
         {
@@ -565,7 +566,7 @@ public sealed class InspectorPanel : UserControl
             _suppress = false;
         });
 
-        return Section("Scroll & Animate", rows, expanded: false);
+        return Section("Deslocar e animar", rows, expanded: false);
     }
 
     /// <summary>A string attribute editor: live preview while typing, one undo entry per focus (the focus
@@ -632,7 +633,7 @@ public sealed class InspectorPanel : UserControl
             combo.SelectedIndex = Math.Max(0, Sprocket.Render.TitleFonts.Families.ToList().IndexOf(current));
             _suppress = false;
         });
-        return LabeledRow("Font", combo);
+        return LabeledRow("Tipo de letra", combo);
     }
 
     /// <summary>Bold / Italic toggles and the left/centre/right alignment radio group on one row.</summary>
@@ -655,13 +656,13 @@ public sealed class InspectorPanel : UserControl
             return b;
         }
 
-        ToggleButton bold = Make("B", "Bold");
+        ToggleButton bold = Make("B", "Negrito");
         bold.FontWeight = FontWeight.Bold;
-        ToggleButton italic = Make("I", "Italic");
+        ToggleButton italic = Make("I", "Itálico");
         italic.FontStyle = FontStyle.Italic;
-        ToggleButton left = Make("⟸", "Align left");
-        ToggleButton centre = Make("≡", "Align centre");
-        ToggleButton right = Make("⟹", "Align right");
+        ToggleButton left = Make("⟸", "Alinhar à esquerda");
+        ToggleButton centre = Make("≡", "Alinhar ao centro");
+        ToggleButton right = Make("⟹", "Alinhar à direita");
 
         bold.Click += (_, _) => ExecuteGeneratorString(
             gen, GeneratorParamNames.Bold, bold.IsChecked == true ? "true" : "", coalescing: false);
@@ -696,7 +697,7 @@ public sealed class InspectorPanel : UserControl
             _suppress = false;
         });
 
-        return LabeledRow("Style", group);
+        return LabeledRow("Estilo", group);
     }
 
     /// <summary>A colour attribute as a swatch + <c>#AARRGGBB</c> hex box (Enter/blur commits; invalid input reverts).</summary>
@@ -831,7 +832,7 @@ public sealed class InspectorPanel : UserControl
     {
         var button = new Button
         {
-            Content = "Animate ▾",
+            Content = "Animar ▾",
             FontSize = Typography.Caption,
             Padding = new Avalonia.Thickness(10, 3),
             Background = RaisedBg,
@@ -853,26 +854,26 @@ public sealed class InspectorPanel : UserControl
         long pop = Math.Min(Timecode.FromSeconds(0.5).Ticks, clip.Duration.Ticks);
         long type = Math.Min(Timecode.FromSeconds(2).Ticks, clip.Duration.Ticks);
 
-        Add("Fade In", () =>
+        Add("Aparecer", () =>
         {
             (long _, long fadeOut) = FadeOps.ReadFades(clip);
             ExecuteEdit(new SetClipFadeCommand(
                 clip,
                 FadeOps.BuildOpacity(FadeOps.FadeOpacity(clip), start, end, fade, fadeOut),
-                "Fade in"), coalescing: false);
+                "Aparecer"), coalescing: false);
         });
-        Add("Fade Out", () =>
+        Add("Desaparecer", () =>
         {
             (long fadeIn, long _) = FadeOps.ReadFades(clip);
             ExecuteEdit(new SetClipFadeCommand(
                 clip,
                 FadeOps.BuildOpacity(FadeOps.FadeOpacity(clip), start, end, fadeIn, fade),
-                "Fade out"), coalescing: false);
+                "Desaparecer"), coalescing: false);
         });
-        Add("Pop In", () => ApplyTransformPreset(clip, "Pop in", EffectParamNames.Scale, 0.2, 1.0, pop));
-        Add("Slide In From Left", () => ApplyTransformPreset(clip, "Slide in", EffectParamNames.PositionX, -1.0, 0.0, pop));
-        Add("Slide In From Right", () => ApplyTransformPreset(clip, "Slide in", EffectParamNames.PositionX, 1.0, 0.0, pop));
-        Add("Typewriter", () => ExecuteGeneratorParam(
+        Add("Entrada com pop", () => ApplyTransformPreset(clip, "Entrada com pop", EffectParamNames.Scale, 0.2, 1.0, pop));
+        Add("Entrada a partir da esquerda", () => ApplyTransformPreset(clip, "Entrada a deslizar", EffectParamNames.PositionX, -1.0, 0.0, pop));
+        Add("Entrada a partir da direita", () => ApplyTransformPreset(clip, "Entrada a deslizar", EffectParamNames.PositionX, 1.0, 0.0, pop));
+        Add("Máquina de escrever", () => ExecuteGeneratorParam(
             gen,
             GeneratorParamNames.RevealFraction,
             AnimatableValue.Animated(
@@ -907,7 +908,7 @@ public sealed class InspectorPanel : UserControl
 
         var conformBox = new ComboBox
         {
-            ItemsSource = new List<string> { "Fit", "Fill" },
+            ItemsSource = new List<string> { "Ajustar", "Preencher" },
             SelectedIndex = clip.ConformMode == ClipConformMode.Fill ? 1 : 0,
             FontSize = Typography.Caption,
             MinHeight = 24,
@@ -922,7 +923,7 @@ public sealed class InspectorPanel : UserControl
             if (mode == clip.ConformMode)
                 return;
             ExecuteEdit(SetPropertyCommand<ClipConformMode>.Create(
-                "Set conform mode", () => clip.ConformMode, v => clip.ConformMode = v, mode), coalescing: false);
+                "Definir modo de conformação", () => clip.ConformMode, v => clip.ConformMode = v, mode), coalescing: false);
         };
         _valueRefreshers.Add(() =>
         {
@@ -930,8 +931,8 @@ public sealed class InspectorPanel : UserControl
             conformBox.SelectedIndex = clip.ConformMode == ClipConformMode.Fill ? 1 : 0;
             _suppress = false;
         });
-        rows.Children.Add(LabeledRow("Conform", conformBox,
-            "How mismatched-resolution media fills the frame — Fit letterboxes, Fill crops."));
+        rows.Children.Add(LabeledRow("Conformação", conformBox,
+            "Como a multimédia de resolução divergente preenche o fotograma — Ajustar adiciona barras, Preencher recorta."));
 
         Button MakeButton(string label, string? tip = null)
         {
@@ -950,19 +951,19 @@ public sealed class InspectorPanel : UserControl
 
         EffectInstance? Transform() => clip.Effects.FirstOrDefault(e => e.EffectTypeId == EffectTypeIds.Transform);
 
-        Button center = MakeButton("Center", "Reset the Transform position to the frame centre.");
+        Button center = MakeButton("Centrar", "Repor a posição da transformação no centro do fotograma.");
         center.Click += (_, _) =>
         {
             if (Transform() is not { } transform)
                 return; // no Transform → already centred
-            ExecuteEdit(new CompositeCommand("Center clip",
+            ExecuteEdit(new CompositeCommand("Centrar clipe",
             [
                 new SetEffectParameterCommand(transform, EffectParamNames.PositionX, AnimatableValue.Constant(0)),
                 new SetEffectParameterCommand(transform, EffectParamNames.PositionY, AnimatableValue.Constant(0)),
             ]), coalescing: false);
         };
 
-        Button fillHeight = MakeButton("Fill Height", "Scale so the picture spans the full frame height.");
+        Button fillHeight = MakeButton("Preencher altura", "Escalar para a imagem ocupar toda a altura do fotograma.");
         fillHeight.Click += (_, _) =>
         {
             if (_project is null
@@ -976,14 +977,14 @@ public sealed class InspectorPanel : UserControl
                 return;
             }
             var created = new EffectInstance(EffectTypeIds.Transform);
-            ExecuteEdit(new CompositeCommand("Fill height",
+            ExecuteEdit(new CompositeCommand("Preencher altura",
             [
                 new AddEffectCommand(clip, created),
                 new SetEffectParameterCommand(created, EffectParamNames.Scale, value),
             ]), coalescing: false);
         };
 
-        Button reset = MakeButton("Reset Framing", "Remove the Transform effect (conform mode is kept).");
+        Button reset = MakeButton("Repor enquadramento", "Remover o efeito de transformação (o modo de conformação é mantido).");
         reset.Click += (_, _) =>
         {
             if (Transform() is { } transform)
@@ -997,7 +998,7 @@ public sealed class InspectorPanel : UserControl
             Children = { center, fillHeight, reset },
         });
 
-        return Section("Framing", rows, expanded: true);
+        return Section("Enquadramento", rows, expanded: true);
     }
 
     /// <summary>The pixel dimensions of the clip's presented content, or <see langword="null"/> when unknown
@@ -1103,8 +1104,8 @@ public sealed class InspectorPanel : UserControl
             Margin = new Avalonia.Thickness(0, 2, 0, 0),
             IsVisible = false,
         };
-        var analyzeButton = new Button { Content = "Analyze", FontSize = Typography.Caption, Padding = new Avalonia.Thickness(10, 3) };
-        var cancelButton = new Button { Content = "Cancel", FontSize = Typography.Caption, Padding = new Avalonia.Thickness(10, 3), IsVisible = false };
+        var analyzeButton = new Button { Content = "Analisar", FontSize = Typography.Caption, Padding = new Avalonia.Thickness(10, 3) };
+        var cancelButton = new Button { Content = "Cancelar", FontSize = Typography.Caption, Padding = new Avalonia.Thickness(10, 3), IsVisible = false };
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Margin = new Avalonia.Thickness(0, 2, 0, 0) };
         buttons.Children.Add(analyzeButton);
         buttons.Children.Add(cancelButton);
@@ -1118,7 +1119,7 @@ public sealed class InspectorPanel : UserControl
         if (PrecededByTransform(clip, effect))
             panel.Children.Add(new TextBlock
             {
-                Text = "A Transform runs before this — stabilization reads the reframed image. Move it below Transform for best results.",
+                Text = "Existe uma transformação antes desta — a estabilização lê a imagem reenquadrada. Mova-a para baixo da transformação para melhores resultados.",
                 FontSize = Typography.Caption,
                 Foreground = Palette.WarnBrush,
                 TextWrapping = TextWrapping.Wrap,
@@ -1127,8 +1128,8 @@ public sealed class InspectorPanel : UserControl
         if (_stab is null || media is null)
         {
             statusText.Text = media is null
-                ? "Stabilization applies to clips backed by source media."
-                : "Analysis is unavailable in this session.";
+                ? "A estabilização aplica-se a clips suportados por multimédia de origem."
+                : "A análise não está disponível nesta sessão.";
             analyzeButton.IsVisible = false;
             return panel;
         }
@@ -1168,12 +1169,12 @@ public sealed class InspectorPanel : UserControl
             lastTrack = track;
             zoomReadout.IsVisible = true;
             zoomReadout.Text = sol.AppliedZoom > 1.0005
-                ? string.Create(CultureInfo.InvariantCulture, $"Applied zoom: {sol.AppliedZoom * 100:0.#}% (crop to hide borders)")
-                : "Applied zoom: none — borders shown where the frame moves off-source.";
+                ? string.Create(CultureInfo.InvariantCulture, $"Zoom aplicado: {sol.AppliedZoom * 100:0.#}% (recorte para ocultar margens)")
+                : "Zoom aplicado: nenhum — margens visíveis onde o fotograma sai da origem.";
 
             int lowConf = _stab.LowConfidenceFrames(clip.MediaRefId, detailed);
             if (lowConf > 0)
-                zoomReadout.Text += string.Create(CultureInfo.InvariantCulture, $"  ·  low confidence on {lowConf} frame(s)");
+                zoomReadout.Text += string.Create(CultureInfo.InvariantCulture, $"  ·  baixa confiança em {lowConf} fotograma(s)");
 
             graph.IsVisible = true;
             graph.Update(sol, PlayheadFraction(clip, track));
@@ -1185,21 +1186,21 @@ public sealed class InspectorPanel : UserControl
             switch (s.State)
             {
                 case AnalysisState.Ready:
-                    statusText.Text = "Analyzed — stabilizing this clip.";
+                    statusText.Text = "Analisado — a estabilizar este clipe.";
                     progress.IsVisible = false;
-                    analyzeButton.Content = "Re-analyze";
+                    analyzeButton.Content = "Analisar novamente";
                     analyzeButton.IsVisible = true;
                     cancelButton.IsVisible = false;
                     break;
                 case AnalysisState.Queued:
-                    statusText.Text = "Queued for analysis…";
+                    statusText.Text = "Em fila para análise…";
                     progress.IsVisible = true;
                     progress.IsIndeterminate = true;
                     analyzeButton.IsVisible = false;
                     cancelButton.IsVisible = true;
                     break;
                 case AnalysisState.Analyzing:
-                    statusText.Text = string.Create(CultureInfo.InvariantCulture, $"Analyzing… {s.Progress * 100:0}%");
+                    statusText.Text = string.Create(CultureInfo.InvariantCulture, $"A analisar… {s.Progress * 100:0}%");
                     progress.IsVisible = true;
                     progress.IsIndeterminate = false;
                     progress.Value = s.Progress;
@@ -1207,16 +1208,16 @@ public sealed class InspectorPanel : UserControl
                     cancelButton.IsVisible = true;
                     break;
                 case AnalysisState.Failed:
-                    statusText.Text = "Analysis failed — the clip renders unstabilized.";
+                    statusText.Text = "A análise falhou — o clipe é processado sem estabilização.";
                     progress.IsVisible = false;
-                    analyzeButton.Content = "Retry";
+                    analyzeButton.Content = "Repetir";
                     analyzeButton.IsVisible = true;
                     cancelButton.IsVisible = false;
                     break;
                 default:
-                    statusText.Text = "Not analyzed — renders unstabilized until analysis completes.";
+                    statusText.Text = "Não analisado — é processado sem estabilização até a análise terminar.";
                     progress.IsVisible = false;
-                    analyzeButton.Content = "Analyze";
+                    analyzeButton.Content = "Analisar";
                     analyzeButton.IsVisible = true;
                     cancelButton.IsVisible = false;
                     break;
@@ -1300,8 +1301,8 @@ public sealed class InspectorPanel : UserControl
             rows.Children.Add(new TextBlock
             {
                 Text = context.ClipScope
-                    ? "CPU-heavy tail — Sequence ▸ Freeze Clip Audio pre-renders it."
-                    : "CPU-heavy tail — recomputed on every playback pass.",
+                    ? "Cauda pesada para o CPU — Sequência ▸ Congelar áudio do clipe processa-a previamente."
+                    : "Cauda pesada para o CPU — recalculada em cada passagem de reprodução.",
                 FontSize = Typography.Caption,
                 Foreground = FaintText,
                 TextWrapping = TextWrapping.Wrap,
@@ -1319,7 +1320,7 @@ public sealed class InspectorPanel : UserControl
         if (Sprocket.Render.SkiaEffectPipeline.IsCpuEffect(effect.EffectTypeId))
             rows.Children.Add(new TextBlock
             {
-                Text = "CPU plugin effect — heavy in playback; Sequence ▸ Render In to Out pre-renders it.",
+                Text = "Efeito de extensão com uso intensivo de CPU — pesado na reprodução; Sequência ▸ Processar de entrada a saída processa-o previamente.",
                 FontSize = Typography.Caption,
                 Foreground = FaintText,
                 TextWrapping = TextWrapping.Wrap,
@@ -1328,7 +1329,7 @@ public sealed class InspectorPanel : UserControl
         IReadOnlyList<EffectParameterDescriptor> parameters =
             descriptor?.Parameters ?? FallbackDescriptors(effect);
         if (parameters.Count == 0)
-            rows.Children.Add(new TextBlock { Text = "No editable parameters.", FontSize = Typography.Caption, Foreground = FaintText });
+            rows.Children.Add(new TextBlock { Text = "Sem parâmetros editáveis.", FontSize = Typography.Caption, Foreground = FaintText });
 
         // The three-way grade is a composite control over four parameters per wheel, which the per-param
         // descriptor model can't express — so Color Wheels gets Resolve-style trackballs instead of twelve
@@ -1372,7 +1373,7 @@ public sealed class InspectorPanel : UserControl
             HorizontalContentAlignment = HorizontalAlignment.Center,
             VerticalContentAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(toggle, effect.Enabled ? "Disable effect" : "Enable effect");
+        ToolTip.SetTip(toggle, effect.Enabled ? "Desativar efeito" : "Ativar efeito");
         toggle.Click += (_, e) =>
         {
             e.Handled = true;
@@ -1395,7 +1396,7 @@ public sealed class InspectorPanel : UserControl
             HorizontalContentAlignment = HorizontalAlignment.Center,
             VerticalContentAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(remove, "Remove effect");
+        ToolTip.SetTip(remove, "Remover efeito");
         remove.Click += (_, e) =>
         {
             e.Handled = true;
@@ -1440,7 +1441,7 @@ public sealed class InspectorPanel : UserControl
                     VerticalAlignment = VerticalAlignment.Center,
                 },
             };
-            ToolTip.SetTip(chip, "Reference tag — how AI assistants (MCP) identify this effect instance.");
+            ToolTip.SetTip(chip, "Etiqueta de referência — como os assistentes de IA (MCP) identificam esta instância do efeito.");
             titleGroup.Children.Add(chip);
         }
         header.Children.Add(titleGroup);
@@ -1492,9 +1493,9 @@ public sealed class InspectorPanel : UserControl
     /// affordance (PLAN.md step 51). Boundary items are disabled rather than wrapping.</summary>
     private ContextMenu BuildMoveMenu(ChainContext context, int index, int count)
     {
-        var up = new MenuItem { Header = "Move Up", IsEnabled = index > 0 };
+        var up = new MenuItem { Header = "Mover para cima", IsEnabled = index > 0 };
         up.Click += (_, _) => MoveEffect(context.Effects, index, EffectReorder.StepIndex(index, count, -1));
-        var down = new MenuItem { Header = "Move Down", IsEnabled = index < count - 1 };
+        var down = new MenuItem { Header = "Mover para baixo", IsEnabled = index < count - 1 };
         down.Click += (_, _) => MoveEffect(context.Effects, index, EffectReorder.StepIndex(index, count, +1));
         return new ContextMenu { ItemsSource = new[] { up, down } };
     }
@@ -1541,8 +1542,8 @@ public sealed class InspectorPanel : UserControl
 
         var panel = new StackPanel { Spacing = 3, Margin = new Avalonia.Thickness(0, 0, 0, 2) };
         panel.Children.Add(LabeledRow("GR", grRow));
-        panel.Children.Add(LabeledRow("In", inRow));
-        panel.Children.Add(LabeledRow("Out", outRow));
+        panel.Children.Add(LabeledRow("Entrada", inRow));
+        panel.Children.Add(LabeledRow("Saída", outRow));
 
         _valueRefreshers.Add(() =>
         {
@@ -1604,7 +1605,7 @@ public sealed class InspectorPanel : UserControl
                     ToolTip.SetTip(text, preset.Description);
                 return text;
             }),
-            PlaceholderText = "Choose…",
+            PlaceholderText = "Escolher…",
             FontSize = Typography.Caption,
             MinHeight = 24,
             Width = 170,
@@ -1617,9 +1618,9 @@ public sealed class InspectorPanel : UserControl
             EffectPreset preset = descriptor.Presets[combo.SelectedIndex];
             List<IEditCommand> commands = [.. preset.Values.Select(kv =>
                 (IEditCommand)new SetEffectParameterCommand(effect, kv.Key, AnimatableValue.Constant(kv.Value)))];
-            ExecuteEdit(new CompositeCommand($"Apply preset {preset.Name}", commands), coalescing: false);
+            ExecuteEdit(new CompositeCommand($"Aplicar predefinição {preset.Name}", commands), coalescing: false);
         };
-        return LabeledRow("Preset", combo);
+        return LabeledRow("Predefinição", combo);
     }
 
     private Control BuildParamRow(EffectInstance effect, EffectParameterDescriptor p, bool compact = false) =>
@@ -1653,13 +1654,13 @@ public sealed class InspectorPanel : UserControl
         };
         var browse = new Button
         {
-            Content = "Browse…",
+            Content = "Procurar…",
             FontSize = Typography.Caption,
             Padding = new Avalonia.Thickness(6, 2),
             MinHeight = 22,
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(browse, $"Choose a {p.DisplayName} file");
+        ToolTip.SetTip(browse, $"Escolher um ficheiro de {p.DisplayName}");
         var clear = new Button
         {
             Content = new ShapesPath
@@ -1674,7 +1675,7 @@ public sealed class InspectorPanel : UserControl
             HorizontalContentAlignment = HorizontalAlignment.Center,
             VerticalContentAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(clear, $"Clear {p.DisplayName}");
+        ToolTip.SetTip(clear, $"Limpar {p.DisplayName}");
 
         int SampleRate() => _project?.Timeline.SampleRate ?? 48000;
         browse.Click += async (_, _) =>
@@ -1685,12 +1686,12 @@ public sealed class InspectorPanel : UserControl
                     return;
                 IReadOnlyList<IStorageFile> files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
                 {
-                    Title = $"Choose {p.DisplayName}",
+                    Title = $"Escolher {p.DisplayName}",
                     AllowMultiple = false,
                     FileTypeFilter =
                     [
                         // WAV is the only asset kind today (impulse responses); widen per descriptor if more arrive.
-                        new FilePickerFileType("WAV audio") { Patterns = ["*.wav"] },
+                        new FilePickerFileType("Áudio WAV") { Patterns = ["*.wav"] },
                         FilePickerFileTypes.All,
                     ],
                 });
@@ -1724,12 +1725,12 @@ public sealed class InspectorPanel : UserControl
             // A present-but-unreadable file (not a WAV, corrupt) is flagged too, from the loader's own verdict.
             bool failed = exists && Sprocket.Audio.Effects.ImpulseResponseCache.HasFailed(path, SampleRate());
             string name = Path.GetFileName(path);
-            fileName.Text = !exists ? $"{name} (missing)" : failed ? $"{name} (unreadable)" : name;
+            fileName.Text = !exists ? $"{name} (em falta)" : failed ? $"{name} (ilegível)" : name;
             fileName.Foreground = exists && !failed ? TextBrush : Palette.WarnBrush;
             ToolTip.SetTip(fileName, !exists
-                ? $"{path}\nFile not found — the effect passes audio through until it is relinked."
+                ? $"{path}\nFicheiro não encontrado — o efeito passa o áudio direto até ser religado."
                 : failed
-                    ? $"{path}\nNot a readable WAV impulse response — the effect passes audio through."
+                    ? $"{path}\nNão é uma resposta a impulso WAV legível — o efeito passa o áudio direto."
                     : path);
             clear.IsVisible = true;
         }
@@ -1739,7 +1740,7 @@ public sealed class InspectorPanel : UserControl
             effect.Assets.TryGetValue(p.Name, out string? path);
             if (string.IsNullOrEmpty(path))
             {
-                fileName.Text = "None";
+                fileName.Text = "Nenhum";
                 fileName.Foreground = FaintText;
                 ToolTip.SetTip(fileName, null);
                 clear.IsVisible = false;
@@ -1863,7 +1864,7 @@ public sealed class InspectorPanel : UserControl
             VerticalAlignment = VerticalAlignment.Center,
             VerticalContentAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(box, "Drag to scrub (Shift = coarse, Ctrl = fine) · click to type");
+        ToolTip.SetTip(box, "Arraste para percorrer (Shift = grosseiro, Ctrl = fino) · clique para escrever");
         var keyButton = new Button
         {
             Content = keyGlyph,
@@ -1876,7 +1877,7 @@ public sealed class InspectorPanel : UserControl
             VerticalAlignment = VerticalAlignment.Center,
             IsVisible = keyframeable,
         };
-        ToolTip.SetTip(keyButton, "Toggle keyframing at the playhead");
+        ToolTip.SetTip(keyButton, "Alternar fotogramas-chave no indicador de reprodução");
 
         // Velocity-graph toggle (PLAN.md step 16d): expands the keyframe strip into the editable value graph.
         var graphButton = new Button
@@ -1891,7 +1892,7 @@ public sealed class InspectorPanel : UserControl
             VerticalAlignment = VerticalAlignment.Center,
             IsVisible = false,
         };
-        ToolTip.SetTip(graphButton, "Show / hide the velocity graph");
+        ToolTip.SetTip(graphButton, "Mostrar/ocultar o gráfico de velocidade");
 
         var label = new TextBlock
         {
@@ -2073,7 +2074,7 @@ public sealed class InspectorPanel : UserControl
             VerticalAlignment = VerticalAlignment.Center,
             IsVisible = keyframeable,
         };
-        ToolTip.SetTip(keyButton, "Toggle keyframing at the playhead");
+        ToolTip.SetTip(keyButton, "Alternar fotogramas-chave no indicador de reprodução");
 
         var check = new CheckBox
         {
@@ -2281,7 +2282,7 @@ public sealed class InspectorPanel : UserControl
         channels.Children.Add(BuildParamRow(effect, bDesc, compact: true));
         var channelsExpander = new Expander
         {
-            Header = new TextBlock { Text = "Channels", FontSize = Typography.Caption, Foreground = FaintText },
+            Header = new TextBlock { Text = "Canais", FontSize = Typography.Caption, Foreground = FaintText },
             Content = channels,
             IsExpanded = false,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -2314,7 +2315,7 @@ public sealed class InspectorPanel : UserControl
     {
         var add = new Button
         {
-            Content = "+ Effect",
+            Content = "+ Efeito",
             FontSize = Typography.Body,
             Padding = new Avalonia.Thickness(10, 4),
             Margin = new Avalonia.Thickness(8, 6, 8, 0),
@@ -2374,7 +2375,7 @@ public sealed class InspectorPanel : UserControl
     {
         var add = new Button
         {
-            Content = "+ Effect",
+            Content = "+ Efeito",
             FontSize = Typography.Body,
             Padding = new Avalonia.Thickness(10, 4),
             Margin = new Avalonia.Thickness(8, 6, 8, 0),

@@ -43,7 +43,7 @@ internal sealed class ExportQueueWindow : Window
         _addJob = addJob;
         _startQueue = startQueue;
 
-        Title = "Export Queue";
+        Title = "Fila de Exportação";
         Icon = AppIcon.Window;
         Width = 560;
         Height = 420;
@@ -52,10 +52,10 @@ internal sealed class ExportQueueWindow : Window
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Background = Palette.WindowBgBrush;
 
-        _addButton = ToolButton("Add…", accent: false);
-        _startButton = ToolButton("Start", accent: true);
-        _stopButton = ToolButton("Stop", accent: false);
-        _clearButton = ToolButton("Clear Finished", accent: false);
+        _addButton = ToolButton("Adicionar…", accent: false);
+        _startButton = ToolButton("Iniciar", accent: true);
+        _stopButton = ToolButton("Parar", accent: false);
+        _clearButton = ToolButton("Limpar Terminados", accent: false);
         _addButton.Click += (_, _) => _ = SafeInvoke(_addJob);
         _startButton.Click += (_, _) => _ = SafeInvoke(_startQueue);
         _stopButton.Click += (_, _) => _queue.CancelAll();
@@ -72,7 +72,7 @@ internal sealed class ExportQueueWindow : Window
         _list = new StackPanel { Spacing = 8, Margin = new Thickness(16, 0, 16, 12) };
         _emptyHint = new TextBlock
         {
-            Text = "No export jobs yet. Click Add… to queue the current sequence.",
+            Text = "Ainda não há tarefas de exportação. Clique em Adicionar… para pôr a sequência atual na fila.",
             Foreground = Palette.MutedTextBrush,
             FontSize = Typography.Emphasis,
             Margin = new Thickness(16, 8, 16, 0),
@@ -198,7 +198,7 @@ internal sealed class ExportQueueWindow : Window
             var subtitle = new TextBlock
             {
                 // A Fast Export job says so while still queued (export-speed phase 3), not only once its summary lands.
-                Text = FormatLabel(job.Options.Format) + (job.Options.Mode == ExportMode.Fast ? " · Fast Export" : ""),
+                Text = FormatLabel(job.Options.Format) + (job.Options.Mode == ExportMode.Fast ? " · Exportação Rápida" : ""),
                 Foreground = Palette.FaintTextBrush,
                 FontSize = Typography.Caption,
             };
@@ -207,7 +207,7 @@ internal sealed class ExportQueueWindow : Window
 
             _cancel = new Button
             {
-                Content = "Cancel",
+                Content = "Cancelar",
                 Padding = new Thickness(10, 4),
                 FontSize = Typography.Body,
                 Foreground = Palette.TextBrush,
@@ -216,7 +216,7 @@ internal sealed class ExportQueueWindow : Window
             };
             _remove = new Button
             {
-                Content = "Remove",
+                Content = "Remover",
                 Padding = new Thickness(10, 4),
                 FontSize = Typography.Body,
                 Foreground = Palette.MutedTextBrush,
@@ -268,11 +268,11 @@ internal sealed class ExportQueueWindow : Window
 
             (_status.Text, _status.Foreground) = job.Status switch
             {
-                ExportJobStatus.Queued => ("Queued", Palette.MutedTextBrush),
-                ExportJobStatus.Running => ($"Exporting… {job.Progress * 100:0}%", Palette.AccentBrush),
-                ExportJobStatus.Succeeded => (job.Summary is { } summary ? ExportSummaryText.Compact(summary) : "Done", Palette.GoodBrush),
-                ExportJobStatus.Cancelled => ("Cancelled", Palette.MutedTextBrush),
-                ExportJobStatus.Failed => ($"Failed — {job.Error}", Palette.BadBrush),
+                ExportJobStatus.Queued => ("Na fila", Palette.MutedTextBrush),
+                ExportJobStatus.Running => ($"A exportar… {job.Progress * 100:0}%", Palette.AccentBrush),
+                ExportJobStatus.Succeeded => (job.Summary is { } summary ? ExportSummaryText.Compact(summary) : "Concluído", Palette.GoodBrush),
+                ExportJobStatus.Cancelled => ("Cancelado", Palette.MutedTextBrush),
+                ExportJobStatus.Failed => ($"Falhou — {job.Error}", Palette.BadBrush),
                 _ => (job.Status.ToString(), Palette.MutedTextBrush),
             };
 

@@ -52,26 +52,26 @@ public static class TransitionCatalog
     [
         new TransitionDescriptor(
             TransitionTypeIds.CrossDissolve,
-            "Cross Dissolve",
-            "Fades the outgoing clip directly into the incoming one — the standard transition.",
+            "Dissolução cruzada",
+            "Desvanece o clipe de saída diretamente para o de entrada — a transição padrão.",
             []),
 
         new TransitionDescriptor(
             TransitionTypeIds.DipToBlack,
-            "Dip to Black",
-            "Fades the outgoing clip to black, then black up to the incoming clip.",
+            "Passagem a preto",
+            "Desvanece o clipe de saída para preto e depois do preto para o clipe de entrada.",
             []),
 
         new TransitionDescriptor(
             TransitionTypeIds.DipToWhite,
-            "Dip to White",
-            "Fades the outgoing clip to white, then white down to the incoming clip.",
+            "Passagem a branco",
+            "Desvanece o clipe de saída para branco e depois do branco para o clipe de entrada.",
             []),
 
         new TransitionDescriptor(
             TransitionTypeIds.Wipe,
-            "Wipe",
-            "Wipes the incoming clip over the outgoing one, left to right.",
+            "Varrimento",
+            "Varre o clipe de entrada sobre o de saída, da esquerda para a direita.",
             []),
     ];
 

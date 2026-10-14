@@ -10,9 +10,9 @@ namespace Sprocket.App.Tests;
 public class StatusBarFormatTests
 {
     [Theory]
-    [InlineData(PlaybackState.Stopped, "Ready")]
-    [InlineData(PlaybackState.Paused, "Paused")]
-    [InlineData(PlaybackState.Playing, "Playing")]
+    [InlineData(PlaybackState.Stopped, "Pronto")]
+    [InlineData(PlaybackState.Paused, "Em pausa")]
+    [InlineData(PlaybackState.Playing, "Em reprodução")]
     public void EngineLabel_no_decode_is_just_the_state_word(PlaybackState state, string expected) =>
         Assert.Equal(expected, StatusBarFormat.EngineLabel(state, decode: null));
 
@@ -20,14 +20,14 @@ public class StatusBarFormatTests
     public void EngineLabel_hardware_decode_shows_GPU_and_uppercased_device()
     {
         var decode = new VideoDecodeInfo("hevc", "d3d11va");
-        Assert.Equal("Playing · GPU · D3D11VA", StatusBarFormat.EngineLabel(PlaybackState.Playing, decode));
+        Assert.Equal("Em reprodução · GPU · D3D11VA", StatusBarFormat.EngineLabel(PlaybackState.Playing, decode));
     }
 
     [Fact]
     public void EngineLabel_software_decode_shows_CPU_path()
     {
         var decode = new VideoDecodeInfo("h264", HardwareDeviceName: null);
-        Assert.Equal("Ready · CPU · software", StatusBarFormat.EngineLabel(PlaybackState.Stopped, decode));
+        Assert.Equal("Pronto · CPU · software", StatusBarFormat.EngineLabel(PlaybackState.Stopped, decode));
     }
 
     [Fact]

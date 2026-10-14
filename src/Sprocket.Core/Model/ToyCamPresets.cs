@@ -20,7 +20,7 @@ public static class ToyCamPresets
         [SmearLength] = 0.25, [SmearThreshold] = 0.82,
         [NoiseLines] = 0.05, [Dropouts] = 0.0, [GrainAmount] = 0.2,
         [BorderSize] = 0.25, [BorderSoftness] = 0.2,
-    }, "A well-kept camera on fresh tape: blocky soft pixels and the black border, with barely any tape noise.");
+    }, "Uma câmara bem conservada com fita nova: píxeis blocados e suaves e a moldura preta, quase sem ruído de fita.");
 
     /// <summary>A tape played to death: frequent noise lines and dropouts, heavier shimmer and contrast.</summary>
     public static EffectPreset WornTape { get; } = new("Worn Tape", new Dictionary<string, double>
@@ -30,7 +30,7 @@ public static class ToyCamPresets
         [SmearLength] = 0.4, [SmearThreshold] = 0.76,
         [NoiseLines] = 0.5, [Dropouts] = 0.45, [GrainAmount] = 0.4,
         [BorderSize] = 0.25, [BorderSoftness] = 0.25,
-    }, "A cassette dubbed and replayed too often: streaking noise lines, white dropouts and a harsher picture.");
+    }, "Uma cassete copiada e reproduzida demasiadas vezes: linhas de ruído em listras, quedas de sinal brancas e uma imagem mais dura.");
 
     /// <summary>Shooting indoors or at dusk: deep crushed shadows, heavy shimmer, lamps that bloom and trail.</summary>
     public static EffectPreset LowLight { get; } = new("Low Light", new Dictionary<string, double>
@@ -40,7 +40,7 @@ public static class ToyCamPresets
         [SmearLength] = 0.85, [SmearThreshold] = 0.6,
         [NoiseLines] = 0.3, [Dropouts] = 0.1, [GrainAmount] = 0.9,
         [BorderSize] = 0.25, [BorderSoftness] = 0.25,
-    }, "A dim room or dusk: murky crushed shadows, strong sensor shimmer, and lights that bloom and leave long trails.");
+    }, "Um quarto escuro ou ao entardecer: sombras esmagadas e soturnas, cintilação forte do sensor e luzes que sofrem bloom e deixam rastos longos.");
 
     /// <summary>All looks, in picker order.</summary>
     public static IReadOnlyList<EffectPreset> All { get; } = [Clean, WornTape, LowLight];

@@ -15,7 +15,7 @@ public sealed class SetSequenceMarksCommand : EditCommand
     private readonly Timecode? _newIn, _newOut;
 
     /// <summary>Captures the sequence's current marks and the marks to set (<see langword="null"/> clears).</summary>
-    public SetSequenceMarksCommand(Sequence sequence, Timecode? markIn, Timecode? markOut, string label = "Set In/Out")
+    public SetSequenceMarksCommand(Sequence sequence, Timecode? markIn, Timecode? markOut, string label = "Definir entrada/saída")
         : base(label)
     {
         ArgumentNullException.ThrowIfNull(sequence);
@@ -53,7 +53,7 @@ public sealed class SetSourceMarksCommand : EditCommand
     private readonly Timecode? _newIn, _newOut;
 
     /// <summary>Captures the media's current marks and the marks to set (<see langword="null"/> clears).</summary>
-    public SetSourceMarksCommand(MediaRef media, Timecode? markIn, Timecode? markOut, string label = "Set Source In/Out")
+    public SetSourceMarksCommand(MediaRef media, Timecode? markIn, Timecode? markOut, string label = "Definir entrada/saída da origem")
         : base(label)
     {
         ArgumentNullException.ThrowIfNull(media);

@@ -38,7 +38,7 @@ public static class SequenceSettingsOps
         {
             0 => null,
             1 => commands[0],
-            _ => new CompositeCommand("Sequence settings", commands),
+            _ => new CompositeCommand("Definições da sequência", commands),
         };
     }
 }

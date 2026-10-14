@@ -14,7 +14,7 @@ namespace Sprocket.Core.Commands;
 /// flips the dirty indicator. Clips reference media by id, so undoing an import while a clip still uses the
 /// source leaves that clip offline (renders as black/silence, §15) rather than corrupting the model.
 /// </summary>
-public sealed class AddMediaCommand(MediaPool pool, MediaRef media) : EditCommand("Import media")
+public sealed class AddMediaCommand(MediaPool pool, MediaRef media) : EditCommand("Importar multimédia")
 {
     /// <inheritdoc />
     public override void Apply() => pool.Add(media);
@@ -24,7 +24,7 @@ public sealed class AddMediaCommand(MediaPool pool, MediaRef media) : EditComman
 }
 
 /// <summary>Adds a clip to a track; undo removes it.</summary>
-public sealed class AddClipCommand(Track track, Clip clip) : EditCommand("Add clip")
+public sealed class AddClipCommand(Track track, Clip clip) : EditCommand("Adicionar clipe")
 {
     /// <inheritdoc />
     public override void Apply() => track.Clips.Add(clip);
@@ -34,7 +34,7 @@ public sealed class AddClipCommand(Track track, Clip clip) : EditCommand("Add cl
 }
 
 /// <summary>Removes a clip from a track; undo re-inserts it at the same position so z-order is preserved.</summary>
-public sealed class RemoveClipCommand(Track track, Clip clip) : EditCommand("Remove clip")
+public sealed class RemoveClipCommand(Track track, Clip clip) : EditCommand("Remover clipe")
 {
     private int _index = -1;
 
@@ -70,7 +70,7 @@ public sealed class TrimClipCommand : EditCommand
 
     /// <summary>Captures the clip's current trim and records the new in/out points to apply.</summary>
     public TrimClipCommand(Clip clip, Timecode newSourceIn, Timecode newSourceOut)
-        : base("Trim clip")
+        : base("Aparar clipe")
     {
         ArgumentNullException.ThrowIfNull(clip);
         if (newSourceOut < newSourceIn)
@@ -150,7 +150,7 @@ public sealed class SetClipPlacementCommand : EditCommand
 
     /// <summary>Captures the clip's current placement and records the new one to apply.</summary>
     public SetClipPlacementCommand(
-        Clip clip, Timecode newSourceIn, Timecode newSourceOut, Timecode newTimelineStart, string label = "Move clip")
+        Clip clip, Timecode newSourceIn, Timecode newSourceOut, Timecode newTimelineStart, string label = "Mover clipe")
         : base(label)
     {
         ArgumentNullException.ThrowIfNull(clip);
@@ -221,7 +221,7 @@ public sealed class MoveClipToTrackCommand : EditCommand
     private int _index = -1;
 
     /// <summary>Captures the clip's current start and records the destination track + new start to apply.</summary>
-    public MoveClipToTrackCommand(Track from, Track to, Clip clip, Timecode newStart, string label = "Move clip to track")
+    public MoveClipToTrackCommand(Track from, Track to, Clip clip, Timecode newStart, string label = "Mover clipe para pista")
         : base(label)
     {
         ArgumentNullException.ThrowIfNull(from);
@@ -280,7 +280,7 @@ public sealed class RippleTrimCommand : EditCommand
     public RippleTrimCommand(
         Clip clip, Timecode newSourceIn, Timecode newSourceOut,
         IReadOnlyList<(Clip Clip, Timecode OrigStart)> downstream, long shiftTicks)
-        : base("Ripple trim")
+        : base("Aparar em cadeia")
     {
         ArgumentNullException.ThrowIfNull(clip);
         ArgumentNullException.ThrowIfNull(downstream);
@@ -350,7 +350,7 @@ public sealed class RollEditCommand : EditCommand
 
     /// <summary>Captures both clips' current edge/placement and records the rolled values to apply.</summary>
     public RollEditCommand(Clip left, Clip right, Timecode newLeftOut, Timecode newRightIn, Timecode newRightStart)
-        : base("Roll edit")
+        : base("Edição por rolagem")
     {
         ArgumentNullException.ThrowIfNull(left);
         ArgumentNullException.ThrowIfNull(right);
@@ -423,7 +423,7 @@ public sealed class SlideClipCommand : EditCommand
         Clip clip, Timecode newStart,
         Clip? prev, Timecode newPrevOut,
         Clip? next, Timecode newNextIn, Timecode newNextStart)
-        : base("Slide clip")
+        : base("Arrastar clipe")
     {
         ArgumentNullException.ThrowIfNull(clip);
         if (prev is not null && newPrevOut < prev.SourceIn)
@@ -506,7 +506,7 @@ public sealed class SetClipSpeedCommand : EditCommand
     private Rational _newSpeed;
 
     /// <summary>Captures the clip's current speed (and ramp) and records the new (strictly positive) ratio to apply.</summary>
-    public SetClipSpeedCommand(Clip clip, Rational newSpeed) : base("Change speed")
+    public SetClipSpeedCommand(Clip clip, Rational newSpeed) : base("Alterar velocidade")
     {
         ArgumentNullException.ThrowIfNull(clip);
         if (newSpeed.Num <= 0)
@@ -557,7 +557,7 @@ public sealed class SetClipSpeedCurveCommand : EditCommand
     private AnimatableValue? _newCurve;
 
     /// <summary>Captures the clip's current curve and records the new one (clip-local keyframe times) to apply.</summary>
-    public SetClipSpeedCurveCommand(Clip clip, AnimatableValue? newCurve) : base("Change speed ramp")
+    public SetClipSpeedCurveCommand(Clip clip, AnimatableValue? newCurve) : base("Alterar rampa de velocidade")
     {
         ArgumentNullException.ThrowIfNull(clip);
         _clip = clip;
@@ -595,7 +595,7 @@ public sealed class SetClipReverseCommand : EditCommand
 
     /// <summary>Records the direction to apply. Throws for a clip kind that can't be reversed
     /// (<see cref="Clip.SupportsReverse"/>) when <paramref name="reverse"/> is requested.</summary>
-    public SetClipReverseCommand(Clip clip, bool reverse) : base(reverse ? "Reverse clip" : "Play clip forward")
+    public SetClipReverseCommand(Clip clip, bool reverse) : base(reverse ? "Inverter velocidade" : "Reproduzir para a frente")
     {
         ArgumentNullException.ThrowIfNull(clip);
         if (reverse && !clip.SupportsReverse)
@@ -643,7 +643,7 @@ public sealed class SplitClipCommand : EditCommand
     /// chain every subsequent split into one group — so a linked delete of any piece would wipe them all.
     /// </summary>
     public SplitClipCommand(Track track, Clip clip, Timecode at, Guid? rightLinkGroup = null)
-        : base("Split clip")
+        : base("Dividir clipe")
     {
         ArgumentNullException.ThrowIfNull(track);
         ArgumentNullException.ThrowIfNull(clip);
@@ -758,7 +758,7 @@ public sealed class CompositeCommand : EditCommand
 }
 
 /// <summary>Appends an effect to a clip's effect stack; undo removes it.</summary>
-public sealed class AddEffectCommand(Clip clip, EffectInstance effect) : EditCommand("Add effect")
+public sealed class AddEffectCommand(Clip clip, EffectInstance effect) : EditCommand("Adicionar efeito")
 {
     /// <inheritdoc />
     public override void Apply() => clip.Effects.Add(effect);
@@ -773,7 +773,7 @@ public sealed class AddEffectCommand(Clip clip, EffectInstance effect) : EditCom
 /// creative grade — the manual-tag path inserts it at index 0, where the auto-detect path also places it.
 /// </summary>
 public sealed class InsertEffectAtCommand(Clip clip, EffectInstance effect, int index)
-    : EditCommand("Add effect")
+    : EditCommand("Adicionar efeito")
 {
     /// <inheritdoc />
     public override void Apply() => clip.Effects.Insert(Math.Clamp(index, 0, clip.Effects.Count), effect);
@@ -789,7 +789,7 @@ public sealed class InsertEffectAtCommand(Clip clip, EffectInstance effect, int 
 /// chain is the clip's ordinary effect stack, edited by <see cref="AddEffectCommand"/>.
 /// </summary>
 public sealed class AddChainEffectCommand(IList<EffectInstance> chain, EffectInstance effect)
-    : EditCommand("Add audio effect")
+    : EditCommand("Adicionar efeito de áudio")
 {
     /// <inheritdoc />
     public override void Apply() => chain.Add(effect);
@@ -801,7 +801,7 @@ public sealed class AddChainEffectCommand(IList<EffectInstance> chain, EffectIns
 /// <summary>Removes an effect from an audio effect chain; undo re-inserts it at the same position — chain
 /// order is the processing order (PLAN.md step 31).</summary>
 public sealed class RemoveChainEffectCommand(IList<EffectInstance> chain, EffectInstance effect)
-    : EditCommand("Remove audio effect")
+    : EditCommand("Remover efeito de áudio")
 {
     private int _index = -1;
 
@@ -833,7 +833,7 @@ public sealed class RemoveChainEffectCommand(IList<EffectInstance> chain, Effect
 /// position applies as a no-op (callers should avoid executing one so history stays clean).
 /// </summary>
 public sealed class MoveChainEffectCommand(IList<EffectInstance> chain, EffectInstance effect, int newIndex)
-    : EditCommand("Move effect")
+    : EditCommand("Mover efeito")
 {
     private int _from = -1;
     private int _to = -1;
@@ -890,7 +890,7 @@ public sealed class SetEffectEnabledCommand : EditCommand
 }
 
 /// <summary>Removes an effect from a clip; undo re-inserts it at the same stack position (order matters, §5d).</summary>
-public sealed class RemoveEffectCommand(Clip clip, EffectInstance effect) : EditCommand("Remove effect")
+public sealed class RemoveEffectCommand(Clip clip, EffectInstance effect) : EditCommand("Remover efeito")
 {
     private int _index = -1;
 
@@ -1126,7 +1126,7 @@ public sealed class SetClipFadeCommand : EditCommand
 
     /// <summary>Captures the clip's current fade (the first enabled Fade effect, or a new one to add) and
     /// records the new opacity envelope to apply.</summary>
-    public SetClipFadeCommand(Clip clip, AnimatableValue newOpacity, string label = "Adjust fade")
+    public SetClipFadeCommand(Clip clip, AnimatableValue newOpacity, string label = "Ajustar desvanecimento")
         : base(label)
     {
         ArgumentNullException.ThrowIfNull(clip);
@@ -1192,7 +1192,7 @@ public sealed class SetClipFadeCommand : EditCommand
 /// clip list); undo removes it (PLAN.md step 20). Markers go through the command stack like every other model
 /// mutation so they are undoable and flip the dirty indicator.
 /// </summary>
-public sealed class AddMarkerCommand(IList<Marker> markers, Marker marker) : EditCommand("Add marker")
+public sealed class AddMarkerCommand(IList<Marker> markers, Marker marker) : EditCommand("Adicionar marcador")
 {
     /// <inheritdoc />
     public override void Apply() => markers.Add(marker);
@@ -1202,7 +1202,7 @@ public sealed class AddMarkerCommand(IList<Marker> markers, Marker marker) : Edi
 }
 
 /// <summary>Removes a marker from its list; undo re-inserts it at the same position.</summary>
-public sealed class RemoveMarkerCommand(IList<Marker> markers, Marker marker) : EditCommand("Remove marker")
+public sealed class RemoveMarkerCommand(IList<Marker> markers, Marker marker) : EditCommand("Remover marcador")
 {
     private int _index = -1;
 
@@ -1234,7 +1234,7 @@ public sealed class MoveMarkerCommand : EditCommand
     private Timecode _newTime;
 
     /// <summary>Captures the marker's current time and records the new one to apply.</summary>
-    public MoveMarkerCommand(Marker marker, Timecode newTime) : base("Move marker")
+    public MoveMarkerCommand(Marker marker, Timecode newTime) : base("Mover marcador")
     {
         ArgumentNullException.ThrowIfNull(marker);
         _marker = marker;
@@ -1266,7 +1266,7 @@ public sealed class MoveMarkerCommand : EditCommand
 /// and flips the dirty indicator. Switching the <em>active</em> sequence is navigation, not a model edit, so it
 /// is not a command; undo therefore never strips the active sequence (the nest flow leaves the parent active).
 /// </summary>
-public sealed class AddSequenceCommand(Project project, Sequence sequence) : EditCommand("Add sequence")
+public sealed class AddSequenceCommand(Project project, Sequence sequence) : EditCommand("Adicionar sequência")
 {
     /// <inheritdoc />
     public override void Apply() => project.Sequences.Add(sequence);
@@ -1287,7 +1287,7 @@ public sealed class RemoveSequenceCommand : EditCommand
     private int _index = -1;
 
     /// <summary>Captures the sequence to remove.</summary>
-    public RemoveSequenceCommand(Project project, Sequence sequence) : base("Remove sequence")
+    public RemoveSequenceCommand(Project project, Sequence sequence) : base("Remover sequência")
     {
         ArgumentNullException.ThrowIfNull(project);
         ArgumentNullException.ThrowIfNull(sequence);
@@ -1319,7 +1319,7 @@ public sealed class RemoveSequenceCommand : EditCommand
 /// goes through the command stack so it is undoable and flips the dirty indicator. A clip referencing a removed
 /// source renders as nothing (§15), and undo restores it.
 /// </summary>
-public sealed class AddMulticamSourceCommand(Project project, MulticamSource source) : EditCommand("Add multicam source")
+public sealed class AddMulticamSourceCommand(Project project, MulticamSource source) : EditCommand("Adicionar fonte multicâmara")
 {
     /// <inheritdoc />
     public override void Apply() => project.MulticamSources.Add(source);
@@ -1336,7 +1336,7 @@ public sealed class RemoveMulticamSourceCommand : EditCommand
     private int _index = -1;
 
     /// <summary>Captures the source to remove.</summary>
-    public RemoveMulticamSourceCommand(Project project, MulticamSource source) : base("Remove multicam source")
+    public RemoveMulticamSourceCommand(Project project, MulticamSource source) : base("Remover fonte multicâmara")
     {
         ArgumentNullException.ThrowIfNull(project);
         ArgumentNullException.ThrowIfNull(source);
@@ -1373,7 +1373,7 @@ public sealed class SetClipAngleCommand : EditCommand
     private readonly int _newAngle;
 
     /// <summary>Captures the clip's current angle and records the new one to apply.</summary>
-    public SetClipAngleCommand(Clip clip, int newAngle) : base("Switch angle")
+    public SetClipAngleCommand(Clip clip, int newAngle) : base("Mudar de ângulo")
     {
         ArgumentNullException.ThrowIfNull(clip);
         if (newAngle < 0)
@@ -1402,7 +1402,7 @@ public sealed class SetMulticamOffsetsCommand : EditCommand
     private readonly Timecode[] _newOffsets;
 
     /// <summary>Captures the source's current offsets and records the new ones to apply.</summary>
-    public SetMulticamOffsetsCommand(MulticamSource source, IReadOnlyList<Timecode> newOffsets) : base("Sync angles")
+    public SetMulticamOffsetsCommand(MulticamSource source, IReadOnlyList<Timecode> newOffsets) : base("Sincronizar ângulos")
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(newOffsets);
@@ -1429,7 +1429,7 @@ public sealed class SetMulticamOffsetsCommand : EditCommand
 }
 
 /// <summary>Adds a track to the timeline (appended on top in z-order); undo removes it.</summary>
-public sealed class AddTrackCommand(Timeline timeline, Track track) : EditCommand("Add track")
+public sealed class AddTrackCommand(Timeline timeline, Track track) : EditCommand("Adicionar pista")
 {
     /// <inheritdoc />
     public override void Apply() => timeline.Tracks.Add(track);
@@ -1439,7 +1439,7 @@ public sealed class AddTrackCommand(Timeline timeline, Track track) : EditComman
 }
 
 /// <summary>Removes a track from the timeline; undo re-inserts it at the same z-order index.</summary>
-public sealed class RemoveTrackCommand(Timeline timeline, Track track) : EditCommand("Remove track")
+public sealed class RemoveTrackCommand(Timeline timeline, Track track) : EditCommand("Remover pista")
 {
     private int _index = -1;
 
@@ -1499,7 +1499,7 @@ public static class TrackRemoval
         IReadOnlyList<Track> empty = EmptyRemovable(timeline);
         return empty.Count == 0
             ? null
-            : new CompositeCommand("Delete empty tracks",
+            : new CompositeCommand("Eliminar pistas vazias",
                 empty.Select(t => (IEditCommand)new RemoveTrackCommand(timeline, t)).ToList());
     }
 }
@@ -1508,7 +1508,7 @@ public static class TrackRemoval
 /// Adds a transition to a track's cut (PLAN.md step 25); undo removes it. Applying a transition goes through the
 /// command stack like every other model mutation (step 10), so it is undoable and flips the dirty indicator.
 /// </summary>
-public sealed class AddTransitionCommand(Track track, Transition transition) : EditCommand("Add transition")
+public sealed class AddTransitionCommand(Track track, Transition transition) : EditCommand("Adicionar transição")
 {
     /// <inheritdoc />
     public override void Apply() => track.Transitions.Add(transition);
@@ -1518,7 +1518,7 @@ public sealed class AddTransitionCommand(Track track, Transition transition) : E
 }
 
 /// <summary>Removes a transition from a track; undo re-inserts it at the same position (PLAN.md step 25).</summary>
-public sealed class RemoveTransitionCommand(Track track, Transition transition) : EditCommand("Remove transition")
+public sealed class RemoveTransitionCommand(Track track, Transition transition) : EditCommand("Remover transição")
 {
     private int _index = -1;
 
@@ -1555,7 +1555,7 @@ public sealed class SetTransitionWindowCommand : EditCommand
 
     /// <summary>Captures the transition's current window and records the new duration/alignment to apply.</summary>
     public SetTransitionWindowCommand(Transition transition, Timecode newDuration, TransitionAlignment newAlignment)
-        : base("Adjust transition")
+        : base("Ajustar transição")
     {
         ArgumentNullException.ThrowIfNull(transition);
         if (newDuration.Ticks <= 0)
@@ -1613,7 +1613,7 @@ public sealed class ReinterpretFootageCommand : EditCommand
     private ReinterpretFootageCommand(
         MediaRef media, ProbedMediaInfo oldInfo, ProbedMediaInfo newInfo,
         (Clip, Timecode, Timecode, Timecode, Timecode)[] clips)
-        : base("Interpret footage")
+        : base("Interpretar metragem")
     {
         _media = media;
         _oldInfo = oldInfo;
@@ -1707,7 +1707,7 @@ public sealed class SetClipHoldCommand : EditCommand
 
     /// <summary>Captures the clip's current hold and records the new one to apply (<paramref name="holdFrameAt"/>
     /// <see langword="null"/> = un-hold; <paramref name="holdDuration"/> is then ignored and the old value kept).</summary>
-    public SetClipHoldCommand(Clip clip, Timecode? holdFrameAt, Timecode holdDuration, string label = "Frame hold")
+    public SetClipHoldCommand(Clip clip, Timecode? holdFrameAt, Timecode holdDuration, string label = "Congelação de fotograma")
         : base(label)
     {
         ArgumentNullException.ThrowIfNull(clip);
@@ -1763,7 +1763,7 @@ public sealed class TrimHeldClipCommand : EditCommand
     private Timecode _newStart, _newDuration;
 
     /// <summary>Captures the held clip's current placement and records the new start/duration to apply.</summary>
-    public TrimHeldClipCommand(Clip clip, Timecode newStart, Timecode newDuration, string label = "Trim clip")
+    public TrimHeldClipCommand(Clip clip, Timecode newStart, Timecode newDuration, string label = "Aparar clipe")
         : base(label)
     {
         ArgumentNullException.ThrowIfNull(clip);
@@ -1819,7 +1819,7 @@ public sealed class ShiftClipsCommand : EditCommand
     private readonly long _shift;
 
     /// <summary>Captures the clips (with their current starts) and the tick delta to shift them by.</summary>
-    public ShiftClipsCommand(IReadOnlyList<(Clip Clip, Timecode OrigStart)> clips, long shiftTicks, string label = "Ripple")
+    public ShiftClipsCommand(IReadOnlyList<(Clip Clip, Timecode OrigStart)> clips, long shiftTicks, string label = "Deslocar em cadeia")
         : base(label)
     {
         ArgumentNullException.ThrowIfNull(clips);

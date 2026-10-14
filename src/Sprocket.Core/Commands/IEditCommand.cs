@@ -8,7 +8,7 @@ namespace Sprocket.Core.Commands;
 /// </summary>
 public interface IEditCommand
 {
-    /// <summary>A short, human-readable description for the edit-history surface (e.g. "Move clip").</summary>
+    /// <summary>A short, human-readable description for the edit-history surface (e.g. "Mover clipe").</summary>
     string Label { get; }
 
     /// <summary>Applies the edit. Called once when the command is executed and again on redo.</summary>

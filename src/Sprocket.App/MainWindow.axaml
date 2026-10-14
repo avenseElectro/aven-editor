@@ -60,194 +60,194 @@
         <Menu x:Name="MenuBar" Grid.Column="1" VerticalAlignment="Center" Background="Transparent"
               Margin="6,0,0,0" FontSize="{x:Static local:Typography.Body}"
               chrome:WindowDecorationProperties.ElementRole="User">
-          <MenuItem x:Name="FileMenu" Header="_File">
-            <MenuItem x:Name="NewMenuItem" Header="_New Project" InputGesture="Ctrl+N" />
-            <MenuItem x:Name="OpenMenuItem" Header="_Open Project…" InputGesture="Ctrl+O" />
-            <MenuItem x:Name="OpenRecentMenuItem" Header="Open _Recent" />
-            <MenuItem x:Name="OpenSampleMenuItem" Header="Open Sa_mple Project" />
+          <MenuItem x:Name="FileMenu" Header="_Ficheiro">
+            <MenuItem x:Name="NewMenuItem" Header="_Novo projeto" InputGesture="Ctrl+N" />
+            <MenuItem x:Name="OpenMenuItem" Header="_Abrir projeto…" InputGesture="Ctrl+O" />
+            <MenuItem x:Name="OpenRecentMenuItem" Header="Abrir re_centes" />
+            <MenuItem x:Name="OpenSampleMenuItem" Header="Abrir projeto de e_xemplo" />
             <Separator />
-            <MenuItem x:Name="SaveMenuItem" Header="_Save Project" InputGesture="Ctrl+S" />
-            <MenuItem x:Name="SaveAsMenuItem" Header="Save Project _As…" InputGesture="Ctrl+Shift+S" />
+            <MenuItem x:Name="SaveMenuItem" Header="_Guardar projeto" InputGesture="Ctrl+S" />
+            <MenuItem x:Name="SaveAsMenuItem" Header="Guardar projeto _como…" InputGesture="Ctrl+Shift+S" />
             <Separator />
-            <MenuItem x:Name="ImportMenuItem" Header="_Import Media…" InputGesture="Ctrl+I" />
-            <MenuItem x:Name="RelinkMenuItem" Header="_Relink Media…" />
-            <MenuItem x:Name="ExportMenuItem" Header="_Export…" InputGesture="Ctrl+E" />
-            <MenuItem x:Name="ExportQueueMenuItem" Header="Export _Queue…" InputGesture="Ctrl+Shift+E" />
-            <MenuItem Header="Export I_nterchange">
+            <MenuItem x:Name="ImportMenuItem" Header="_Importar multimédia…" InputGesture="Ctrl+I" />
+            <MenuItem x:Name="RelinkMenuItem" Header="_Religar multimédia…" />
+            <MenuItem x:Name="ExportMenuItem" Header="_Exportar…" InputGesture="Ctrl+E" />
+            <MenuItem x:Name="ExportQueueMenuItem" Header="Fila de e_xportação…" InputGesture="Ctrl+Shift+E" />
+            <MenuItem Header="Exportar intercâmbio">
               <MenuItem x:Name="ExportEdlMenuItem" Header="_EDL (CMX3600)…" />
               <MenuItem x:Name="ExportFcpXmlMenuItem" Header="_Final Cut XML…" />
             </MenuItem>
             <Separator />
-            <MenuItem x:Name="ExitMenuItem" Header="E_xit" InputGesture="Alt+F4" />
+            <MenuItem x:Name="ExitMenuItem" Header="Sai_r" InputGesture="Alt+F4" />
           </MenuItem>
-          <MenuItem x:Name="EditMenu" Header="_Edit">
-            <MenuItem x:Name="UndoMenuItem" Header="_Undo" InputGesture="Ctrl+Z" IsEnabled="False" />
-            <MenuItem x:Name="RedoMenuItem" Header="_Redo" InputGesture="Ctrl+Shift+Z" IsEnabled="False" />
+          <MenuItem x:Name="EditMenu" Header="_Editar">
+            <MenuItem x:Name="UndoMenuItem" Header="_Anular" InputGesture="Ctrl+Z" IsEnabled="False" />
+            <MenuItem x:Name="RedoMenuItem" Header="_Refazer" InputGesture="Ctrl+Shift+Z" IsEnabled="False" />
             <Separator />
-            <MenuItem x:Name="CutMenuItem" Header="Cu_t" InputGesture="Ctrl+X" IsEnabled="False" />
-            <MenuItem x:Name="CopyMenuItem" Header="_Copy" InputGesture="Ctrl+C" IsEnabled="False" />
-            <MenuItem x:Name="PasteMenuItem" Header="_Paste" InputGesture="Ctrl+V" IsEnabled="False" />
-            <MenuItem x:Name="DeleteMenuItem" Header="_Delete" InputGesture="Delete" IsEnabled="False" />
-            <MenuItem x:Name="RippleDeleteMenuItem" Header="_Ripple Delete" InputGesture="Shift+Delete" IsEnabled="False" />
+            <MenuItem x:Name="CutMenuItem" Header="Cor_tar" InputGesture="Ctrl+X" IsEnabled="False" />
+            <MenuItem x:Name="CopyMenuItem" Header="_Copiar" InputGesture="Ctrl+C" IsEnabled="False" />
+            <MenuItem x:Name="PasteMenuItem" Header="Co_lar" InputGesture="Ctrl+V" IsEnabled="False" />
+            <MenuItem x:Name="DeleteMenuItem" Header="_Eliminar" InputGesture="Delete" IsEnabled="False" />
+            <MenuItem x:Name="RippleDeleteMenuItem" Header="Eliminar em _cadeia" InputGesture="Shift+Delete" IsEnabled="False" />
             <Separator />
             <!-- Select All (multi-clip selection, PLAN.md step 54); enablement refreshed on submenu open. -->
-            <MenuItem x:Name="SelectAllMenuItem" Header="Select _All" InputGesture="Ctrl+A" />
+            <MenuItem x:Name="SelectAllMenuItem" Header="Selecionar _tudo" InputGesture="Ctrl+A" />
             <Separator />
             <!-- Application-level (user-scoped) settings (PLAN.md step 38) — Edit ▸ Preferences with Ctrl+,
                  matches the convention in leading editors on Windows/Linux. The gesture is handled in OnKeyDown;
                  the text here is the display label (OemComma would render as "Ctrl+OemComma"). -->
-            <MenuItem x:Name="PreferencesMenuItem" Header="Pre_ferences…" InputGesture="Ctrl+," />
+            <MenuItem x:Name="PreferencesMenuItem" Header="_Preferências…" InputGesture="Ctrl+," />
             <Separator />
             <!-- Plugin Manager (PLAN.md step 58): see / enable / disable / install / uninstall effect plugins
                  over the managed host. DAW convention (Ableton's Plug-Ins preferences) puts it beside Preferences. -->
             <MenuItem x:Name="PluginsMenuItem" Header="_Plugins…" />
           </MenuItem>
-          <MenuItem x:Name="ClipMenu" Header="_Clip">
+          <MenuItem x:Name="ClipMenu" Header="_Clipe">
             <!-- Insert generators / adjustment layer at the playhead (PLAN.md step 19); children added at runtime. -->
-            <MenuItem x:Name="ClipInsertMenuItem" Header="_Insert" />
+            <MenuItem x:Name="ClipInsertMenuItem" Header="_Inserir" />
             <Separator />
             <!-- Three-point edits (PLAN.md step 61 phase 3), Premiere's , and . keys: cut the Source monitor's marked
                  range into the sequence on the patched tracks. Bare "," "." carry no InputGesture (KeyGesture renders
                  Oem names), so the labels say the key. Enabled while the Source monitor has media. -->
-            <MenuItem x:Name="InsertEditMenuItem" Header="Insert Ed_it  (,)" IsEnabled="False" />
-            <MenuItem x:Name="OverwriteEditMenuItem" Header="_Overwrite Edit  (.)" IsEnabled="False" />
+            <MenuItem x:Name="InsertEditMenuItem" Header="Edição por inserção  (,)" IsEnabled="False" />
+            <MenuItem x:Name="OverwriteEditMenuItem" Header="Edição por sobreposição  (.)" IsEnabled="False" />
             <!-- Fit to Fill (step 61 phase 6, Resolve's Shift+F11): retimes the source range to the sequence In–Out. -->
-            <MenuItem x:Name="FitToFillMenuItem" Header="Fit to Fill" InputGesture="Shift+F11" IsEnabled="False" />
+            <MenuItem x:Name="FitToFillMenuItem" Header="Preencher para caber" InputGesture="Shift+F11" IsEnabled="False" />
             <Separator />
             <!-- Split at Playhead (Ctrl+K, the Add Edit command in leading editors) and Duplicate (PLAN.md step 53) — also on the
                  clip right-click context menu; every context item keeps a menu-bar home. -->
-            <MenuItem x:Name="ClipSplitAtPlayheadMenuItem" Header="Spli_t at Playhead" InputGesture="Ctrl+K" IsEnabled="False" />
-            <MenuItem x:Name="ClipDuplicateMenuItem" Header="Du_plicate" IsEnabled="False" />
+            <MenuItem x:Name="ClipSplitAtPlayheadMenuItem" Header="Dividir no indicador de reprodução" InputGesture="Ctrl+K" IsEnabled="False" />
+            <MenuItem x:Name="ClipDuplicateMenuItem" Header="_Duplicar" IsEnabled="False" />
             <Separator />
             <!-- Enable toggle (Shift+E, the convention in leading editors, PLAN.md step 53): a disabled clip renders
                  nothing and contributes no audio; checked state refreshed in RefreshClipMenu. -->
-            <MenuItem x:Name="ClipEnableMenuItem" Header="_Enable" InputGesture="Shift+E" ToggleType="CheckBox" IsEnabled="False" />
+            <MenuItem x:Name="ClipEnableMenuItem" Header="_Ativar" InputGesture="Shift+E" ToggleType="CheckBox" IsEnabled="False" />
             <Separator />
             <!-- Link groups a multi-clip selection spanning video + audio (PLAN.md step 55); Unlink works on
                  the selected linked clip. Ctrl+L (as in leading editors) toggles between them by selection state,
                  so both items show the shared shortcut; enablement refreshed in RefreshClipMenu. -->
-            <MenuItem x:Name="ClipLinkMenuItem" Header="_Link" InputGesture="Ctrl+L" IsEnabled="False" />
-            <MenuItem x:Name="ClipUnlinkMenuItem" Header="_Unlink" InputGesture="Ctrl+L" IsEnabled="False" />
+            <MenuItem x:Name="ClipLinkMenuItem" Header="_Ligar" InputGesture="Ctrl+L" IsEnabled="False" />
+            <MenuItem x:Name="ClipUnlinkMenuItem" Header="_Desligar" InputGesture="Ctrl+L" IsEnabled="False" />
             <Separator />
-            <MenuItem x:Name="ClipSpeedMenuItem" Header="_Speed / Duration…" IsEnabled="False" /> <!-- enabled when a clip is selected -->
+            <MenuItem x:Name="ClipSpeedMenuItem" Header="_Velocidade / duração…" IsEnabled="False" /> <!-- enabled when a clip is selected -->
             <!-- Interpret Footage (PLAN.md step 42): reassign the selected clip's source frame rate. Enabled when the
                  selected clip references video media (also on the media-bin tile context menu). -->
-            <MenuItem x:Name="ClipInterpretFootageMenuItem" Header="Interpret _Footage…" IsEnabled="False" />
+            <MenuItem x:Name="ClipInterpretFootageMenuItem" Header="Interpretar metragem…" IsEnabled="False" />
 
             <Separator />
             <!-- Frame hold + stop-motion frame edits (PLAN.md step 43), naming used by leading editors. Options… holds/unholds the
                  whole selected video clip; Add Frame Hold splits at the playhead and freezes the right half; Insert
                  Frame Hold Segment inserts a 2 s freeze at the playhead and ripples downstream. Duplicate/Remove
                  Frame edit one source frame on the exact frame grid and ripple ±1 frame. -->
-            <MenuItem x:Name="ClipFrameHoldOptionsMenuItem" Header="Frame _Hold Options…" IsEnabled="False" />
-            <MenuItem x:Name="ClipAddFrameHoldMenuItem" Header="_Add Frame Hold" IsEnabled="False" />
-            <MenuItem x:Name="ClipInsertFrameHoldSegmentMenuItem" Header="Insert Frame Hold Se_gment" IsEnabled="False" />
-            <MenuItem x:Name="ClipDuplicateFrameMenuItem" Header="_Duplicate Frame" IsEnabled="False" />
-            <MenuItem x:Name="ClipRemoveFrameMenuItem" Header="Remo_ve Frame" IsEnabled="False" />
+            <MenuItem x:Name="ClipFrameHoldOptionsMenuItem" Header="Opções de congelação de fotograma…" IsEnabled="False" />
+            <MenuItem x:Name="ClipAddFrameHoldMenuItem" Header="Adicionar congelação de fotograma" IsEnabled="False" />
+            <MenuItem x:Name="ClipInsertFrameHoldSegmentMenuItem" Header="Inserir segmento de congelação" IsEnabled="False" />
+            <MenuItem x:Name="ClipDuplicateFrameMenuItem" Header="Duplicar fotograma" IsEnabled="False" />
+            <MenuItem x:Name="ClipRemoveFrameMenuItem" Header="Remover fotograma" IsEnabled="False" />
 
             <Separator />
             <!-- Loudness-normalize the selected clip's audio to the mixer's target (PLAN.md step 30); enabled when
                  the selected clip references an audio-bearing source. Applying it to each clip matches their loudness. -->
-            <MenuItem x:Name="ClipNormalizeMenuItem" Header="_Normalize Audio" IsEnabled="False" />
+            <MenuItem x:Name="ClipNormalizeMenuItem" Header="_Normalizar áudio" IsEnabled="False" />
 
             <Separator />
             <!-- Multicam (PLAN.md step 24): build a synced angle group from the stacked video tracks. Switch the
                  active angle with the 1–9 keys or the Inspector. Create enables when ≥2 video tracks carry a clip. -->
-            <MenuItem x:Name="CreateMulticamMenuItem" Header="Create _Multicam Source" IsEnabled="False" />
+            <MenuItem x:Name="CreateMulticamMenuItem" Header="Criar fonte _multicâmara" IsEnabled="False" />
 
             <Separator />
-            <MenuItem x:Name="NudgeLeftMenuItem" Header="Nudge _Left" InputGesture="Alt+Left" IsEnabled="False" />
-            <MenuItem x:Name="NudgeRightMenuItem" Header="Nudge _Right" InputGesture="Alt+Right" IsEnabled="False" />
+            <MenuItem x:Name="NudgeLeftMenuItem" Header="Mover para a esquerda" InputGesture="Alt+Left" IsEnabled="False" />
+            <MenuItem x:Name="NudgeRightMenuItem" Header="Mover para a direita" InputGesture="Alt+Right" IsEnabled="False" />
           </MenuItem>
           <!-- Sequences: multiple sequences + nested/compound clips (PLAN.md step 23). New / Open / Settings are
                always available; Nest enables when a clip is selected; Open Sequence lists every sequence (the
                active one checked) and is populated on submenu-open in RefreshSequenceMenu. -->
-          <MenuItem x:Name="SequenceMenu" Header="_Sequence">
-            <MenuItem x:Name="NewSequenceMenuItem" Header="_New Sequence" />
-            <MenuItem x:Name="OpenSequenceMenuItem" Header="_Open Sequence" />
+          <MenuItem x:Name="SequenceMenu" Header="_Sequência">
+            <MenuItem x:Name="NewSequenceMenuItem" Header="_Nova sequência" />
+            <MenuItem x:Name="OpenSequenceMenuItem" Header="_Abrir sequência" />
             <Separator />
-            <MenuItem x:Name="NestMenuItem" Header="_Nest" IsEnabled="False" />
+            <MenuItem x:Name="NestMenuItem" Header="_Aninhar" IsEnabled="False" />
             <Separator />
             <!-- Play In to Out (the dedicated ranged-play transport command of leading editors — Premiere's
                  Ctrl+Shift+Space): plays the Program monitor from the in mark and stops at the out mark, falling
                  back to the sequence ends when a mark is unset. Normal Space playback is deliberately NOT
                  constrained by the marks (the convention in leading editors). -->
-            <MenuItem x:Name="PlayInOutMenuItem" Header="_Play In to Out" InputGesture="Ctrl+Shift+Space" />
+            <MenuItem x:Name="PlayInOutMenuItem" Header="_Reproduzir da entrada à saída" InputGesture="Ctrl+Shift+Space" />
             <Separator />
             <!-- In/out marks, Premiere's commands and keys (its Markers menu). Marks are per-sequence, undoable,
                  and saved with the project. The keys are handled in OnKeyDown; the bare "/" ";" "'" keys carry no
                  InputGesture because KeyGesture renders them as their Oem enum names, so their labels say the key. -->
-            <MenuItem x:Name="MarksMenuItem" Header="_In / Out">
-              <MenuItem x:Name="MarkInMenuItem" Header="Mark _In" InputGesture="I" />
-              <MenuItem x:Name="MarkOutMenuItem" Header="Mark _Out" InputGesture="O" />
-              <MenuItem x:Name="MarkClipMenuItem" Header="Mark _Clip" InputGesture="X" />
-              <MenuItem x:Name="MarkSelectionMenuItem" Header="Mark _Selection  (/)" />
+            <MenuItem x:Name="MarksMenuItem" Header="_Entrada/Saída">
+              <MenuItem x:Name="MarkInMenuItem" Header="Marcar _entrada" InputGesture="I" />
+              <MenuItem x:Name="MarkOutMenuItem" Header="Marcar _saída" InputGesture="O" />
+              <MenuItem x:Name="MarkClipMenuItem" Header="Marcar _clipe" InputGesture="X" />
+              <MenuItem x:Name="MarkSelectionMenuItem" Header="Marcar seleção  (/)" />
               <Separator />
-              <MenuItem x:Name="GoToInMenuItem" Header="_Go to In" InputGesture="Shift+I" />
-              <MenuItem x:Name="GoToOutMenuItem" Header="Go to O_ut" InputGesture="Shift+O" />
+              <MenuItem x:Name="GoToInMenuItem" Header="Ir para _entrada" InputGesture="Shift+I" />
+              <MenuItem x:Name="GoToOutMenuItem" Header="Ir para _saída" InputGesture="Shift+O" />
               <Separator />
-              <MenuItem x:Name="ClearInMenuItem" Header="Clear I_n" InputGesture="Alt+I" />
-              <MenuItem x:Name="ClearOutMenuItem" Header="Clear Ou_t" InputGesture="Alt+O" />
-              <MenuItem x:Name="ClearInOutMenuItem" Header="Clear In _and Out" InputGesture="Ctrl+Shift+X" />
+              <MenuItem x:Name="ClearInMenuItem" Header="Limpar _entrada" InputGesture="Alt+I" />
+              <MenuItem x:Name="ClearOutMenuItem" Header="Limpar _saída" InputGesture="Alt+O" />
+              <MenuItem x:Name="ClearInOutMenuItem" Header="Limpar entrada e saída" InputGesture="Ctrl+Shift+X" />
             </MenuItem>
             <!-- Lift leaves a gap; Extract ripples the rest of the sequence left (Premiere's ; and ' keys). -->
-            <MenuItem x:Name="LiftMenuItem" Header="Lif_t  (;)" />
-            <MenuItem x:Name="ExtractMenuItem" Header="_Extract  (')" />
+            <MenuItem x:Name="LiftMenuItem" Header="Elevar  (;)" />
+            <MenuItem x:Name="ExtractMenuItem" Header="_Extrair  (')" />
             <Separator />
             <!-- Preview render cache (PLAN.md step 32): render commands + cache management. Render In to Out
                  uses the timeline in/out marks (I / O keys; Alt+I / Alt+O clear) and falls back to the whole
                  sequence when unset; Delete Render Files shows the cache's disk footprint on submenu-open. -->
-            <MenuItem x:Name="RenderInOutMenuItem" Header="_Render In to Out" />
-            <MenuItem x:Name="RenderSelectionMenuItem" Header="Render Se_lection" IsEnabled="False" />
-            <MenuItem x:Name="RenderAudioMenuItem" Header="Render _Audio" />
+            <MenuItem x:Name="RenderInOutMenuItem" Header="P_rocessar de entrada a saída" />
+            <MenuItem x:Name="RenderSelectionMenuItem" Header="Processar _seleção" IsEnabled="False" />
+            <MenuItem x:Name="RenderAudioMenuItem" Header="Processar _áudio" />
             <!-- Audio freeze (PLAN.md step 41): pre-render the selected clip's range through the audio render
                  cache so heavy effect chains (Studio Reverb tails) replay instead of recomputing every pass;
                  Unfreeze forgets the cached range so it mixes live again. Enablement on submenu-open. -->
-            <MenuItem x:Name="FreezeClipAudioMenuItem" Header="Free_ze Clip Audio" IsEnabled="False" />
-            <MenuItem x:Name="UnfreezeClipAudioMenuItem" Header="Un_freeze Clip Audio" IsEnabled="False" />
-            <MenuItem x:Name="DeleteRenderFilesMenuItem" Header="_Delete Render Files…" />
+            <MenuItem x:Name="FreezeClipAudioMenuItem" Header="Congelar áudio do clipe" IsEnabled="False" />
+            <MenuItem x:Name="UnfreezeClipAudioMenuItem" Header="Descongelar áudio do clipe" IsEnabled="False" />
+            <MenuItem x:Name="DeleteRenderFilesMenuItem" Header="Eliminar _ficheiros de processamento…" />
             <Separator />
-            <MenuItem x:Name="SequenceSettingsMenuItem" Header="Sequence _Settings…" />
+            <MenuItem x:Name="SequenceSettingsMenuItem" Header="_Definições da sequência…" />
           </MenuItem>
           <!-- Effects menu is populated from EffectCatalog at runtime (WireCommandMenus). -->
-          <MenuItem x:Name="EffectsMenu" Header="Effe_cts" />
-          <MenuItem x:Name="ViewMenu" Header="_View">
+          <MenuItem x:Name="EffectsMenu" Header="Efe_itos" />
+          <MenuItem x:Name="ViewMenu" Header="_Ver">
             <!-- The bare =/- keys and Ctrl++/Ctrl+- are handled in OnKeyDown; we don't set InputGesture here
                  because Avalonia's KeyGesture.ToString() uses the raw Key enum name, so even a bare
                  KeyGesture.Parse("-") renders as "OemMinus". The clean shortcut text lives in the timeline zoom
                  buttons' tooltips instead. Shift+Z renders cleanly so it keeps its gesture. -->
-            <MenuItem x:Name="ZoomInMenuItem" Header="Zoom _In" />
-            <MenuItem x:Name="ZoomOutMenuItem" Header="Zoom _Out" />
-            <MenuItem x:Name="ZoomToFitMenuItem" Header="Zoom to _Fit" InputGesture="Shift+Z" />
+            <MenuItem x:Name="ZoomInMenuItem" Header="_Ampliar" />
+            <MenuItem x:Name="ZoomOutMenuItem" Header="_Reduzir" />
+            <MenuItem x:Name="ZoomToFitMenuItem" Header="Zoom para ajustar" InputGesture="Shift+Z" />
             <Separator />
-            <MenuItem x:Name="SnappingMenuItem" Header="_Snapping" ToggleType="CheckBox" />
-            <MenuItem x:Name="GuidesMenuItem" Header="_Guides" ToggleType="CheckBox" />
+            <MenuItem x:Name="SnappingMenuItem" Header="_Ajuste magnético" ToggleType="CheckBox" />
+            <MenuItem x:Name="GuidesMenuItem" Header="_Guias" ToggleType="CheckBox" />
             <!-- Playback auto-scroll: Premiere's three modes and its Page Scroll default (Preferences ▸ Timeline ▸
                  Timeline Playback Auto-Scroll). No accelerator — the leading editors don't bind one either.
                  RefreshViewMenu re-checks the active mode each time the View menu opens. -->
-            <MenuItem x:Name="AutoScrollMenuItem" Header="Playback _Auto-Scroll">
-              <MenuItem x:Name="AutoScrollNoneMenuItem" Header="_No Scroll" ToggleType="Radio" GroupName="AutoScroll" />
-              <MenuItem x:Name="AutoScrollPageMenuItem" Header="_Page Scroll" ToggleType="Radio" GroupName="AutoScroll" />
-              <MenuItem x:Name="AutoScrollSmoothMenuItem" Header="_Smooth Scroll" ToggleType="Radio" GroupName="AutoScroll" />
+            <MenuItem x:Name="AutoScrollMenuItem" Header="Deslocamento automático">
+              <MenuItem x:Name="AutoScrollNoneMenuItem" Header="_Sem deslocamento" ToggleType="Radio" GroupName="AutoScroll" />
+              <MenuItem x:Name="AutoScrollPageMenuItem" Header="Deslocamento por _página" ToggleType="Radio" GroupName="AutoScroll" />
+              <MenuItem x:Name="AutoScrollSmoothMenuItem" Header="Deslocamento suave" ToggleType="Radio" GroupName="AutoScroll" />
             </MenuItem>
             <Separator />
-            <MenuItem x:Name="ShowProjectMenuItem" Header="_Project Panel" ToggleType="CheckBox" IsChecked="True" />
-            <MenuItem x:Name="ShowInspectorMenuItem" Header="I_nspector Panel" ToggleType="CheckBox" IsChecked="True" />
+            <MenuItem x:Name="ShowProjectMenuItem" Header="Painel _Projeto" ToggleType="CheckBox" IsChecked="True" />
+            <MenuItem x:Name="ShowInspectorMenuItem" Header="Painel I_nspetor" ToggleType="CheckBox" IsChecked="True" />
             <Separator />
-            <MenuItem x:Name="ShowStatsMenuItem" Header="Playback _Statistics" ToggleType="CheckBox" />
+            <MenuItem x:Name="ShowStatsMenuItem" Header="_Estatísticas de reprodução" ToggleType="CheckBox" />
             <!-- Background Tasks (PLAN.md step 18 + stabilization phase 6), Final Cut Pro's Background Tasks window:
                  live proxy pipeline control + stabilization analyses. Non-modal like Playback Statistics, so it can
                  sit open while editing. -->
-            <MenuItem x:Name="ShowProxyStatusMenuItem" Header="_Background Tasks" ToggleType="CheckBox" />
+            <MenuItem x:Name="ShowProxyStatusMenuItem" Header="Tarefas em _segundo plano" ToggleType="CheckBox" />
             <Separator />
             <!-- Fullscreen (user-requested; F11 is the Windows/Linux convention). On macOS the gestures are
                  swapped in code to the native ⌃⌘F / ⌘F (WireCommandMenus) — Magic Keyboards treat F11 as a
                  media key. Esc exits either mode; both accelerators are handled in OnKeyDown. -->
-            <MenuItem x:Name="FullScreenMenuItem" Header="_Full Screen" ToggleType="CheckBox" InputGesture="F11" />
-            <MenuItem x:Name="FullScreenPreviewMenuItem" Header="Full Screen Previe_w" InputGesture="Ctrl+F" />
+            <MenuItem x:Name="FullScreenMenuItem" Header="Ecrã _inteiro" ToggleType="CheckBox" InputGesture="F11" />
+            <MenuItem x:Name="FullScreenPreviewMenuItem" Header="Pré-visualização em ecrã inteiro" InputGesture="Ctrl+F" />
           </MenuItem>
-          <MenuItem x:Name="WindowMenu" Header="_Window">
-            <MenuItem x:Name="ResetLayoutMenuItem" Header="_Reset Layout" />
+          <MenuItem x:Name="WindowMenu" Header="_Janela">
+            <MenuItem x:Name="ResetLayoutMenuItem" Header="_Repor disposição" />
           </MenuItem>
           <MenuItem x:Name="HelpMenu">
             <!-- Custom header keeps the Alt+H mnemonic (AccessText) while adding a discoverability dot
@@ -256,7 +256,7 @@
                  colour tracks the same escalation tier as the badge. -->
             <MenuItem.Header>
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <AccessText Text="_Help" />
+                <AccessText Text="_Ajuda" />
                 <Ellipse x:Name="HelpMenuUpdateDot" Width="6" Height="6" Margin="5,0,0,0"
                          Fill="{DynamicResource Accent}" VerticalAlignment="Center" IsVisible="False" />
               </StackPanel>
@@ -264,7 +264,7 @@
             <MenuItem x:Name="CheckUpdatesMenuItem">
               <MenuItem.Header>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                  <AccessText Text="Check for _Updates…" />
+                  <AccessText Text="Verificar _atualizações…" />
                   <Ellipse x:Name="CheckUpdatesMenuDot" Width="6" Height="6" Margin="7,0,0,0"
                            Fill="{DynamicResource Accent}" VerticalAlignment="Center" IsVisible="False" />
                 </StackPanel>
@@ -272,16 +272,16 @@
             </MenuItem>
             <!-- Linux AppImage only: shown/hidden in WireMenu per install state (an AppImage does not
                  register itself in the applications menu — these let the user add/remove that entry). -->
-            <MenuItem x:Name="AddToApplicationsMenuMenuItem" Header="Add to _Applications Menu" IsVisible="False" />
-            <MenuItem x:Name="RemoveFromApplicationsMenuMenuItem" Header="Remove from Applications _Menu" IsVisible="False" />
+            <MenuItem x:Name="AddToApplicationsMenuMenuItem" Header="Adicionar ao menu de a_plicações" IsVisible="False" />
+            <MenuItem x:Name="RemoveFromApplicationsMenuMenuItem" Header="Remover do menu de aplicações" IsVisible="False" />
             <Separator />
-            <MenuItem x:Name="DocsMenuItem" Header="_Documentation" />
-            <MenuItem x:Name="WebsiteMenuItem" Header="Sprocket _Website" />
-            <MenuItem x:Name="ReportIssueMenuItem" Header="_Report an Issue…" />
-            <MenuItem x:Name="SupportMenuItem" Header="_Support Sprocket ♥" />
-            <MenuItem x:Name="ThirdPartyNoticesMenuItem" Header="_Third-Party Notices" />
+            <MenuItem x:Name="DocsMenuItem" Header="_Documentação" />
+            <MenuItem x:Name="WebsiteMenuItem" Header="_Site do Sprocket" />
+            <MenuItem x:Name="ReportIssueMenuItem" Header="_Comunicar um problema…" />
+            <MenuItem x:Name="SupportMenuItem" Header="_Apoiar o Sprocket ♥" />
+            <MenuItem x:Name="ThirdPartyNoticesMenuItem" Header="Avisos de _terceiros" />
             <Separator />
-            <MenuItem x:Name="AboutMenuItem" Header="_About Sprocket" />
+            <MenuItem x:Name="AboutMenuItem" Header="_Acerca do Sprocket" />
           </MenuItem>
         </Menu>
 
@@ -289,16 +289,16 @@
         <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center"
                     VerticalAlignment="Center" Spacing="8">
           <TextBlock x:Name="ProjectTitleText" Foreground="{DynamicResource Text}" FontSize="{x:Static local:Typography.Body}"
-                     VerticalAlignment="Center" Text="Untitled" />
+                     VerticalAlignment="Center" Text="Sem título" />
           <TextBlock x:Name="SaveStateText" Foreground="{DynamicResource FaintText}" FontSize="{x:Static local:Typography.Body}"
-                     VerticalAlignment="Center" Text="• all changes saved" />
+                     VerticalAlignment="Center" Text="• todas as alterações guardadas" />
         </StackPanel>
 
         <!-- Hidden on macOS, where the native traffic lights do this job (ConfigureWindowChrome). -->
         <StackPanel x:Name="CaptionButtons" Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Top">
           <Button x:Name="MinButton" Classes="caption"
                   chrome:WindowDecorationProperties.ElementRole="MinimizeButton"
-                  AutomationProperties.Name="Minimize" ToolTip.Tip="Minimize">
+                  AutomationProperties.Name="Minimizar" ToolTip.Tip="Minimizar">
             <!-- Height is Minimize's own 14:2 aspect ratio at the Chrome reference width — see IconSizes. -->
             <Path Data="{x:Static local:Icons.Minimize}" Fill="{DynamicResource MutedText}"
                   Width="{x:Static local:IconSizes.Chrome}" Height="1.14" Stretch="Uniform" />
@@ -306,14 +306,14 @@
           <!-- MaxButtonIcon's Data + the button's accessible name toggle Maximize/Restore in OnPropertyChanged. -->
           <Button x:Name="MaxButton" Classes="caption"
                   chrome:WindowDecorationProperties.ElementRole="MaximizeButton"
-                  AutomationProperties.Name="Maximize" ToolTip.Tip="Maximize">
+                  AutomationProperties.Name="Maximizar" ToolTip.Tip="Maximizar">
             <Path x:Name="MaxButtonIcon" Data="{x:Static local:Icons.Maximize}" Stroke="{DynamicResource MutedText}"
                   StrokeThickness="1.2" StrokeLineCap="Round" StrokeJoin="Round"
                   Width="{x:Static local:IconSizes.Chrome}" Height="{x:Static local:IconSizes.Chrome}" Stretch="Uniform" />
           </Button>
           <Button x:Name="CloseButton" Classes="caption close"
                   chrome:WindowDecorationProperties.ElementRole="CloseButton"
-                  AutomationProperties.Name="Close" ToolTip.Tip="Close">
+                  AutomationProperties.Name="Fechar" ToolTip.Tip="Fechar">
             <Path Data="{x:Static local:Icons.Close}" Stroke="{DynamicResource MutedText}"
                   StrokeThickness="1.2" StrokeLineCap="Round" StrokeJoin="Round"
                   Width="{x:Static local:IconSizes.Chrome}" Height="{x:Static local:IconSizes.Chrome}" Stretch="Uniform" />
@@ -329,33 +329,33 @@
         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Spacing="2">
           <!-- Tool palette (radio group): Select/Blade edit, Ripple/Roll/Slip/Slide trim, Hand/Zoom view
                (PLAN.md steps 13/22, UI.md §3.2). -->
-          <RadioButton x:Name="SelectTool" Classes="tool" GroupName="Tools" Content="Select" IsChecked="True"
-                       ToolTip.Tip="Select, move, and edge-trim clips" />
-          <RadioButton x:Name="BladeTool" Classes="tool" GroupName="Tools" Content="Blade"
-                       ToolTip.Tip="Razor: click a clip to split it at the cursor" />
-          <RadioButton x:Name="RippleTool" Classes="tool" GroupName="Tools" Content="Ripple"
-                       ToolTip.Tip="Ripple edit: trim a clip's edge and shift everything downstream to close the gap" />
-          <RadioButton x:Name="RollTool" Classes="tool" GroupName="Tools" Content="Roll"
-                       ToolTip.Tip="Rolling edit: drag the cut between two adjacent clips, keeping their combined length" />
-          <RadioButton x:Name="SlipTool" Classes="tool" GroupName="Tools" Content="Slip"
-                       ToolTip.Tip="Slip a clip's source in/out without moving it on the timeline" />
-          <RadioButton x:Name="SlideTool" Classes="tool" GroupName="Tools" Content="Slide"
-                       ToolTip.Tip="Slide a clip along the timeline while its neighbours absorb the change" />
-          <RadioButton x:Name="HandTool" Classes="tool" GroupName="Tools" Content="Hand"
-                       ToolTip.Tip="Pan the timeline view" />
+          <RadioButton x:Name="SelectTool" Classes="tool" GroupName="Tools" Content="Selecionar" IsChecked="True"
+                       ToolTip.Tip="Selecionar, mover e aparar arestas de clipes" />
+          <RadioButton x:Name="BladeTool" Classes="tool" GroupName="Tools" Content="Lâmina"
+                       ToolTip.Tip="Lâmina: clique num clipe para o dividir no cursor" />
+          <RadioButton x:Name="RippleTool" Classes="tool" GroupName="Tools" Content="Onda"
+                       ToolTip.Tip="Edição em cadeia: apare a aresta do clipe e desloca o que se segue para fechar o espaço" />
+          <RadioButton x:Name="RollTool" Classes="tool" GroupName="Tools" Content="Rolar"
+                       ToolTip.Tip="Edição por rolagem: arraste o corte entre dois clipes adjacentes mantendo o comprimento total" />
+          <RadioButton x:Name="SlipTool" Classes="tool" GroupName="Tools" Content="Deslizar"
+                       ToolTip.Tip="Deslizar a origem (entrada/saída) do clipe sem o mover na linha do tempo" />
+          <RadioButton x:Name="SlideTool" Classes="tool" GroupName="Tools" Content="Arrastar"
+                       ToolTip.Tip="Arrastar um clipe ao longo da linha do tempo enquanto os vizinhos absorvem a alteração" />
+          <RadioButton x:Name="HandTool" Classes="tool" GroupName="Tools" Content="Mão"
+                       ToolTip.Tip="Deslocar a vista da linha do tempo" />
           <RadioButton x:Name="ZoomTool" Classes="tool" GroupName="Tools" Content="Zoom"
-                       ToolTip.Tip="Zoom the timeline view (click to zoom in, Alt-click to zoom out)" />
+                       ToolTip.Tip="Ampliar a vista da linha do tempo (clique para ampliar, Alt+clique para reduzir)" />
           <Border Width="1" Height="18" Background="{DynamicResource Edge}" Margin="8,0" />
-          <ToggleButton x:Name="SnappingToggle" Content="Snapping" IsChecked="True" FontSize="{x:Static local:Typography.Body}" Padding="7,2"
-                        ToolTip.Tip="Snap clip edges and the playhead to nearby edits, markers, and the playhead while dragging" />
-          <ToggleButton x:Name="LinkedToggle" Content="Linked" IsChecked="True" FontSize="{x:Static local:Typography.Body}" Padding="7,2" Margin="2,0,0,0"
-                        ToolTip.Tip="Move linked audio and video clips together as a group when editing" />
+          <ToggleButton x:Name="SnappingToggle" Content="Ajuste magnético" IsChecked="True" FontSize="{x:Static local:Typography.Body}" Padding="7,2"
+                        ToolTip.Tip="Ajustar arestas de clipes e o indicador de reprodução a cortes e marcadores próximos durante o arrastamento" />
+          <ToggleButton x:Name="LinkedToggle" Content="Ligados" IsChecked="True" FontSize="{x:Static local:Typography.Body}" Padding="7,2" Margin="2,0,0,0"
+                        ToolTip.Tip="Mover clipes de áudio e vídeo ligados em grupo ao editar" />
         </StackPanel>
 
         <TextBlock x:Name="SequenceBadge" Grid.Column="2" Margin="0,0,12,0" VerticalAlignment="Center"
                    FontFamily="{x:Static local:Typography.Mono}" FontSize="{x:Static local:Typography.Body}"
                    Foreground="{DynamicResource MutedText}" Text="—" />
-        <Button x:Name="ExportButton" Grid.Column="3" Classes="primary" Content="Export" VerticalAlignment="Center" />
+        <Button x:Name="ExportButton" Grid.Column="3" Classes="primary" Content="Exportar" VerticalAlignment="Center" />
       </Grid>
     </Border>
 
@@ -368,7 +368,7 @@
         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Spacing="6">
           <Ellipse x:Name="StateDot" Width="8" Height="8" Fill="{DynamicResource Good}" VerticalAlignment="Center" />
           <TextBlock x:Name="EngineStateText" Foreground="{DynamicResource MutedText}" FontSize="{x:Static local:Typography.Caption}"
-                     VerticalAlignment="Center" Text="Ready" />
+                     VerticalAlignment="Center" Text="Pronto" />
           <!-- MCP server indicator (PLAN.md step 38): visible only while the loopback MCP listener runs, so the
                user always knows when the app is externally controllable. Driven by UpdateMcpStatus(). -->
           <StackPanel x:Name="McpStatus" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
@@ -383,7 +383,7 @@
                Driven by RefreshUpdateBadge(). -->
           <StackPanel x:Name="UpdateBadge" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
                       Margin="10,0,0,0" IsVisible="False" Cursor="Hand" Background="Transparent"
-                      ToolTip.Tip="A newer version of Sprocket is available — click for details.">
+                      ToolTip.Tip="Está disponível uma versão mais recente do Sprocket — clique para ver detalhes.">
             <Border Width="1" Height="12" Background="{DynamicResource Edge}" Margin="0,0,4,0" />
             <Ellipse x:Name="UpdateBadgeDot" Width="8" Height="8" Fill="{DynamicResource Accent}" VerticalAlignment="Center" />
             <TextBlock x:Name="UpdateBadgeLabel" Foreground="{DynamicResource MutedText}" FontSize="{x:Static local:Typography.Caption}"
@@ -418,14 +418,14 @@
         <!-- Project panel: tabbed media bin / effects / transitions / audio browser (PLAN.md step 15).
              AutomationProperties.Name on each of the four pane Borders below names the work areas of the
              Tab / Shift+Tab focus ring (WorkAreaFocus) for screen readers. -->
-        <Border x:Name="ProjectPane" Grid.Column="0" Classes="pane" AutomationProperties.Name="Project panel">
+        <Border x:Name="ProjectPane" Grid.Column="0" Classes="pane" AutomationProperties.Name="Painel Projeto">
           <DockPanel>
             <Border DockPanel.Dock="Top" Classes="paneHeader">
               <Grid ColumnDefinitions="Auto,*">
-                <TextBlock Classes="title" Text="Project" />
+                <TextBlock Classes="title" Text="Projeto" />
                 <TextBlock x:Name="ProjectItemsText" Grid.Column="1" HorizontalAlignment="Right"
                            Foreground="{DynamicResource FaintText}" FontSize="{x:Static local:Typography.Caption}" VerticalAlignment="Center"
-                           Text="0 items" />
+                           Text="0 itens" />
               </Grid>
             </Border>
             <mb:MediaBrowserPanel x:Name="MediaBrowser" />
@@ -443,22 +443,22 @@
               <Grid ColumnDefinitions="Auto,*,Auto">
                 <!-- Dual-monitor tabs: Program (composited timeline) / Source (raw clip), UI.md §3.4. -->
                 <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                  <RadioButton x:Name="ProgramTab" Classes="tool" GroupName="Monitor" Content="Program" IsChecked="True" />
-                  <RadioButton x:Name="SourceTab" Classes="tool" GroupName="Monitor" Content="Source" />
+                  <RadioButton x:Name="ProgramTab" Classes="tool" GroupName="Monitor" Content="Programa" IsChecked="True" />
+                  <RadioButton x:Name="SourceTab" Classes="tool" GroupName="Monitor" Content="Origem" />
                 </StackPanel>
                 <!-- Grading scopes selector (PLAN.md step 34) + safe-area / framing-grid overlay toggle +
                      the Fit ▾ zoom level. -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                   <ComboBox x:Name="ScopeBox" MinWidth="112" MinHeight="0" FontSize="{x:Static local:Typography.Body}" Padding="7,2" Margin="0,1,0,0" SelectedIndex="0">
-                    <ComboBoxItem>No Scopes</ComboBoxItem>
-                    <ComboBoxItem>Waveform</ComboBoxItem>
-                    <ComboBoxItem>RGB Parade</ComboBoxItem>
-                    <ComboBoxItem>Vectorscope</ComboBoxItem>
-                    <ComboBoxItem>Histogram</ComboBoxItem>
+                    <ComboBoxItem>Sem âmbitos</ComboBoxItem>
+                    <ComboBoxItem>Forma de onda</ComboBoxItem>
+                    <ComboBoxItem>Desfile RGB</ComboBoxItem>
+                    <ComboBoxItem>Vetorescópio</ComboBoxItem>
+                    <ComboBoxItem>Histograma</ComboBoxItem>
                   </ComboBox>
-                  <ToggleButton x:Name="GuidesToggle" Content="Guides" FontSize="{x:Static local:Typography.Body}" Padding="7,2" />
+                  <ToggleButton x:Name="GuidesToggle" Content="Guias" FontSize="{x:Static local:Typography.Body}" Padding="7,2" />
                   <ComboBox x:Name="ZoomBox" MinWidth="76" MinHeight="0" FontSize="{x:Static local:Typography.Body}" Padding="7,2" Margin="0,1,0,0" SelectedIndex="0">
-                    <ComboBoxItem>Fit</ComboBoxItem>
+                    <ComboBoxItem>Ajustar</ComboBoxItem>
                     <ComboBoxItem>50%</ComboBoxItem>
                     <ComboBoxItem>100%</ComboBoxItem>
                     <ComboBoxItem>200%</ComboBoxItem>
@@ -476,7 +476,7 @@
                    geometry, not glyph text, so they render identically across platforms. -->
               <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto" VerticalAlignment="Center">
                 <Button x:Name="JumpStartButton" Grid.Column="0" Classes="transport"
-                        AutomationProperties.Name="Jump to start" ToolTip.Tip="Jump to start — press Home">
+                        AutomationProperties.Name="Ir para o início" ToolTip.Tip="Ir para o início — prima Home">
                   <Path Data="{x:Static local:Icons.SkipBack}" Stroke="{DynamicResource Text}" StrokeThickness="1.7"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="10.5" Height="12" Stretch="Uniform" />
                 </Button>
@@ -488,22 +488,22 @@
                      transport row's 12px (14px for the composite chevron+diamond icons) reference dimension;
                      the other is that icon's own aspect-derived literal. -->
                 <Button x:Name="StepBackButton" Grid.Column="1" Classes="transport" Margin="4,0,0,0"
-                        AutomationProperties.Name="Step back one frame" ToolTip.Tip="Step back one frame — press ← (Shift+← for five)">
+                        AutomationProperties.Name="Recuar um fotograma" ToolTip.Tip="Recuar um fotograma — prima ← (Shift+← para cinco)">
                   <Path Data="{x:Static local:Icons.Rewind}" Stroke="{DynamicResource Text}" StrokeThickness="1.7"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="12" Height="8.4" Stretch="Uniform" />
                 </Button>
                 <!-- PlayPauseIcon's Data + the button's accessible name toggle Play/Pause as playback state changes. -->
                 <Button x:Name="PlayPauseButton" Grid.Column="2" Classes="transport play" Margin="4,0,0,0"
-                        AutomationProperties.Name="Play" ToolTip.Tip="Play / Pause (Space)">
+                        AutomationProperties.Name="Reproduzir" ToolTip.Tip="Reproduzir / Pausa (Espaço)">
                   <Path x:Name="PlayPauseIcon" Data="{x:Static local:Icons.Play}" Fill="White" Width="9.3" Height="12" Stretch="Uniform" />
                 </Button>
                 <Button x:Name="StepForwardButton" Grid.Column="3" Classes="transport" Margin="4,0,0,0"
-                        AutomationProperties.Name="Step forward one frame" ToolTip.Tip="Step forward one frame — press → (Shift+→ for five)">
+                        AutomationProperties.Name="Avançar um fotograma" ToolTip.Tip="Avançar um fotograma — prima → (Shift+→ para cinco)">
                   <Path Data="{x:Static local:Icons.FastForward}" Stroke="{DynamicResource Text}" StrokeThickness="1.7"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="12" Height="8.4" Stretch="Uniform" />
                 </Button>
                 <Button x:Name="JumpEndButton" Grid.Column="4" Classes="transport" Margin="4,0,0,0"
-                        AutomationProperties.Name="Jump to end" ToolTip.Tip="Jump to end — press End">
+                        AutomationProperties.Name="Ir para o fim" ToolTip.Tip="Ir para o fim — prima End">
                   <Path Data="{x:Static local:Icons.SkipForward}" Stroke="{DynamicResource Text}" StrokeThickness="1.7"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="10.5" Height="12" Stretch="Uniform" />
                 </Button>
@@ -511,14 +511,14 @@
                      composing two separately-stretched Paths: that composition rendered a visibly uneven gap
                      between the diamond and the arrow depending on which side the arrow was on. -->
                 <Button x:Name="PrevKeyframeButton" Grid.Column="5" Classes="transport" Margin="12,0,0,0"
-                        AutomationProperties.Name="Previous keyframe"
-                        ToolTip.Tip="Jump to previous keyframe of the selected clip — press [">
+                        AutomationProperties.Name="Fotograma-chave anterior"
+                        ToolTip.Tip="Ir para o fotograma-chave anterior do clipe selecionado — prima [">
                   <Path Data="{x:Static local:Icons.PrevKeyframe}" Stroke="{DynamicResource Text}" StrokeThickness="1.9"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="14" Height="9.9" Stretch="Uniform" />
                 </Button>
                 <Button x:Name="NextKeyframeButton" Grid.Column="6" Classes="transport" Margin="4,0,0,0"
-                        AutomationProperties.Name="Next keyframe"
-                        ToolTip.Tip="Jump to next keyframe of the selected clip — press ]">
+                        AutomationProperties.Name="Fotograma-chave seguinte"
+                        ToolTip.Tip="Ir para o fotograma-chave seguinte do clipe selecionado — prima ]">
                   <Path Data="{x:Static local:Icons.NextKeyframe}" Stroke="{DynamicResource Text}" StrokeThickness="1.9"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="14" Height="9.9" Stretch="Uniform" />
                 </Button>
@@ -555,42 +555,42 @@
                     BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" IsVisible="False">
               <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto" VerticalAlignment="Center">
                 <Button x:Name="SourceMarkInButton" Grid.Column="0" Classes="transport"
-                        AutomationProperties.Name="Mark In" ToolTip.Tip="Mark In — press I (Alt+I clears, Shift+I goes to it)">
+                        AutomationProperties.Name="Marcar entrada" ToolTip.Tip="Marcar entrada — prima I (Alt+I limpa, Shift+I vai para a marca)">
                   <Path Data="{x:Static local:Icons.MarkIn}" Stroke="{DynamicResource Text}" StrokeThickness="1.9"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="6" Height="12" Stretch="Uniform" />
                 </Button>
                 <Button x:Name="SourceMarkOutButton" Grid.Column="1" Classes="transport" Margin="4,0,0,0"
-                        AutomationProperties.Name="Mark Out" ToolTip.Tip="Mark Out — press O (Alt+O clears, Shift+O goes to it)">
+                        AutomationProperties.Name="Marcar saída" ToolTip.Tip="Marcar saída — prima O (Alt+O limpa, Shift+O vai para a marca)">
                   <Path Data="{x:Static local:Icons.MarkOut}" Stroke="{DynamicResource Text}" StrokeThickness="1.9"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="6" Height="12" Stretch="Uniform" />
                 </Button>
                 <Button x:Name="SourceInsertButton" Grid.Column="2" Classes="transport" Margin="12,0,0,0"
-                        AutomationProperties.Name="Insert" ToolTip.Tip="Insert the marked source range into the sequence — press ,">
+                        AutomationProperties.Name="Inserir" ToolTip.Tip="Inserir o intervalo de origem marcado na sequência — prima ,">
                   <Path Data="{x:Static local:Icons.InsertEdit}" Stroke="{DynamicResource Text}" StrokeThickness="1.9"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="12" Height="11" Stretch="Uniform" />
                 </Button>
                 <Button x:Name="SourceOverwriteButton" Grid.Column="3" Classes="transport" Margin="4,0,0,0"
-                        AutomationProperties.Name="Overwrite" ToolTip.Tip="Overwrite the sequence with the marked source range — press .">
+                        AutomationProperties.Name="Sobrescrever" ToolTip.Tip="Sobrescrever a sequência com o intervalo de origem marcado — prima .">
                   <Path Data="{x:Static local:Icons.OverwriteEdit}" Stroke="{DynamicResource Text}" StrokeThickness="1.9"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="12" Height="11" Stretch="Uniform" />
                 </Button>
-                <!-- Premiere's "Drag Video Only" / "Drag Audio Only" handles (step 61 phase 4): drag one onto a lane to
+                <!-- Premiere's "Arrastar só o vídeo" / "Arrastar só o áudio" handles (step 61 phase 4): drag one onto a lane to
                      edit in just that stream (Ctrl-drop inserts). Borders, not Buttons, so the press starts a drag. -->
                 <Border x:Name="SourceDragVideoHandle" Grid.Column="4" Classes="dragHandle" Margin="12,0,0,0"
-                        AutomationProperties.Name="Drag Video Only"
-                        ToolTip.Tip="Drag Video Only — drop on a video track to overwrite (Ctrl+drop inserts)">
+                        AutomationProperties.Name="Arrastar só o vídeo"
+                        ToolTip.Tip="Arrastar só o vídeo — largue numa pista de vídeo para sobrescrever (Ctrl+largar insere)">
                   <Path Data="{x:Static local:Icons.Film}" Stroke="{DynamicResource Text}" StrokeThickness="1.9"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="12" Height="12" Stretch="Uniform" />
                 </Border>
                 <Border x:Name="SourceDragAudioHandle" Grid.Column="5" Classes="dragHandle" Margin="4,0,0,0"
-                        AutomationProperties.Name="Drag Audio Only"
-                        ToolTip.Tip="Drag Audio Only — drop on an audio track to overwrite (Ctrl+drop inserts)">
+                        AutomationProperties.Name="Arrastar só o áudio"
+                        ToolTip.Tip="Arrastar só o áudio — largue numa pista de áudio para sobrescrever (Ctrl+largar insere)">
                   <Path Data="{x:Static local:Icons.Music}" Stroke="{DynamicResource Text}" StrokeThickness="1.9"
                         StrokeLineCap="Round" StrokeJoin="Round" Width="12" Height="12" Stretch="Uniform" />
                 </Border>
                 <TextBlock x:Name="SourceMarkText" Grid.Column="7" VerticalAlignment="Center"
                            FontFamily="{x:Static local:Typography.Mono}" FontSize="{x:Static local:Typography.Body}"
-                           Foreground="{DynamicResource MutedText}" Text="In --  Out --  Dur --" />
+                           Foreground="{DynamicResource MutedText}" Text="Ent --  Saí --  Dur --" />
               </Grid>
             </Border>
 
@@ -603,7 +603,7 @@
 
             <!-- Both monitors (Program/Source) present through this one surface; the active tab swaps the
                  engine it is attached to (PLAN.md step 17). An audio-only source shows its waveform over the blank
-                 frame (step 61 phase 5) under an "Audio only" label; their ZIndex keeps them over the surface after
+                 frame (step 61 phase 5) under an "Apenas áudio" label; their ZIndex keeps them over the surface after
                  a fullscreen round trip re-adds it. -->
             <Panel>
               <local:PreviewSurface x:Name="Preview" />
@@ -611,7 +611,7 @@
               <TextBlock x:Name="AudioOnlyLabel" ZIndex="1" IsVisible="False" IsHitTestVisible="False"
                          HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,8,0,0"
                          FontSize="{x:Static local:Typography.Body}" Foreground="{DynamicResource MutedText}"
-                         Text="Audio only" />
+                         Text="Apenas áudio" />
             </Panel>
           </DockPanel>
         </Border>
@@ -620,26 +620,26 @@
                       HorizontalAlignment="Stretch" />
 
         <!-- Inspector: type-driven, collapsible property sections for the selected clip (PLAN.md step 16). -->
-        <Border x:Name="InspectorPane" Grid.Column="4" Classes="pane" AutomationProperties.Name="Inspector">
+        <Border x:Name="InspectorPane" Grid.Column="4" Classes="pane" AutomationProperties.Name="Inspetor">
           <DockPanel>
             <Border DockPanel.Dock="Top" Classes="paneHeader">
               <Grid ColumnDefinitions="*,Auto,Auto">
-                <TextBlock Classes="title" Text="Inspector" />
+                <TextBlock Classes="title" Text="Inspetor" />
                 <!-- Matched to the section-header chevron spec (InspectorPanel.cs Section()): Chrome-tier
                      8px width, 1.2 stroke, FaintText. Height is aspect-true (the ChevronsDown/Up geometry is
                      10x12 → 8x9.6) because Uniform stretch pins the drawn glyph to the box's top-left rather
                      than centering the slack. -->
                 <Button x:Name="InspectorExpandAllButton" Grid.Column="1" Padding="5,1" Background="Transparent"
-                        VerticalAlignment="Center" AutomationProperties.Name="Expand all sections"
-                        ToolTip.Tip="Expand all sections">
+                        VerticalAlignment="Center" AutomationProperties.Name="Expandir todas as secções"
+                        ToolTip.Tip="Expandir todas as secções">
                   <Path Data="{x:Static local:Icons.ChevronsDown}" Stroke="{DynamicResource FaintText}"
                         StrokeThickness="1.2" StrokeLineCap="Round" StrokeJoin="Round"
                         Width="8" Height="9.6"
                         Stretch="Uniform" />
                 </Button>
                 <Button x:Name="InspectorCollapseAllButton" Grid.Column="2" Padding="5,1" Background="Transparent"
-                        VerticalAlignment="Center" AutomationProperties.Name="Collapse all sections"
-                        ToolTip.Tip="Collapse all sections">
+                        VerticalAlignment="Center" AutomationProperties.Name="Recolher todas as secções"
+                        ToolTip.Tip="Recolher todas as secções">
                   <Path Data="{x:Static local:Icons.ChevronsUp}" Stroke="{DynamicResource FaintText}"
                         StrokeThickness="1.2" StrokeLineCap="Round" StrokeJoin="Round"
                         Width="8" Height="9.6"
@@ -657,30 +657,30 @@
 
       <!-- Timeline (custom-drawn control lands in step 12). -->
       <Border x:Name="TimelinePane" Grid.Row="2" Classes="pane" ClipToBounds="True"
-              AutomationProperties.Name="Timeline">
+              AutomationProperties.Name="Linha do tempo">
         <DockPanel>
           <Border DockPanel.Dock="Top" Classes="paneHeader">
             <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
-              <TextBlock x:Name="TimelineHeader" Classes="title" Text="Timeline" />
+              <TextBlock x:Name="TimelineHeader" Classes="title" Text="Linha do tempo" />
               <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center"
                           Margin="0,0,10,0">
                 <Button x:Name="ZoomOutButton" Padding="5,2" VerticalAlignment="Center"
-                        AutomationProperties.Name="Zoom out" ToolTip.Tip="Zoom Out (- or Ctrl+-)">
+                        AutomationProperties.Name="Reduzir" ToolTip.Tip="Reduzir (- ou Ctrl+-)">
                   <Path Data="M12,7 A5,5 0 1,1 2,7 A5,5 0 1,1 12,7 M10.9,10.9 L15,15 M4,7 L10,7"
                         Stroke="{DynamicResource MutedText}" StrokeThickness="1.4"
                         StrokeLineCap="Round" Width="16" Height="16" Stretch="None" />
                 </Button>
                 <Button x:Name="ZoomInButton" Padding="5,2" VerticalAlignment="Center"
-                        AutomationProperties.Name="Zoom in" ToolTip.Tip="Zoom In (= or Ctrl+=)">
+                        AutomationProperties.Name="Ampliar" ToolTip.Tip="Ampliar (= ou Ctrl+=)">
                   <Path Data="M12,7 A5,5 0 1,1 2,7 A5,5 0 1,1 12,7 M10.9,10.9 L15,15 M4,7 L10,7 M7,4 L7,10"
                         Stroke="{DynamicResource MutedText}" StrokeThickness="1.4"
                         StrokeLineCap="Round" Width="16" Height="16" Stretch="None" />
                 </Button>
               </StackPanel>
-              <Button x:Name="MarkersButton" Grid.Column="3" Content="Markers" FontSize="{x:Static local:Typography.Body}" Padding="9,2"
+              <Button x:Name="MarkersButton" Grid.Column="3" Content="Marcadores" FontSize="{x:Static local:Typography.Body}" Padding="9,2"
                       Margin="0,0,6,0" VerticalAlignment="Center"
-                      ToolTip.Tip="Markers panel (M adds at the playhead; Shift+M / Ctrl+Shift+M navigate)" />
-              <Button x:Name="AddTrackButton" Grid.Column="4" Content="+ Track" FontSize="{x:Static local:Typography.Body}" Padding="9,2"
+                      ToolTip.Tip="Painel de marcadores (M adiciona no indicador; Shift+M / Ctrl+Shift+M navegam)" />
+              <Button x:Name="AddTrackButton" Grid.Column="4" Content="+ Pista" FontSize="{x:Static local:Typography.Body}" Padding="9,2"
                       VerticalAlignment="Center" />
             </Grid>
           </Border>
@@ -714,10 +714,10 @@
       <Ellipse Width="8" Height="8" Fill="{DynamicResource Accent}" VerticalAlignment="Center" />
       <TextBlock x:Name="UpdateToastText" Foreground="{DynamicResource Text}" FontSize="{x:Static local:Typography.Body}"
                  VerticalAlignment="Center" TextWrapping="Wrap" Text="" />
-      <Button x:Name="UpdateToastViewButton" Classes="primary" Content="View" Padding="12,3"
+      <Button x:Name="UpdateToastViewButton" Classes="primary" Content="Ver" Padding="12,3"
               VerticalAlignment="Center" />
       <Button x:Name="UpdateToastDismissButton" Classes="caption" VerticalAlignment="Center"
-              AutomationProperties.Name="Dismiss" ToolTip.Tip="Dismiss">
+              AutomationProperties.Name="Dispensar" ToolTip.Tip="Dispensar">
         <Path Data="{x:Static local:Icons.Close}" Stroke="{DynamicResource MutedText}"
               StrokeThickness="1.2" StrokeLineCap="Round" StrokeJoin="Round"
               Width="{x:Static local:IconSizes.Chrome}" Height="{x:Static local:IconSizes.Chrome}" Stretch="Uniform" />

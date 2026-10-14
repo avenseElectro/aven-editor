@@ -160,53 +160,53 @@ public static class BlackWhitePresets
         // Kodak. Tri-X's gritty grain and punchy contrast are the reportage benchmark; the T-Max tabular stocks
         // are progressively finer; P3200 is the pushed low-light look (coarse grain, lifted toe); Plus-X and
         // BW400CN are the soft, low-contrast entries.
-        FilmStock("Classic 400", "Kodak Tri-X 400", "Gritty grain, punchy contrast, the street/reportage look",
+        FilmStock("Classic 400", "Kodak Tri-X 400", "grão grosseiro, contraste vincado, o visual de rua/reportagem",
             grainAmount: 0.45, grainSize: 1.8, contrast: 1.30, shadows: -0.10, highlights: 0.05),
-        FilmStock("Modern Fine Grain 100", "Kodak T-Max 100", "Tabular grain, very smooth, neutral tones",
+        FilmStock("Modern Fine Grain 100", "Kodak T-Max 100", "grão tabular, muito suave, tons neutros",
             grainAmount: 0.08, grainSize: 0.9, contrast: 1.05),
-        FilmStock("Modern 400", "Kodak T-Max 400", "Fine for its speed, slightly cool, clean shadows",
+        FilmStock("Modern 400", "Kodak T-Max 400", "fino para a sua velocidade, ligeiramente frio, sombras limpas",
             grainAmount: 0.20, grainSize: 1.2, contrast: 1.10, shadows: 0.05, reds: -5.0, blues: 10.0),
-        FilmStock("Pushed 3200", "Kodak T-Max P3200", "Coarse grain, lifted shadows, low-light",
+        FilmStock("Pushed 3200", "Kodak T-Max P3200", "grão grosseiro, sombras erguidas, pouca luz",
             grainAmount: 0.75, grainSize: 2.8, contrast: 1.15, shadows: 0.25, highlights: -0.05),
-        FilmStock("Vintage 125", "Kodak Plus-X 125", "Soft midtones, gentle roll-off, 1950s–60s feel",
+        FilmStock("Vintage 125", "Kodak Plus-X 125", "meios-tons suaves, transição suave, ambiente dos anos 1950–60",
             grainAmount: 0.15, grainSize: 1.3, contrast: 0.90, shadows: 0.10, highlights: -0.10),
-        FilmStock("Chromogenic 400 (K)", "Kodak BW400CN", "Very fine grain, low contrast, smooth skin",
+        FilmStock("Chromogenic 400 (K)", "Kodak BW400CN", "grão muito fino, baixo contraste, pele suave",
             grainAmount: 0.10, grainSize: 1.0, contrast: 0.85, highlights: -0.05, oranges: 10.0),
 
         // Ilford. HP5/FP4 are the classic cubic-grain latitude stocks; Delta is the tabular family; Pan F is the
         // slow near-grainless high-contrast stock; XP2 is the chromogenic (smooth, flat, bright highlights).
-        FilmStock("Traditional 400", "Ilford HP5 Plus 400", "Classic cubic grain, forgiving latitude, warm mids",
+        FilmStock("Traditional 400", "Ilford HP5 Plus 400", "grão cúbico clássico, latitude tolerante, meios-tons quentes",
             grainAmount: 0.40, grainSize: 1.7, contrast: 1.10, shadows: 0.05, oranges: 8.0, yellows: 5.0),
-        FilmStock("Traditional 125", "Ilford FP4 Plus 125", "Fine grain, rich midtones, long tonal range",
+        FilmStock("Traditional 125", "Ilford FP4 Plus 125", "grão fino, meios-tons ricos, longo intervalo tonal",
             grainAmount: 0.18, grainSize: 1.2, contrast: 1.00, shadows: 0.05, highlights: -0.05),
-        FilmStock("Tabular 100", "Ilford Delta 100", "Sharp, smooth, slightly higher contrast than Fine Grain 100",
+        FilmStock("Tabular 100", "Ilford Delta 100", "nítido, suave, contraste ligeiramente mais alto do que o Modern Fine Grain 100",
             grainAmount: 0.10, grainSize: 0.9, contrast: 1.15),
-        FilmStock("Tabular 400", "Ilford Delta 400", "Fine grain, crisp, neutral",
+        FilmStock("Tabular 400", "Ilford Delta 400", "grão fino, incisivo, neutro",
             grainAmount: 0.22, grainSize: 1.2, contrast: 1.10),
-        FilmStock("Tabular 3200", "Ilford Delta 3200", "Heavy but even grain, soft contrast",
+        FilmStock("Tabular 3200", "Ilford Delta 3200", "grão forte mas uniforme, contraste suave",
             grainAmount: 0.70, grainSize: 2.6, contrast: 0.95, shadows: 0.15),
-        FilmStock("Ultra Fine 50", "Ilford Pan F Plus 50", "Near-grainless, high acutance, strong contrast",
+        FilmStock("Ultra Fine 50", "Ilford Pan F Plus 50", "quase sem grão, acutância elevada, contraste forte",
             grainAmount: 0.04, grainSize: 0.7, contrast: 1.35, highlights: 0.05),
-        FilmStock("Chromogenic 400 (I)", "Ilford XP2 Super", "Smooth, low grain, slightly flat, bright highlights",
+        FilmStock("Chromogenic 400 (I)", "Ilford XP2 Super", "suave, pouco grão, ligeiramente plano, altas luzes brilhantes",
             grainAmount: 0.12, grainSize: 1.0, contrast: 0.85, highlights: 0.15),
 
         // Fujifilm. Acros is the orthopanchromatic ultra-fine stock (reds render darker, cool clean look);
         // Neopan 400/1600 are the snappy medium/coarse reportage stocks.
-        FilmStock("Orthopanchromatic 100", "Fujifilm Neopan Acros 100", "Extremely fine, reds render darker, cool clean look",
+        FilmStock("Orthopanchromatic 100", "Fujifilm Neopan Acros 100", "extremamente fino, vermelhos mais escuros, visual frio e limpo",
             grainAmount: 0.06, grainSize: 0.8, contrast: 1.10, reds: -30.0, oranges: -15.0, blues: 10.0),
-        FilmStock("Reportage 400", "Fujifilm Neopan 400", "Medium grain, snappy contrast",
+        FilmStock("Reportage 400", "Fujifilm Neopan 400", "grão médio, contraste vivo",
             grainAmount: 0.35, grainSize: 1.6, contrast: 1.20, shadows: -0.05),
-        FilmStock("Reportage 1600", "Fujifilm Neopan 1600", "Pronounced grain, deep blacks",
+        FilmStock("Reportage 1600", "Fujifilm Neopan 1600", "grão acentuado, pretos profundos",
             grainAmount: 0.60, grainSize: 2.2, contrast: 1.25, shadows: -0.20),
 
         // Agfa APX — classic European grain structure, the 400 coarser and gentler than the 100.
-        FilmStock("European 100", "Agfa APX 100", "Classic grain structure, warm tonality",
+        FilmStock("European 100", "Agfa APX 100", "estrutura de grão clássica, tonalidade quente",
             grainAmount: 0.12, grainSize: 1.1, contrast: 1.05, oranges: 8.0, yellows: 5.0),
-        FilmStock("European 400", "Agfa APX 400", "Coarser grain, gentle contrast",
+        FilmStock("European 400", "Agfa APX 400", "grão mais grosseiro, contraste suave",
             grainAmount: 0.40, grainSize: 1.8, contrast: 0.95),
 
         // Rollei Retro 80S — extended red sensitivity (near-IR): pale skin & foliage, dark skies.
-        FilmStock("Near-Infrared 80", "Rollei Retro 80S", "Extended red sensitivity: pale skin & foliage, dark skies",
+        FilmStock("Near-Infrared 80", "Rollei Retro 80S", "sensibilidade alargada ao vermelho: pele e folhagem pálidas, céus escuros",
             grainAmount: 0.10, grainSize: 1.0, contrast: 1.15, highlights: 0.10,
             reds: 50.0, oranges: 40.0, yellows: 30.0, greens: 45.0, aquas: -30.0, blues: -60.0),
     ];
@@ -273,6 +273,6 @@ public static class BlackWhitePresets
         if (blues != 0.0) values[MixBlues] = blues;
         if (purples != 0.0) values[MixPurples] = purples;
         if (magentas != 0.0) values[MixMagentas] = magentas;
-        return new EffectPreset(name, values, $"Inspired by {inspiredBy}. {character}.");
+        return new EffectPreset(name, values, $"Inspirado em {inspiredBy}. {character}.");
     }
 }

@@ -14,7 +14,7 @@ public sealed class SetSourcePatchCommand : EditCommand
     private readonly SourcePatch? _new;
 
     /// <summary>Captures the sequence's current patch and the patch to set (<see langword="null"/> = default).</summary>
-    public SetSourcePatchCommand(Sequence sequence, SourcePatch? patch, string label = "Source patch")
+    public SetSourcePatchCommand(Sequence sequence, SourcePatch? patch, string label = "Ligação de origem")
         : base(label)
     {
         ArgumentNullException.ThrowIfNull(sequence);

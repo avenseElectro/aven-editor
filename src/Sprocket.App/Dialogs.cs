@@ -62,7 +62,7 @@ internal static class AboutDialog
         // chrome, UI.md §3.7). Degrades gracefully if FFmpeg can't be probed.
         string ffmpeg;
         try { ffmpeg = Sprocket.Media.FFmpegDiagnostics.DisplayVersion(); }
-        catch { ffmpeg = "FFmpeg unavailable"; }
+        catch { ffmpeg = "FFmpeg indisponível"; }
 
         var logo = new Image
         {
@@ -74,7 +74,7 @@ internal static class AboutDialog
 
         var openLogs = new Button
         {
-            Content = "Open Logs Folder",
+            Content = "Abrir pasta de registos",
             HorizontalAlignment = HorizontalAlignment.Center,
             Padding = new Thickness(12, 4),
             Foreground = Palette.TextBrush,
@@ -84,7 +84,7 @@ internal static class AboutDialog
 
         var close = new Button
         {
-            Content = "Close",
+            Content = "Fechar",
             HorizontalAlignment = HorizontalAlignment.Center,
             Padding = new Thickness(18, 5),
             Foreground = Brushes.White,
@@ -105,7 +105,7 @@ internal static class AboutDialog
 
         var dialog = new Window
         {
-            Title = "About Sprocket",
+            Title = "Acerca do Sprocket",
             Icon = AppIcon.Window,
             Width = 420,
             Height = 380,
@@ -121,13 +121,13 @@ internal static class AboutDialog
                 {
                     logo,
                     Centered("Sprocket", AboutWordmarkSize, FontWeight.SemiBold, Palette.TextBrush),
-                    Centered($"Version {Program.AppVersion}", Typography.Body, FontWeight.Normal, Palette.MutedTextBrush),
-                    Centered($"Media engine: {ffmpeg}", Typography.Body, FontWeight.Normal, Palette.MutedTextBrush),
-                    Centered("A cross-platform, non-destructive video editor. Free and open source.", Typography.Body, FontWeight.Normal, Palette.MutedTextBrush),
+                    Centered($"Versão {Program.AppVersion}", Typography.Body, FontWeight.Normal, Palette.MutedTextBrush),
+                    Centered($"Motor de multimédia: {ffmpeg}", Typography.Body, FontWeight.Normal, Palette.MutedTextBrush),
+                    Centered("Um editor de vídeo multiplataforma e não destrutivo. Gratuito e de código aberto.", Typography.Body, FontWeight.Normal, Palette.MutedTextBrush),
                     website,
                     // Where crash / exception logs are written (CrashLog), so a user hitting a problem can find the
                     // log without knowing the per-OS convention. The path is selectable; the button opens the folder.
-                    Centered("Logs are written to:", Typography.Caption, FontWeight.Normal, Palette.MutedTextBrush),
+                    Centered("Os registos são escritos em:", Typography.Caption, FontWeight.Normal, Palette.MutedTextBrush),
                     Selectable(CrashLog.LogDirectory),
                     openLogs,
                     close,
@@ -207,7 +207,7 @@ internal static class ThirdPartyNoticesDialog
         {
             body = new SelectableTextBlock
             {
-                Text = "THIRD-PARTY-NOTICES.md was not found next to the executable.",
+                Text = "O THIRD-PARTY-NOTICES.md não foi encontrado junto do executável.",
                 FontSize = Typography.Emphasis,
                 Foreground = Palette.TextBrush,
                 TextWrapping = TextWrapping.Wrap,
@@ -217,7 +217,7 @@ internal static class ThirdPartyNoticesDialog
 
         var close = new Button
         {
-            Content = "Close",
+            Content = "Fechar",
             HorizontalAlignment = HorizontalAlignment.Right,
             Padding = new Thickness(18, 5),
             Foreground = Brushes.White,
@@ -227,7 +227,7 @@ internal static class ThirdPartyNoticesDialog
 
         var dialog = new Window
         {
-            Title = "Third-Party Notices",
+            Title = "Avisos de terceiros",
             Icon = AppIcon.Window,
             Width = 760,
             Height = 600,
@@ -362,7 +362,7 @@ internal static class SaveChangesDialog
     {
         var save = new Button
         {
-            Content = "Save",
+            Content = "Guardar",
             Padding = new Thickness(16, 5),
             Foreground = Brushes.White,
             Background = Palette.AccentBrush,
@@ -371,7 +371,7 @@ internal static class SaveChangesDialog
         };
         var cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -380,7 +380,7 @@ internal static class SaveChangesDialog
         };
         var discard = new Button
         {
-            Content = "Don't Save",
+            Content = "Não guardar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -389,7 +389,7 @@ internal static class SaveChangesDialog
 
         var dialog = new Window
         {
-            Title = "Unsaved changes",
+            Title = "Alterações não guardadas",
             Icon = AppIcon.Window,
             Width = 440,
             Height = 200,
@@ -455,7 +455,7 @@ internal static class NamePromptDialog
         };
         var ok = new Button
         {
-            Content = "Save",
+            Content = "Guardar",
             Padding = new Thickness(16, 5),
             Foreground = Brushes.White,
             Background = Palette.AccentBrush,
@@ -463,7 +463,7 @@ internal static class NamePromptDialog
         };
         var cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -594,19 +594,19 @@ internal static class SpeedDialog
     {
         var reverse = new CheckBox
         {
-            Content = "Reverse speed",
+            Content = "Inverter velocidade",
             IsChecked = currentReverse,
             IsEnabled = canReverse,
             Foreground = Palette.TextBrush,
             Margin = new Thickness(0, 8, 0, 0),
         };
         ToolTip.SetTip(reverse, canReverse
-            ? "Play the clip backwards at the chosen speed (the duration is unchanged)"
-            : "A nested sequence can't be reversed");
+            ? "Reproduz o clipe ao contrário à velocidade escolhida (a duração não é alterada)"
+            : "Uma sequência aninhada não pode ser invertida");
         // A ramped clip's constant speed is dormant; say so, since applying a *different* speed removes the ramp.
         var rampNote = new TextBlock
         {
-            Text = "This clip has a speed ramp. Applying a different speed replaces the ramp.",
+            Text = "Este clipe tem uma rampa de velocidade. Aplicar uma velocidade diferente substitui a rampa.",
             Foreground = Palette.MutedTextBrush,
             FontSize = Typography.Caption,
             TextWrapping = TextWrapping.Wrap,
@@ -640,7 +640,7 @@ internal static class SpeedDialog
 
         var ok = new Button
         {
-            Content = "Apply",
+            Content = "Aplicar",
             Padding = new Thickness(16, 5),
             Foreground = Brushes.White,
             Background = Palette.AccentBrush,
@@ -648,7 +648,7 @@ internal static class SpeedDialog
         };
         var cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -657,7 +657,7 @@ internal static class SpeedDialog
 
         var dialog = new Window
         {
-            Title = "Speed / Duration",
+            Title = "Velocidade / Duração",
             Icon = AppIcon.Window,
             Width = 360,
             Height = hasRamp ? 290 : 250,
@@ -683,7 +683,7 @@ internal static class SpeedDialog
                         Spacing = 6,
                         Children =
                         {
-                            new TextBlock { Text = "Speed", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body },
+                            new TextBlock { Text = "Velocidade", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body },
                             new StackPanel
                             {
                                 Orientation = Orientation.Horizontal,
@@ -732,11 +732,11 @@ internal static class SequenceSettingsDialog
 
     /// <summary>Sequence ▸ Settings: edit the active sequence's name + frame size.</summary>
     public static Task<Result?> ShowSettings(Window owner, Sequence sequence) =>
-        Show(owner, "Sequence Settings", "Apply", sequence.Name, sequence.Timeline);
+        Show(owner, "Definições de sequência", "Aplicar", sequence.Name, sequence.Timeline);
 
     /// <summary>Sequence ▸ New Sequence: pick the new sequence's name + format, seeded from the active one.</summary>
     public static Task<Result?> ShowNew(Window owner, string suggestedName, Timeline seedFormat) =>
-        Show(owner, "New Sequence", "Create", suggestedName, seedFormat);
+        Show(owner, "Nova sequência", "Criar", suggestedName, seedFormat);
 
     private static Task<Result?> Show(Window owner, string title, string acceptLabel, string name, Timeline format)
     {
@@ -788,7 +788,7 @@ internal static class SequenceSettingsDialog
 
         double fps = format.FrameRate.Den > 0 ? (double)format.FrameRate.Num / format.FrameRate.Den : 0;
         string fixedFormat = string.Format(
-            CultureInfo.InvariantCulture, "{0:0.##} fps  ·  {1:0.#} kHz  (fixed)", fps, format.SampleRate / 1000.0);
+            CultureInfo.InvariantCulture, "{0:0.##} fps  ·  {1:0.#} kHz  (fixa)", fps, format.SampleRate / 1000.0);
 
         var apply = new Button
         {
@@ -800,7 +800,7 @@ internal static class SequenceSettingsDialog
         };
         var cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -811,12 +811,12 @@ internal static class SequenceSettingsDialog
         var widthCol = new StackPanel
         {
             Spacing = 3,
-            Children = { new TextBlock { Text = "Width", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body }, widthBox },
+            Children = { new TextBlock { Text = "Largura", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body }, widthBox },
         };
         var heightCol = new StackPanel
         {
             Spacing = 3,
-            Children = { new TextBlock { Text = "Height", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body }, heightBox },
+            Children = { new TextBlock { Text = "Altura", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body }, heightBox },
         };
         widthCol.SetValue(Grid.ColumnProperty, 0);
         heightCol.SetValue(Grid.ColumnProperty, 2);
@@ -851,9 +851,9 @@ internal static class SequenceSettingsDialog
                         Spacing = 6,
                         Children =
                         {
-                            new TextBlock { Text = "Name", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body },
+                            new TextBlock { Text = "Nome", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body },
                             nameBox,
-                            new TextBlock { Text = "Frame size", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, Margin = new Thickness(0, 10, 0, 0) },
+                            new TextBlock { Text = "Dimensão do fotograma", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, Margin = new Thickness(0, 10, 0, 0) },
                             presetBox,
                             sizeGrid,
                             new TextBlock { Text = fixedFormat, Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, Margin = new Thickness(0, 10, 0, 0) },
@@ -906,21 +906,21 @@ internal static class ExportSettingsDialog
     // back to a dropdown entry.
     private static readonly (string Label, Resolution? Value)[] Resolutions =
     [
-        ("Same as sequence", null),
+        ("Igual à sequência", null),
         ("3840 × 2160 (4K UHD)", new Resolution(3840, 2160)),
         ("1920 × 1080 (1080p)", new Resolution(1920, 1080)),
         ("1280 × 720 (720p)", new Resolution(1280, 720)),
         ("854 × 480 (480p)", new Resolution(854, 480)),
-        ("2160 × 3840 (4K Portrait)", new Resolution(2160, 3840)),
-        ("1080 × 1920 (1080p Portrait)", new Resolution(1080, 1920)),
-        ("720 × 1280 (720p Portrait)", new Resolution(720, 1280)),
-        ("1080 × 1350 (4:5 Portrait)", new Resolution(1080, 1350)),
-        ("1080 × 1080 (Square)", new Resolution(1080, 1080)),
+        ("2160 × 3840 (4K Vertical)", new Resolution(2160, 3840)),
+        ("1080 × 1920 (1080p Vertical)", new Resolution(1080, 1920)),
+        ("720 × 1280 (720p Vertical)", new Resolution(720, 1280)),
+        ("1080 × 1350 (4:5 Vertical)", new Resolution(1080, 1350)),
+        ("1080 × 1080 (Quadrada)", new Resolution(1080, 1080)),
     ];
 
     private static readonly (string Label, Rational? Value)[] FrameRates =
     [
-        ("Same as sequence", null),
+        ("Igual à sequência", null),
         ("23.976", new Rational(24000, 1001)),
         ("24", new Rational(24, 1)),
         ("25 (PAL)", new Rational(25, 1)),
@@ -938,7 +938,7 @@ internal static class ExportSettingsDialog
         // per-export scope, not delivery format) and never snaps the preset box to Custom. Applies to audio-only
         // deliveries too — the master mix can be exported in-to-out. Choosing the range option with no marks set
         // degrades to the whole sequence (the caller resolves the marks).
-        ComboBox rangeBox = MakeCombo(["Entire sequence", "In/Out range"]);
+        ComboBox rangeBox = MakeCombo(["Sequência inteira", "Intervalo entrada/saída"]);
         rangeBox.SelectedIndex = hasMarkedRange ? 1 : 0;
 
         // The Format list holds the video containers first, then the audio-only delivery targets (PLAN.md step 44):
@@ -949,7 +949,7 @@ internal static class ExportSettingsDialog
         ComboBox containerBox = MakeCombo(
         [
             .. containers.Select(c => ExportCodecs.Container(c).DisplayName),
-            .. audioFormats.Select(a => "Audio only · " + ExportCodecs.AudioFormat(a).DisplayName),
+            .. audioFormats.Select(a => "Apenas áudio · " + ExportCodecs.AudioFormat(a).DisplayName),
         ]);
         bool IsAudioOnly() => containerBox.SelectedIndex >= videoFormatCount;
         ExportAudioFormat SelectedAudioFormat() => audioFormats[containerBox.SelectedIndex - videoFormatCount];
@@ -959,25 +959,25 @@ internal static class ExportSettingsDialog
         // VBR target): constant quality holds the picture steady via a CRF slider (size floats with content);
         // target bitrate aims at a Mbps figure (size predictable, quality floats). Part of the delivery format,
         // so presets capture it.
-        ComboBox rateControlBox = MakeCombo(["Constant quality", "Target bitrate"]);
+        ComboBox rateControlBox = MakeCombo(["Qualidade constante", "Bitrate de destino"]);
         rateControlBox.SelectedIndex = 0;
         // Encoding: software (deterministic, best compatibility — the default) or hardware (GPU encoder with
         // automatic software fallback, PLAN.md step 29; it honours the same rate control via each vendor's own
         // quality knob). It swaps only the encoder — the label says so, so it never implies the whole export runs on
         // the GPU (that is Fast Export's job). Presets capture it.
-        ComboBox encodingBox = MakeCombo(["Software", "Hardware encoder (if available)"]);
+        ComboBox encodingBox = MakeCombo(["Software", "Codificador por hardware (se disponível)"]);
         encodingBox.SelectedIndex = 0;
         // Mode (export-speed phase 3): Final Export — the deterministic reference render — or Fast Export, which
         // always probes the GPU encoders and falls back to a speed-first software preset (the reference-vs-draft split
         // of leading editors). Fast locks Encoding to hardware, restoring the user's choice when switched back.
         // Presets capture it.
-        ComboBox modeBox = MakeCombo(["Final Export", "Fast Export"]);
+        ComboBox modeBox = MakeCombo(["Exportação final", "Exportação rápida"]);
         modeBox.SelectedIndex = 0;
         var modeText = new TextBlock { Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, TextWrapping = TextWrapping.Wrap };
         int encodingBeforeFast = 0;
         void UpdateModeText() => modeText.Text = modeBox.SelectedIndex == 1
-            ? "Encodes on the GPU when available, otherwise with a faster software preset. Files can be a little larger and differ between machines — not for final delivery."
-            : "Reference quality: reproducible output, for final delivery.";
+            ? "Codifica na GPU quando disponível, caso contrário com uma predefinição de software mais rápida. Os ficheiros podem ser um pouco maiores e diferir entre máquinas — não se destina à entrega final."
+            : "Qualidade de referência: saída reprodutível, para entrega final.";
         modeBox.SelectionChanged += (_, _) =>
         {
             bool fast = modeBox.SelectedIndex == 1;
@@ -1022,7 +1022,7 @@ internal static class ExportSettingsDialog
         };
         TextBox bitrateBox = MakeMbpsBox();
         TextBox maxRateBox = MakeMbpsBox();
-        maxRateBox.PlaceholderText = "none";
+        maxRateBox.PlaceholderText = "nenhum";
 
         var resText = new TextBlock { Foreground = Palette.MutedTextBrush, FontSize = Typography.Body };
         void UpdateResText()
@@ -1031,13 +1031,13 @@ internal static class ExportSettingsDialog
             (int sw, int sh) = sel is { } r ? (r.Width, r.Height) : (sequenceWidth, sequenceHeight);
             (int ow, int oh) = VideoExporter.ComputeExportResolution(sw, sh);
             resText.Text = ow == sw && oh == sh
-                ? $"Output resolution: {ow}×{oh}"
-                : $"Output resolution: {ow}×{oh}  (scaled from {sw}×{sh} to the 4K export cap)";
+                ? $"Resolução de saída: {ow}×{oh}"
+                : $"Resolução de saída: {ow}×{oh}  (ampliada de {sw}×{sh} para o limite de exportação 4K)";
             // Reseed the bitrate watermark to the output size's recommended default ("Same as sequence" frame rate
             // seeds at the 30 fps baseline; the exporter recomputes with the actual rate when the box is left empty).
             Rational fps = FrameRates[Math.Max(0, fpsBox.SelectedIndex)].Value ?? new Rational(30, 1);
             bitrateBox.PlaceholderText = string.Format(
-                CultureInfo.InvariantCulture, "{0:0.#} (recommended)", ExportCodecs.DefaultTargetBitrate(ow, oh, fps) / 1_000_000.0);
+                CultureInfo.InvariantCulture, "{0:0.#} (recomendado)", ExportCodecs.DefaultTargetBitrate(ow, oh, fps) / 1_000_000.0);
         }
         UpdateResText();
 
@@ -1059,7 +1059,7 @@ internal static class ExportSettingsDialog
         void UpdateCrfText()
         {
             int crf = (int)crfSlider.Value;
-            crfText.Text = $"CRF {crf} — {ExportCodecs.QualityLabel(SelectedVideoCodec(), crf)}  (lower = better quality, larger file)";
+            crfText.Text = $"CRF {crf} — {ExportCodecs.QualityLabel(SelectedVideoCodec(), crf)}  (menor = melhor qualidade, ficheiro maior)";
         }
 
         // Keeps the CRF slider on the selected codec's own scale (x264/x265 0–51, AV1/VP9 0–63). When a codec
@@ -1200,13 +1200,13 @@ internal static class ExportSettingsDialog
         // clip name / watermark) with a nine-point position each; handles add extra frames around an in-out range
         // for review / conform outputs. Defaults keep the pre-step-29 behaviour (no burn-ins, no handles).
         BurnInPosition[] positions = Enum.GetValues<BurnInPosition>();
-        var tcCheck = MakeCheck("Timecode");
+        var tcCheck = MakeCheck("Código de tempo");
         ComboBox tcPos = MakePositionCombo((int)BurnInPosition.BottomCenter);
-        var nameCheck = MakeCheck("Clip name");
+        var nameCheck = MakeCheck("Nome do clipe");
         ComboBox namePos = MakePositionCombo((int)BurnInPosition.TopLeft);
         var watermarkBox = new TextBox
         {
-            PlaceholderText = "Watermark text…",
+            PlaceholderText = "Texto da marca de água…",
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
             HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -1222,7 +1222,7 @@ internal static class ExportSettingsDialog
 
         // Log-media color handling (PLAN.md step 37): baked (default — deliverables match the preview) or
         // pass-through so a log source stays log-encoded for downstream grading. Per-export, not preset state.
-        var bakeColorCheck = MakeCheck("Bake input color transform (log → Rec.709)");
+        var bakeColorCheck = MakeCheck("Incorporar transformação de cor de entrada (log → Rec.709)");
         bakeColorCheck.IsChecked = true;
 
         // Container metadata tags (PLAN.md step 38), prefilled from the user-settings defaults set in
@@ -1242,7 +1242,7 @@ internal static class ExportSettingsDialog
 
         var savePreset = new Button
         {
-            Content = "Save Preset…",
+            Content = "Guardar predefinição…",
             Padding = new Thickness(10, 4),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -1252,7 +1252,7 @@ internal static class ExportSettingsDialog
 
         var export = new Button
         {
-            Content = "Export…",
+            Content = "Exportar…",
             Padding = new Thickness(16, 5),
             Foreground = Brushes.White,
             Background = Palette.AccentBrush,
@@ -1260,7 +1260,7 @@ internal static class ExportSettingsDialog
         };
         var cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -1269,20 +1269,20 @@ internal static class ExportSettingsDialog
 
         // Video-side rows, captured so audio-only mode (PLAN.md step 44) can hide them (the master mix has no video
         // codec, resolution, frame rate, burn-ins, or color-transform choice).
-        Control modeRow = LabeledRow("Mode", new StackPanel { Spacing = 2, Children = { modeBox, modeText } });
-        Control codecRow = TwoColumnRow("Video codec", videoBox, "Audio codec", audioBox);
-        Control rateRow = TwoColumnRow("Rate control", rateControlBox, "Encoding", encodingBox);
-        Control crfRowControl = LabeledRow("Quality", new StackPanel { Spacing = 2, Children = { crfSlider, crfText } });
-        Control bitrateRowControl = TwoColumnRow("Target (Mbps)", bitrateBox, "Max (Mbps)", maxRateBox);
+        Control modeRow = LabeledRow("Modo", new StackPanel { Spacing = 2, Children = { modeBox, modeText } });
+        Control codecRow = TwoColumnRow("Codec de vídeo", videoBox, "Codec de áudio", audioBox);
+        Control rateRow = TwoColumnRow("Controlo de taxa", rateControlBox, "Codificação", encodingBox);
+        Control crfRowControl = LabeledRow("Qualidade", new StackPanel { Spacing = 2, Children = { crfSlider, crfText } });
+        Control bitrateRowControl = TwoColumnRow("Destino (Mbps)", bitrateBox, "Máx. (Mbps)", maxRateBox);
         crfRow = crfRowControl;
         bitrateRow = bitrateRowControl;
-        Control resFpsRow = TwoColumnRow("Resolution", resolutionBox, "Frame rate", fpsBox);
-        Control burnHeader = new TextBlock { Text = "Burn-ins", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, Margin = new Thickness(0, 8, 0, 0) };
+        Control resFpsRow = TwoColumnRow("Resolução", resolutionBox, "Cadência de fotogramas", fpsBox);
+        Control burnHeader = new TextBlock { Text = "Sobreposições fixas", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, Margin = new Thickness(0, 8, 0, 0) };
         Control tcRow = BurnInRow(tcCheck, tcPos);
         Control nameRow = BurnInRow(nameCheck, namePos);
         Control watermarkRow = BurnInRow(watermarkBox, watermarkPos);
-        Control handlesRow = LabeledRow("Handles (frames before / after the range)", handlesBox);
-        Control colorHeader = new TextBlock { Text = "Color", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, Margin = new Thickness(0, 8, 0, 0) };
+        Control handlesRow = LabeledRow("Margens (fotogramas antes / depois do intervalo)", handlesBox);
+        Control colorHeader = new TextBlock { Text = "Cor", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, Margin = new Thickness(0, 8, 0, 0) };
         videoOnlyControls =
             [modeRow, codecRow, rateRow, crfRowControl, bitrateRowControl, resFpsRow, resText, burnHeader, tcRow, nameRow, watermarkRow, handlesRow, colorHeader, bakeColorCheck];
 
@@ -1291,9 +1291,9 @@ internal static class ExportSettingsDialog
             Spacing = 8,
             Children =
             {
-                LabeledRow("Preset", BurnInRow(presetBox, savePreset)),
-                LabeledRow("Format", containerBox),
-                LabeledRow("Range", rangeBox),
+                LabeledRow("Predefinição", BurnInRow(presetBox, savePreset)),
+                LabeledRow("Formato", containerBox),
+                LabeledRow("Intervalo", rangeBox),
                 modeRow,
                 codecRow,
                 rateRow,
@@ -1308,9 +1308,9 @@ internal static class ExportSettingsDialog
                 handlesRow,
                 colorHeader,
                 bakeColorCheck,
-                new TextBlock { Text = "Metadata", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, Margin = new Thickness(0, 8, 0, 0) },
-                TwoColumnRow("Title", metaTitle, "Author", metaAuthor),
-                TwoColumnRow("Copyright", metaCopyright, "Comment", metaComment),
+                new TextBlock { Text = "Metadados", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, Margin = new Thickness(0, 8, 0, 0) },
+                TwoColumnRow("Título", metaTitle, "Autor", metaAuthor),
+                TwoColumnRow("Direitos de autor", metaCopyright, "Comentário", metaComment),
             },
         };
         UpdateAudioOnlyMode(); // reflect the initial (video) selection
@@ -1318,7 +1318,7 @@ internal static class ExportSettingsDialog
 
         var dialog = new Window
         {
-            Title = "Export Settings",
+            Title = "Definições de exportação",
             Icon = AppIcon.Window,
             Width = 500,
             Height = 680,
@@ -1493,7 +1493,7 @@ internal static class ExportSettingsDialog
 
     /// <summary>The preset-dropdown labels: "Custom" followed by each preset's name.</summary>
     private static List<string> PresetLabels(IReadOnlyList<ExportPreset> presets) =>
-        ["Custom", .. presets.Select(p => p.Name)];
+        ["Personalizado", .. presets.Select(p => p.Name)];
 
     /// <summary>Index of <paramref name="value"/> in the resolution dropdown (0 = "Same as sequence"); -1 if a
     /// hand-edited preset carries a resolution not offered here.</summary>
@@ -1507,16 +1507,16 @@ internal static class ExportSettingsDialog
 
     /// <summary>Prompts for an export preset name (see <see cref="NamePromptDialog"/>).</summary>
     private static Task<string?> PromptForPresetName(Window owner) =>
-        NamePromptDialog.Show(owner, "Save Export Preset", "Preset name", "e.g. YouTube 1080p");
+        NamePromptDialog.Show(owner, "Guardar predefinição de exportação", "Nome da predefinição", "ex.: YouTube 1080p");
 
     /// <summary>A nine-point burn-in position picker, preselected to <paramref name="defaultIndex"/>.</summary>
     private static ComboBox MakePositionCombo(int defaultIndex)
     {
         ComboBox combo = MakeCombo(
         [
-            "Top Left", "Top Center", "Top Right",
-            "Middle Left", "Center", "Middle Right",
-            "Bottom Left", "Bottom Center", "Bottom Right",
+            "Topo esquerdo", "Topo centro", "Topo direito",
+            "Meio esquerdo", "Centro", "Meio direito",
+            "Base esquerda", "Base centro", "Base direita",
         ]);
         combo.Width = 130;
         combo.HorizontalAlignment = HorizontalAlignment.Right;
@@ -1601,7 +1601,7 @@ internal sealed class ExportProgressDialog : Window
     {
         _cts = cts;
 
-        Title = "Exporting";
+        Title = "A exportar";
         Icon = AppIcon.Window;
         Width = 440;
         Height = 160;
@@ -1620,7 +1620,7 @@ internal sealed class ExportProgressDialog : Window
         };
         _cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -1641,7 +1641,7 @@ internal sealed class ExportProgressDialog : Window
             {
                 new TextBlock
                 {
-                    Text = $"Exporting {fileName}…",
+                    Text = $"A exportar {fileName}…",
                     Foreground = Palette.TextBrush,
                     FontSize = Typography.Body,
                     TextTrimming = TextTrimming.CharacterEllipsis,
@@ -1672,7 +1672,7 @@ internal sealed class ExportProgressDialog : Window
     private void RequestCancel()
     {
         _cancel.IsEnabled = false;
-        _percent.Text = "Cancelling…";
+        _percent.Text = "A cancelar…";
         _cts.Cancel();
     }
 

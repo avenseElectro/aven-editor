@@ -33,20 +33,20 @@ internal static class FrameHoldOptionsDialog
         // unchecking it on a held clip releases the hold.
         var hold = new CheckBox
         {
-            Content = "Hold on frame",
+            Content = "Congelar no fotograma",
             IsChecked = true,
             Foreground = Palette.TextBrush,
         };
 
-        var inPointRadio = new RadioButton { Content = "In point", GroupName = "holdAt", Foreground = Palette.TextBrush };
+        var inPointRadio = new RadioButton { Content = "Ponto de entrada", GroupName = "holdAt", Foreground = Palette.TextBrush };
         var playheadRadio = new RadioButton
         {
-            Content = "Playhead",
+            Content = "Indicador de reprodução",
             GroupName = "holdAt",
             Foreground = Palette.TextBrush,
             IsEnabled = playheadSource is not null,
         };
-        var sourceRadio = new RadioButton { Content = "Source time (seconds):", GroupName = "holdAt", Foreground = Palette.TextBrush };
+        var sourceRadio = new RadioButton { Content = "Tempo de origem (segundos):", GroupName = "holdAt", Foreground = Palette.TextBrush };
         var seconds = new TextBox
         {
             Width = 90,
@@ -77,7 +77,7 @@ internal static class FrameHoldOptionsDialog
         };
         var cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -101,7 +101,7 @@ internal static class FrameHoldOptionsDialog
 
         var dialog = new Window
         {
-            Title = "Frame Hold Options",
+            Title = "Opções de congelação de fotograma",
             Icon = AppIcon.Window,
             Width = 440,
             Height = 280,

@@ -67,8 +67,8 @@ public static class FrameHoldEdits
         Timecode holdDuration = clip.TimelineEnd - at;
 
         var split = new SplitClipCommand(track, clip, at, rightLinkGroup);
-        var hold = new SetClipHoldCommand(split.RightClip, holdAt, holdDuration, "Add frame hold");
-        return (new CompositeCommand("Add frame hold", [split, hold]), split.RightClip);
+        var hold = new SetClipHoldCommand(split.RightClip, holdAt, holdDuration, "Adicionar congelação de fotograma");
+        return (new CompositeCommand("Adicionar congelação de fotograma", [split, hold]), split.RightClip);
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ public static class FrameHoldEdits
             throw new ArgumentException("The insertion point must lie inside the clip.", nameof(at));
 
         return InsertFreeze(track, clip, at, clip.MapToSourceVideo(at), holdDuration, downstream, rightLinkGroup,
-            "Insert frame hold segment");
+            "Inserir segmento de congelação de fotograma");
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public static class FrameHoldEdits
         Timecode frameDuration = span.TimelineEnd - Timecode.Max(span.TimelineStart, clip.TimelineStart);
 
         return InsertFreeze(track, clip, insertAt, span.SourceFrameStart, frameDuration, downstream, rightLinkGroup,
-            "Duplicate frame");
+            "Duplicar fotograma");
     }
 
     /// <summary>
@@ -165,9 +165,9 @@ public static class FrameHoldEdits
             shifted.Add((splitRight.RightClip, to)); // the kept tail closes the gap with the downstream set
         }
         commands.Add(new RemoveClipCommand(track, middle));
-        commands.Add(new ShiftClipsCommand(shifted, -gap, "Remove frame"));
+        commands.Add(new ShiftClipsCommand(shifted, -gap, "Remover fotograma"));
 
-        return new CompositeCommand("Remove frame", commands);
+        return new CompositeCommand("Remover fotograma", commands);
     }
 
     /// <summary>Shared assembly for the freeze-inserting gestures: optional split at the insertion point, shift

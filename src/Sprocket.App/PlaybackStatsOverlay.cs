@@ -59,7 +59,7 @@ internal sealed class PlaybackStatsOverlay : Window
     {
         _engine = engineAccessor;
 
-        Title = "Playback Statistics";
+        Title = "Estatísticas de Reprodução";
         Icon = AppIcon.Window;
         Width = 320;
         SizeToContent = SizeToContent.Height;
@@ -78,51 +78,54 @@ internal sealed class PlaybackStatsOverlay : Window
         };
 
         int row = 0;
-        _state = AddRow(grid, ref row, "State",
-            "Whether the preview is currently playing or paused.");
-        _position = AddRow(grid, ref row, "Position",
-            "The playhead position and the total duration of what's loaded.");
+        _state = AddRow(grid, ref row, "Estado",
+            "Se a pré-visualização está atualmente a reproduzir ou em pausa.");
+        _position = AddRow(grid, ref row, "Posição",
+            "A posição do indicador de reprodução e a duração total do que está carregado.");
         AddSeparator(grid, ref row);
-        _decode = AddRow(grid, ref row, "Video decode",
-            "The codec decoding the preview, and whether it runs on the GPU (hardware-accelerated) or the CPU "
-            + "(software). GPU is faster and is the usual fix for 1080p stutter.");
-        _targetFps = AddRow(grid, ref row, "Timeline rate",
-            "The sequence's frame rate — the rate the preview is trying to hit.");
-        _previewFps = AddRow(grid, ref row, "Preview rate",
-            "Timeline frames delivered on schedule per second, averaged over a few seconds. A slow-motion clip "
-            + "holds each source frame across several timeline frames by design — those still count, so this should "
-            + "match the timeline rate during smooth playback at any clip speed; a lower number means the preview "
-            + "can't keep up.");
-        _dropped = AddRow(grid, ref row, "Dropped frames",
-            "Timeline frames the preview couldn't render in time and had to skip to keep pace with the clock, for "
-            + "the current playback (it resets each time you start playing). Frames a clip skips because its frame "
-            + "rate is higher than the sequence, and frames a slow-motion clip holds on purpose, aren't counted — "
-            + "only frames lost to falling behind. This climbs when the preview can't keep up; 0 is ideal.");
-        _presented = AddRow(grid, ref row, "Frames shown",
-            "Total repaints presented to the screen since playback started. Slow-motion clips legitimately repaint "
-            + "below the timeline rate (held frames don't repaint), so this can trail the preview rate by design.");
-        _pumpRate = AddRow(grid, ref row, "Pump rate",
-            "How many times per second the playback loop runs to schedule and composite a frame "
-            + "(target ≈ the timeline rate).");
+        _decode = AddRow(grid, ref row, "Descodificação de vídeo",
+            "O codec que descodifica a pré-visualização e se corre na GPU (acelerado por hardware) ou na CPU "
+            + "(software). A GPU é mais rápida e é a solução habitual para engasgos a 1080p.");
+        _targetFps = AddRow(grid, ref row, "Cadência da linha do tempo",
+            "A taxa de fotogramas da sequência — a cadência que a pré-visualização tenta atingir.");
+        _previewFps = AddRow(grid, ref row, "Cadência de pré-visualização",
+            "Fotogramas da linha do tempo entregues a tempo por segundo, em média ao longo de alguns segundos. "
+            + "Um clipe em câmara lenta mantém cada fotograma de origem ao longo de vários fotogramas da linha do "
+            + "tempo por desenho — esses contam na mesma, por isso deve igualar a cadência da linha do tempo numa "
+            + "reprodução fluida a qualquer velocidade de clipe; um valor mais baixo significa que a pré-visualização "
+            + "não consegue acompanhar.");
+        _dropped = AddRow(grid, ref row, "Fotogramas perdidos",
+            "Fotogramas da linha do tempo que a pré-visualização não conseguiu compor a tempo e teve de saltar para "
+            + "acompanhar o relógio, na reprodução atual (recomeça de cada vez que inicia a reprodução). Fotogramas "
+            + "que um clipe salta porque a sua taxa é superior à da sequência, e fotogramas que um clipe em câmara "
+            + "lenta mantém de propósito, não contam — apenas os perdidos por ficar atrás. Isto sobe quando a "
+            + "pré-visualização não acompanha; 0 é o ideal.");
+        _presented = AddRow(grid, ref row, "Fotogramas apresentados",
+            "Total de repinturas apresentadas ao ecrã desde o início da reprodução. Clipes em câmara lenta "
+            + "legitimamente repintam abaixo da cadência da linha do tempo (fotogramas mantidos não repintam), "
+            + "por isso pode ficar atrás da cadência de pré-visualização por desenho.");
+        _pumpRate = AddRow(grid, ref row, "Cadência do ciclo",
+            "Quantas vezes por segundo o ciclo de reprodução corre para agendar e compor um fotograma "
+            + "(alvo ≈ a cadência da linha do tempo).");
         AddSeparator(grid, ref row);
         _cpu = AddRow(grid, ref row, "CPU",
-            "This process's CPU use — as a share of the whole machine, and as a number of cores in use.");
-        _memory = AddRow(grid, ref row, "Working set",
-            "Physical memory (RAM) the app is currently using.");
-        _gcHeap = AddRow(grid, ref row, "Managed heap",
-            "Memory held by .NET managed objects. Decoded frame pixels never live here, so it should stay low "
-            + "and steady during playback.");
+            "O uso de CPU deste processo — como parte da máquina inteira e como número de núcleos em uso.");
+        _memory = AddRow(grid, ref row, "Conjunto de trabalho",
+            "Memória física (RAM) que a aplicação está atualmente a usar.");
+        _gcHeap = AddRow(grid, ref row, "Heap gerida",
+            "Memória retida por objetos geridos .NET. Os píxeis dos fotogramas descodificados nunca vivem aqui, "
+            + "por isso deve manter-se baixa e estável durante a reprodução.");
         _gcCollections = AddRow(grid, ref row, "GC (g0/g1/g2)",
-            "Garbage-collection counts for generations 0/1/2. Gen-0 should stay flat while playing — a rising "
-            + "count means per-frame managed allocations, which can cause hitches.");
+            "Contagens de recolha de lixo para as gerações 0/1/2. A g0 deve manter-se plana durante a reprodução — "
+            + "uma contagem a subir significa alocações geridas por fotograma, que podem causar solavancos.");
         _threads = AddRow(grid, ref row, "Threads",
-            "The number of OS threads the process is running.");
+            "O número de threads do SO que o processo está a executar.");
 
         var footnote = new TextBlock
         {
-            Text = "Amber video decode = CPU/software path (the usual 1080p stutter cause); green = GPU. Dropped "
-                 + "frames climb when the preview can't keep pace, and gen-0 GC should stay flat — frame pixels "
-                 + "never touch the managed heap.",
+            Text = "Descodificação de vídeo a âmbar = caminho CPU/software (a causa habitual dos engasgos a 1080p); "
+                 + "verde = GPU. Os fotogramas perdidos sobem quando a pré-visualização não acompanha, e o GC g0 "
+                 + "deve manter-se plano — os píxeis dos fotogramas nunca tocam na heap gerida.",
             Foreground = Palette.MutedTextBrush,
             FontSize = Typography.Micro,
             TextWrapping = TextWrapping.Wrap,
@@ -226,7 +229,7 @@ internal sealed class PlaybackStatsOverlay : Window
     {
         if (engine is null)
         {
-            _state.Text = "no media";
+            _state.Text = "sem multimédia";
             _state.Foreground = Palette.MutedTextBrush;
             _position.Text = _decode.Text = _targetFps.Text = _previewFps.Text = _dropped.Text
                 = _presented.Text = _pumpRate.Text = "—";
@@ -236,7 +239,12 @@ internal sealed class PlaybackStatsOverlay : Window
 
         PlaybackState state = engine.State;
         bool playing = state == PlaybackState.Playing;
-        _state.Text = state.ToString();
+        _state.Text = state switch
+        {
+            PlaybackState.Playing => "Em reprodução",
+            PlaybackState.Paused => "Em pausa",
+            _ => "Pronto",
+        };
         _state.Foreground = playing ? Good : Palette.TextBrush;
 
         _position.Text = $"{FormatTime(engine.Position)} / {FormatTime(engine.Duration)}";
@@ -264,7 +272,7 @@ internal sealed class PlaybackStatsOverlay : Window
 
         if (fps < 0)
         {
-            _previewFps.Text = "measuring…";
+            _previewFps.Text = "a medir…";
             _previewFps.Foreground = Palette.MutedTextBrush;
         }
         else
@@ -297,13 +305,13 @@ internal sealed class PlaybackStatsOverlay : Window
     {
         if (cpuRate < 0)
         {
-            _cpu.Text = "measuring…";
+            _cpu.Text = "a medir…";
             _cpu.Foreground = Palette.MutedTextBrush;
         }
         else
         {
             double machinePct = cpuRate / _cores * 100.0;
-            _cpu.Text = $"{machinePct:0}%  ·  {cpuRate:0.0} cores";
+            _cpu.Text = $"{machinePct:0}%  ·  {cpuRate:0.0} núcleos";
             _cpu.Foreground = machinePct < 60 ? Good : machinePct < 85 ? Warn : Bad;
         }
 

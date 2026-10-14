@@ -29,7 +29,7 @@ public sealed class AudioChainTargetTests
         AudioChainTarget target = AudioChainTarget.ForTrack(track);
         Assert.Same(track.Effects, target.Chain);
         Assert.Same(track, target.StateKey); // RenderGraph keys the track chain by the track object
-        Assert.Equal("Track Inserts — Music", target.Title);
+        Assert.Equal("Inserções de pista — Music", target.Title);
         Assert.True(target.IsAlive(project));
     }
 
@@ -37,7 +37,7 @@ public sealed class AudioChainTargetTests
     public void ForTrack_UnnamedTrack_FallsBackLikeTheMixerStrip()
     {
         var track = new AudioTrack();
-        Assert.Equal("Track Inserts — Audio", AudioChainTarget.ForTrack(track).Title);
+        Assert.Equal("Inserções de pista — Áudio", AudioChainTarget.ForTrack(track).Title);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public sealed class AudioChainTargetTests
         AudioChainTarget target = AudioChainTarget.ForSequenceBus(project.Timeline, project.ActiveSequence.Name);
         Assert.Same(project.Timeline.AudioEffects, target.Chain);
         Assert.Same(project.Timeline, target.StateKey); // the root bus is keyed by the timeline
-        Assert.Equal("Bus Inserts — Sequence 1", target.Title);
+        Assert.Equal("Inserções de Bus — Sequence 1", target.Title);
         Assert.True(target.IsAlive(project));
     }
 
@@ -58,7 +58,7 @@ public sealed class AudioChainTargetTests
         AudioChainTarget target = AudioChainTarget.ForMaster(project.Settings);
         Assert.Same(project.Settings.MasterAudioEffects, target.Chain);
         Assert.Same(project.Settings, target.StateKey); // the master chain is keyed by the settings object
-        Assert.Equal("Master Inserts", target.Title);
+        Assert.Equal("Inserções Master", target.Title);
         Assert.True(target.IsAlive(project));
     }
 

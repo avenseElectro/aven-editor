@@ -37,7 +37,7 @@ internal static class PreferencesDialog
         // ── Audio output device ─────────────────────────────────────────────────────────────────
         // "System Default" ("" specifier) plus the enumerated devices. Keep the persisted device selectable even
         // when it isn't currently enumerated (unplugged) so leaving the dialog doesn't silently discard the choice.
-        var deviceLabels = new List<string> { "System Default" };
+        var deviceLabels = new List<string> { "Predefinição do sistema" };
         var deviceSpecs = new List<string> { "" };
         foreach (string d in audioDevices)
         {
@@ -46,7 +46,7 @@ internal static class PreferencesDialog
         }
         if (current.AudioOutputDevice.Length > 0 && !deviceSpecs.Contains(current.AudioOutputDevice))
         {
-            deviceLabels.Add($"{current.AudioOutputDevice} (not connected)");
+            deviceLabels.Add($"{current.AudioOutputDevice} (não ligado)");
             deviceSpecs.Add(current.AudioOutputDevice);
         }
         var audioDevice = new ComboBox
@@ -63,9 +63,9 @@ internal static class PreferencesDialog
         var proxySizeText = Muted(PreferencesFormat.Bytes(proxyCacheSize()));
         var renderSizeText = Muted(PreferencesFormat.Bytes(renderCacheSize()));
         var analysisSizeText = Muted(PreferencesFormat.Bytes(analysisCacheSize()));
-        Button clearProxy = SmallButton("Clear");
-        Button clearRender = SmallButton("Clear");
-        Button clearAnalysis = SmallButton("Clear");
+        Button clearProxy = SmallButton("Limpar");
+        Button clearRender = SmallButton("Limpar");
+        Button clearAnalysis = SmallButton("Limpar");
 
         // ── Export metadata defaults ────────────────────────────────────────────────────────────
         TextBox title = MakeText(current.ExportTitle);
@@ -87,14 +87,14 @@ internal static class PreferencesDialog
         // ── Updates (PLAN.md steps 36 + 45) ─────────────────────────────────────────────────────
         var updatesEnabled = new CheckBox
         {
-            Content = "Check for updates at startup",
+            Content = "Procurar atualizações no arranque",
             IsChecked = current.UpdateCheckEnabled,
             Foreground = Palette.TextBrush,
         };
         var updatesNote = new TextBlock
         {
-            Text = "Sprocket tells you when a newer build is published; nothing downloads or installs " +
-                   "without your say-so. Portable builds are pointed at the releases page instead.",
+            Text = "O Sprocket avisa-o quando é publicada uma nova versão; nada é transferido nem instalado " +
+                   "sem a sua autorização. As versões portáteis são encaminhadas para a página de lançamentos.",
             Foreground = Palette.MutedTextBrush,
             FontSize = Typography.Caption,
             TextWrapping = TextWrapping.Wrap,
@@ -104,7 +104,7 @@ internal static class PreferencesDialog
         string token = current.McpToken;
         var mcpEnabled = new CheckBox
         {
-            Content = "Enable MCP server (loopback only)",
+            Content = "Ativar servidor MCP (apenas loopback)",
             IsChecked = current.McpEnabled,
             Foreground = Palette.TextBrush,
         };
@@ -113,7 +113,7 @@ internal static class PreferencesDialog
         port.HorizontalAlignment = HorizontalAlignment.Left;
         var requireToken = new CheckBox
         {
-            Content = "Require bearer token",
+            Content = "Exigir token bearer",
             IsChecked = current.McpRequireToken,
             Foreground = Palette.TextBrush,
         };
@@ -126,10 +126,10 @@ internal static class PreferencesDialog
             Foreground = Palette.MutedTextBrush,
             Background = Palette.PanelBgBrush,
         };
-        Button copySetup = SmallButton("Copy setup command");
+        Button copySetup = SmallButton("Copiar comando de configuração");
         var mcpWarning = new TextBlock
         {
-            Text = "While enabled, a local AI client can inspect and edit the open project.",
+            Text = "Enquanto ativado, um cliente de IA local pode inspecionar e editar o projeto aberto.",
             Foreground = Palette.MutedTextBrush,
             FontSize = Typography.Caption,
             TextWrapping = TextWrapping.Wrap,
@@ -165,7 +165,7 @@ internal static class PreferencesDialog
         };
         var cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -174,7 +174,7 @@ internal static class PreferencesDialog
 
         var dialog = new Window
         {
-            Title = "Preferences",
+            Title = "Preferências",
             Icon = AppIcon.Window,
             Width = 474,
             Height = 640,
@@ -205,38 +205,38 @@ internal static class PreferencesDialog
                             Children =
                             {
                                 Section("Caches"),
-                                CacheRow("Proxy cache", proxySizeText, clearProxy),
-                                CacheRow("Render cache (this project)", renderSizeText, clearRender),
-                                CacheRow("Stabilization analysis cache", analysisSizeText, clearAnalysis),
+                                CacheRow("Cache de proxy", proxySizeText, clearProxy),
+                                CacheRow("Cache de processamento (este projeto)", renderSizeText, clearRender),
+                                CacheRow("Cache de análise de estabilização", analysisSizeText, clearAnalysis),
 
-                                Section("Export metadata defaults"),
-                                Labeled("Title", title),
-                                Labeled("Author", author),
-                                Labeled("Copyright", copyright),
-                                Labeled("Comment", comment),
-                                Hint("Tokens {project}, {username}, {year} and {date} are replaced when you export. "
-                                    + "Leave Comment blank and every export still carries “Created with Sprocket” "
-                                    + "plus the Sprocket version."),
+                                Section("Predefinições de metadados de exportação"),
+                                Labeled("Título", title),
+                                Labeled("Autor", author),
+                                Labeled("Direitos de autor", copyright),
+                                Labeled("Comentário", comment),
+                                Hint("Os tokens {project}, {username}, {year} e {date} são substituídos ao exportar. "
+                                    + "Se deixar o Comentário em branco, todas as exportações continuam a incluir "
+                                    + "“Criado com o Sprocket” mais a versão do Sprocket."),
 
-                                Section("Autosave"),
-                                Labeled($"Interval (seconds, {UserSettingsStore.MinAutosaveSeconds}–{UserSettingsStore.MaxAutosaveSeconds})", autosave),
+                                Section("Gravação automática"),
+                                Labeled($"Intervalo (segundos, {UserSettingsStore.MinAutosaveSeconds}–{UserSettingsStore.MaxAutosaveSeconds})", autosave),
 
-                                Section("Import"),
-                                Labeled("Still image default duration (seconds)", stillDuration),
+                                Section("Importar"),
+                                Labeled("Duração predefinida de imagens fixas (segundos)", stillDuration),
 
-                                Section("Audio"),
-                                Labeled("Output device", audioDevice),
-                                Hint("Choose where playback is monitored. A change applies immediately without "
-                                    + "interrupting playback; if the chosen device is later unavailable, Sprocket "
-                                    + "uses the system default."),
+                                Section("Áudio"),
+                                Labeled("Dispositivo de saída", audioDevice),
+                                Hint("Escolha onde a reprodução é monitorizada. Uma alteração aplica-se de imediato "
+                                    + "sem interromper a reprodução; se o dispositivo escolhido ficar indisponível "
+                                    + "mais tarde, o Sprocket usa a predefinição do sistema."),
 
-                                Section("Updates"),
+                                Section("Atualizações"),
                                 updatesEnabled,
                                 updatesNote,
 
-                                Section("AI control (MCP)"),
+                                Section("Controlo de IA (MCP)"),
                                 mcpEnabled,
-                                Labeled("Port", port),
+                                Labeled("Porta", port),
                                 requireToken,
                                 tokenText,
                                 copySetup,
@@ -251,9 +251,9 @@ internal static class PreferencesDialog
         clearProxy.Click += async (_, _) =>
         {
             long size = proxyCacheSize();
-            bool confirmed = await ConfirmDialog.Show(dialog, "Clear Proxy Cache",
-                $"Delete all cached proxy files?\n\nCurrently using {PreferencesFormat.Bytes(size)}. " +
-                "Proxies regenerate on demand; open projects may re-queue proxy builds.", "Clear", "Cancel");
+            bool confirmed = await ConfirmDialog.Show(dialog, "Limpar Cache de Proxy",
+                $"Eliminar todos os ficheiros proxy em cache?\n\nAtualmente a usar {PreferencesFormat.Bytes(size)}. " +
+                "Os proxies são regenerados a pedido; os projetos abertos podem voltar a pôr construções de proxy na fila.", "Limpar", "Cancelar");
             if (!confirmed)
                 return;
             clearProxyCache();
@@ -263,9 +263,9 @@ internal static class PreferencesDialog
         clearAnalysis.Click += async (_, _) =>
         {
             long size = analysisCacheSize();
-            bool confirmed = await ConfirmDialog.Show(dialog, "Clear Analysis Cache",
-                $"Delete all cached stabilization motion tracks?\n\nCurrently using {PreferencesFormat.Bytes(size)}. " +
-                "Stabilized clips re-analyze on demand; open projects may re-queue analyses.", "Clear", "Cancel");
+            bool confirmed = await ConfirmDialog.Show(dialog, "Limpar Cache de Análise",
+                $"Eliminar todos os traçados de movimento de estabilização em cache?\n\nAtualmente a usar {PreferencesFormat.Bytes(size)}. " +
+                "Os clipes estabilizados voltam a ser analisados a pedido; os projetos abertos podem voltar a pôr análises na fila.", "Limpar", "Cancelar");
             if (!confirmed)
                 return;
             clearAnalysisCache();
@@ -275,9 +275,9 @@ internal static class PreferencesDialog
         clearRender.Click += async (_, _) =>
         {
             long size = renderCacheSize();
-            bool confirmed = await ConfirmDialog.Show(dialog, "Delete Render Files",
-                $"Delete this project's preview render files?\n\nCurrently using {PreferencesFormat.Bytes(size)}. " +
-                "Rendered previews rebuild when you render again.", "Delete", "Cancel");
+            bool confirmed = await ConfirmDialog.Show(dialog, "Eliminar Ficheiros de Processamento",
+                $"Eliminar os ficheiros de processamento de pré-visualização deste projeto?\n\nAtualmente a usar {PreferencesFormat.Bytes(size)}. " +
+                "As pré-visualizações processadas são reconstruídas quando voltar a processar.", "Eliminar", "Cancelar");
             if (!confirmed)
                 return;
             clearRenderCache();

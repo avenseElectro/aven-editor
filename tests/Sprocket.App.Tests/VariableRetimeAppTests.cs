@@ -55,8 +55,8 @@ public class VariableRetimeAppTests
         Assert.Equal("◀", TimelineControl.RetimeBadgeText(clip));
 
         clip.SpeedCurve = AnimatableValue.Animated([new Keyframe(Timecode.Zero, 1.0), new Keyframe(Timecode.FromSeconds(1), 2.0)]);
-        Assert.Equal("◀ RAMP", TimelineControl.RetimeBadgeText(clip));
+        Assert.Equal("◀ RAMPA", TimelineControl.RetimeBadgeText(clip));
         clip.Reverse = false;
-        Assert.Equal("RAMP", TimelineControl.RetimeBadgeText(clip));
+        Assert.Equal("RAMPA", TimelineControl.RetimeBadgeText(clip));
     }
 }

@@ -23,7 +23,7 @@ internal static class LooksBrowserModel
         if (look.Entries is [{ EffectTypeId: EffectTypeIds.CreativeLut }])
             return "LUT";
         int n = look.Entries.Count;
-        return n == 1 ? "1 effect" : $"{n} effects";
+        return n == 1 ? "1 efeito" : $"{n} efeitos";
     }
 
     /// <summary>Whether <paramref name="look"/> matches the search box: its name, group or description contains every
@@ -64,7 +64,7 @@ internal static class LooksBrowserModel
             Look.NewUserId(),
             string.IsNullOrWhiteSpace(name) ? "LUT" : name,
             Look.UserGroup,
-            $"Creative LUT: {Path.GetFileName(path)}",
+            $"LUT criativa: {Path.GetFileName(path)}",
             [
                 new LookEntry(EffectTypeIds.CreativeLut,
                     new Dictionary<string, double> { [EffectParamNames.Mix] = 1.0 },
@@ -79,10 +79,10 @@ internal static class LooksBrowserModel
         ArgumentNullException.ThrowIfNull(look);
         ArgumentNullException.ThrowIfNull(result);
         string skipped = result.Skipped.Count == 0 ? string.Empty
-            : $" Skipped {result.Skipped.Count} unavailable effect{(result.Skipped.Count == 1 ? "" : "s")} ({string.Join(", ", result.Skipped.Distinct())}).";
+            : $" Ignorado{(result.Skipped.Count == 1 ? "" : "s")} {result.Skipped.Count} efeito{(result.Skipped.Count == 1 ? "" : "s")} indisponíve{(result.Skipped.Count == 1 ? "l" : "is")} ({string.Join(", ", result.Skipped.Distinct())}).";
         if (result.Command is null)
-            return $"Couldn't apply look {look.Name}: none of its effects are available.{skipped}";
-        return $"Applied look {look.Name} to {clipName}.{skipped}";
+            return $"Não foi possível aplicar o estilo {look.Name}: nenhum dos seus efeitos está disponível.{skipped}";
+        return $"Estilo {look.Name} aplicado a {clipName}.{skipped}";
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ internal static class LooksBrowserModel
     }
 
     /// <summary>The status line when a look is applied to a clip on an audio track.</summary>
-    public const string AudioClipRefusal = "Looks grade video. Select a video clip to apply one.";
+    public const string AudioClipRefusal = "Os estilos gradam vídeo. Selecione um clipe de vídeo para aplicar um.";
 
     /// <summary>
     /// The browser's and the timeline's shared apply: refuses a clip on an audio track (looks carry only colour
@@ -121,5 +121,5 @@ internal static class LooksBrowserModel
 
     /// <summary>The display name of <paramref name="clip"/> for a status line: its source file name, else "clip".</summary>
     public static string ClipName(Project project, Clip clip) =>
-        Path.GetFileName(project.MediaPool.Get(clip.MediaRefId)?.AbsolutePath) is { Length: > 0 } name ? name : "clip";
+        Path.GetFileName(project.MediaPool.Get(clip.MediaRefId)?.AbsolutePath) is { Length: > 0 } name ? name : "clipe";
 }

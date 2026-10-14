@@ -55,7 +55,7 @@ internal static class InterpretFootageDialog
         };
         var cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -64,7 +64,7 @@ internal static class InterpretFootageDialog
 
         var dialog = new Window
         {
-            Title = "Interpret Footage",
+            Title = "Interpretar metragem",
             Icon = AppIcon.Window,
             Width = 440,
             Height = 210,
@@ -100,7 +100,7 @@ internal static class InterpretFootageDialog
                             },
                             new TextBlock
                             {
-                                Text = $"Currently {FormatFps(currentFps)}. Assume this frame rate:",
+                                Text = $"Atualmente {FormatFps(currentFps)}. Assumir esta cadência de fotogramas:",
                                 Foreground = Palette.MutedTextBrush,
                                 FontSize = Typography.Body,
                             },

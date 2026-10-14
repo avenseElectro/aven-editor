@@ -59,8 +59,8 @@ public sealed class AudioChainTarget
         ArgumentNullException.ThrowIfNull(track);
         return new AudioChainTarget(
             AudioChainScope.Track, track.Effects, track,
-            $"Track Inserts — {TrackName(track)}",
-            "Pre-fader inserts: run after each clip's own effects and before the track fader and pan.");
+            $"Inserções de pista — {TrackName(track)}",
+            "Inserções pré-fader: correm depois dos efeitos do próprio clipe e antes do fader e do balanço da pista.");
     }
 
     /// <summary>The active sequence's output-bus chain.</summary>
@@ -69,8 +69,8 @@ public sealed class AudioChainTarget
         ArgumentNullException.ThrowIfNull(timeline);
         return new AudioChainTarget(
             AudioChainScope.SequenceBus, timeline.AudioEffects, timeline,
-            string.IsNullOrEmpty(sequenceName) ? "Bus Inserts" : $"Bus Inserts — {sequenceName}",
-            "Sequence output bus: processes the sequence's summed mix, before the project master chain.");
+            string.IsNullOrEmpty(sequenceName) ? "Inserções de Bus" : $"Inserções de Bus — {sequenceName}",
+            "Bus de saída da sequência: processa a mistura somada da sequência, antes da cadeia master do projeto.");
     }
 
     /// <summary>The project master chain.</summary>
@@ -79,13 +79,13 @@ public sealed class AudioChainTarget
         ArgumentNullException.ThrowIfNull(settings);
         return new AudioChainTarget(
             AudioChainScope.Master, settings.MasterAudioEffects, settings,
-            "Master Inserts",
-            "Master bus: processes the final mix, before the master fader.");
+            "Inserções Master",
+            "Bus master: processa a mistura final, antes do fader master.");
     }
 
     /// <summary>The display name a track strip / chain title uses (tracks can be unnamed).</summary>
     public static string TrackName(AudioTrack track) =>
-        string.IsNullOrEmpty(track.Name) ? "Audio" : track.Name;
+        string.IsNullOrEmpty(track.Name) ? "Áudio" : track.Name;
 
     /// <summary>
     /// Whether this chain still belongs to the project's current state — the track is still in the active

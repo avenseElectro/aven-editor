@@ -129,7 +129,7 @@ public sealed class MixerView : UserControl
 
     private Control BuildLayout()
     {
-        var header = new TextBlock { Text = "Mixer", FontWeight = FontWeight.SemiBold, Foreground = Palette.TextBrush };
+        var header = new TextBlock { Text = "Misturador", FontWeight = FontWeight.SemiBold, Foreground = Palette.TextBrush };
 
         var stripScroll = new ScrollViewer
         {
@@ -156,10 +156,10 @@ public sealed class MixerView : UserControl
         _integratedText.FontWeight = FontWeight.SemiBold;
 
         var numbers = new StackPanel { Spacing = 2 };
-        numbers.Children.Add(Row("Integrated", _integratedText));
-        numbers.Children.Add(Row("Short-term", _shortTermText));
-        numbers.Children.Add(Row("Momentary", _momentaryText));
-        numbers.Children.Add(Row("True peak", _truePeakText));
+        numbers.Children.Add(Row("Integrada", _integratedText));
+        numbers.Children.Add(Row("Curto prazo", _shortTermText));
+        numbers.Children.Add(Row("Momentânea", _momentaryText));
+        numbers.Children.Add(Row("Pico real", _truePeakText));
 
         var meters = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, VerticalAlignment = VerticalAlignment.Bottom };
         meters.Children.Add(LabeledMeter("L", _meterL));
@@ -172,7 +172,7 @@ public sealed class MixerView : UserControl
         {
             if (_suppress || _project is null || _history is null) return;
             _history.Execute(SetPropertyCommand<double>.Create(
-                "Master gain", () => _project.Settings.MasterGainDb, v => _project.Settings.MasterGainDb = v,
+                "Ganho do master", () => _project.Settings.MasterGainDb, v => _project.Settings.MasterGainDb = v,
                 e.NewValue, mergeKey: "master.gain"));
             _masterGainLabel.Text = MixerFormat.GainDbLabel(e.NewValue);
         };
@@ -187,7 +187,7 @@ public sealed class MixerView : UserControl
         right.Children.Add(meters);
         right.Children.Add(fader);
 
-        var normalize = new Button { Content = "Normalize", Padding = new Thickness(8, 3), VerticalAlignment = VerticalAlignment.Bottom };
+        var normalize = new Button { Content = "Normalizar", Padding = new Thickness(8, 3), VerticalAlignment = VerticalAlignment.Bottom };
         normalize.Click += (_, _) => NormalizeMaster();
         right.Children.Add(normalize);
 
@@ -198,7 +198,7 @@ public sealed class MixerView : UserControl
         grid.Children.Add(right);
 
         var targetRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Margin = new Thickness(0, 6, 0, 0) };
-        targetRow.Children.Add(new TextBlock { Text = "Normalize to", Foreground = Palette.MutedTextBrush, VerticalAlignment = VerticalAlignment.Center, FontSize = Typography.Caption });
+        targetRow.Children.Add(new TextBlock { Text = "Normalizar para", Foreground = Palette.MutedTextBrush, VerticalAlignment = VerticalAlignment.Center, FontSize = Typography.Caption });
         targetRow.Children.Add(BuildTargetPicker());
 
         var panel = new StackPanel { Spacing = 4, Margin = new Thickness(0, 6, 0, 8) };
@@ -225,7 +225,7 @@ public sealed class MixerView : UserControl
         [
             ("-14 LUFS (streaming)", LoudnessNormalization.StreamingMinus14Lufs),
             ("-16 LUFS", LoudnessNormalization.StreamingMinus16Lufs),
-            ("-23 LUFS (broadcast)", LoudnessNormalization.BroadcastMinus23Lufs),
+            ("-23 LUFS (difusão)", LoudnessNormalization.BroadcastMinus23Lufs),
         ];
         foreach ((string label, double lufs) in targets)
             picker.Items.Add(new ComboBoxItem { Content = label, Tag = lufs });
@@ -257,7 +257,7 @@ public sealed class MixerView : UserControl
         if (_builtOrder.Count == 0)
             _strips.Children.Add(new TextBlock
             {
-                Text = "No audio tracks. Add one with + Track.",
+                Text = "Sem pistas de áudio. Adicione uma com + Pista.",
                 Foreground = Palette.FaintTextBrush,
                 Margin = new Thickness(2, 8),
             });
@@ -274,11 +274,11 @@ public sealed class MixerView : UserControl
     {
         var name = new TextBlock
         {
-            Text = "Sequence Bus",
+            Text = "Barramento da Sequência",
             Foreground = Palette.TextBrush,
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(name, "The sequence's output bus — its inserts process the summed sequence mix before the project master chain.");
+        ToolTip.SetTip(name, "O barramento de saída da sequência — as suas inserções processam a mistura somada da sequência antes da cadeia master do projeto.");
 
         var body = new StackPanel { Spacing = 4 };
         body.Children.Add(name);
@@ -298,7 +298,7 @@ public sealed class MixerView : UserControl
     {
         var name = new TextBlock
         {
-            Text = string.IsNullOrEmpty(track.Name) ? "Audio" : track.Name,
+            Text = string.IsNullOrEmpty(track.Name) ? "Áudio" : track.Name,
             Foreground = Palette.TextBrush, Width = 90, VerticalAlignment = VerticalAlignment.Center,
             TextTrimming = TextTrimming.CharacterEllipsis,
         };
@@ -322,21 +322,21 @@ public sealed class MixerView : UserControl
         mute.Click += (_, _) =>
         {
             if (_suppress) return;
-            Execute(SetPropertyCommand<bool>.Create("Toggle mute", () => track.Muted, v => track.Muted = v, mute.IsChecked == true));
+            Execute(SetPropertyCommand<bool>.Create("Alternar silêncio", () => track.Muted, v => track.Muted = v, mute.IsChecked == true));
         };
         var solo = ToggleBox("S", track.Solo);
         solo.Click += (_, _) =>
         {
             if (_suppress) return;
-            Execute(SetPropertyCommand<bool>.Create("Toggle solo", () => track.Solo, v => track.Solo = v, solo.IsChecked == true));
+            Execute(SetPropertyCommand<bool>.Create("Alternar solo", () => track.Solo, v => track.Solo = v, solo.IsChecked == true));
         };
 
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
         row.Children.Add(name);
-        row.Children.Add(new TextBlock { Text = "Pan", Foreground = Palette.MutedTextBrush, FontSize = Typography.Caption, VerticalAlignment = VerticalAlignment.Center });
+        row.Children.Add(new TextBlock { Text = "Balanço", Foreground = Palette.MutedTextBrush, FontSize = Typography.Caption, VerticalAlignment = VerticalAlignment.Center });
         row.Children.Add(pan);
         row.Children.Add(panLabel);
-        row.Children.Add(new TextBlock { Text = "Gain", Foreground = Palette.MutedTextBrush, FontSize = Typography.Caption, VerticalAlignment = VerticalAlignment.Center });
+        row.Children.Add(new TextBlock { Text = "Ganho", Foreground = Palette.MutedTextBrush, FontSize = Typography.Caption, VerticalAlignment = VerticalAlignment.Center });
         row.Children.Add(gain);
         row.Children.Add(gainLabel);
         row.Children.Add(mute);
@@ -345,7 +345,7 @@ public sealed class MixerView : UserControl
         Button? normalize = null;
         if (_measureTrack is not null)
         {
-            normalize = new Button { Content = "Norm", Padding = new Thickness(6, 2), VerticalAlignment = VerticalAlignment.Center };
+            normalize = new Button { Content = "Normalizar", Padding = new Thickness(6, 2), VerticalAlignment = VerticalAlignment.Center };
             normalize.Click += (_, _) => NormalizeTrack(track);
             row.Children.Add(normalize);
         }
@@ -387,7 +387,7 @@ public sealed class MixerView : UserControl
             HorizontalContentAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(add, "Add an insert effect");
+        ToolTip.SetTip(add, "Adicionar um efeito de inserção");
         var items = new List<MenuItem>();
         foreach (EffectDescriptor descriptor in EffectRelevance.ForAudioChain())
         {
@@ -400,7 +400,7 @@ public sealed class MixerView : UserControl
         var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
         header.Children.Add(new TextBlock
         {
-            Text = "Inserts",
+            Text = "Inserções",
             Foreground = Palette.MutedTextBrush,
             FontSize = Typography.Caption,
             VerticalAlignment = VerticalAlignment.Center,
@@ -433,7 +433,7 @@ public sealed class MixerView : UserControl
             Background = Brushes.Transparent,
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(toggle, effect.Enabled ? "Disable effect" : "Enable effect");
+        ToolTip.SetTip(toggle, effect.Enabled ? "Desativar efeito" : "Ativar efeito");
         toggle.Click += (_, _) => Execute(new SetEffectEnabledCommand(effect, !effect.Enabled));
 
         var name = new Button
@@ -447,7 +447,7 @@ public sealed class MixerView : UserControl
             HorizontalContentAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(name, "Edit parameters in the Inspector");
+        ToolTip.SetTip(name, "Editar parâmetros no Inspetor");
         name.Click += (_, _) => InspectChainRequested?.Invoke(target);
 
         var remove = new Button
@@ -459,13 +459,13 @@ public sealed class MixerView : UserControl
             Foreground = Palette.FaintTextBrush,
             VerticalAlignment = VerticalAlignment.Center,
         };
-        ToolTip.SetTip(remove, "Remove effect");
+        ToolTip.SetTip(remove, "Remover efeito");
         remove.Click += (_, _) => Execute(new RemoveChainEffectCommand(target.Chain, effect));
 
         int count = target.Chain.Count;
-        var up = new MenuItem { Header = "Move Up", IsEnabled = index > 0 };
+        var up = new MenuItem { Header = "Mover para Cima", IsEnabled = index > 0 };
         up.Click += (_, _) => MoveInsert(target, index, EffectReorder.StepIndex(index, count, -1));
-        var down = new MenuItem { Header = "Move Down", IsEnabled = index < count - 1 };
+        var down = new MenuItem { Header = "Mover para Baixo", IsEnabled = index < count - 1 };
         down.Click += (_, _) => MoveInsert(target, index, EffectReorder.StepIndex(index, count, +1));
 
         var row = new DockPanel { Background = Brushes.Transparent, Margin = new Thickness(8, 0, 0, 0) };
@@ -494,7 +494,7 @@ public sealed class MixerView : UserControl
         {
             if (_suppress || _history is null) return;
             _history.Execute(SetPropertyCommand<double>.Create(
-                "Track gain", () => track.GainDb, v => track.GainDb = v, e.NewValue, mergeKey: (track, "GainDb")));
+                "Ganho da pista", () => track.GainDb, v => track.GainDb = v, e.NewValue, mergeKey: (track, "GainDb")));
             if (_stripWidgets.TryGetValue(track, out StripWidgets? w)) w.GainLabel.Text = MixerFormat.GainDbLabel(e.NewValue);
         };
     }
@@ -507,7 +507,7 @@ public sealed class MixerView : UserControl
         {
             if (_suppress || _history is null) return;
             _history.Execute(SetPropertyCommand<double>.Create(
-                "Track pan", () => track.Pan, v => track.Pan = v, e.NewValue, mergeKey: (track, "Pan")));
+                "Balanço da pista", () => track.Pan, v => track.Pan = v, e.NewValue, mergeKey: (track, "Pan")));
             if (_stripWidgets.TryGetValue(track, out StripWidgets? w)) w.PanLabel.Text = MixerFormat.PanLabel(e.NewValue);
         };
     }
@@ -522,7 +522,7 @@ public sealed class MixerView : UserControl
                 return;
             db = Math.Clamp(db, GainMinDb, GainMaxDb);
             _history.Execute(SetPropertyCommand<double>.Create(
-                "Master gain", () => _project.Settings.MasterGainDb, v => _project.Settings.MasterGainDb = v,
+                "Ganho do master", () => _project.Settings.MasterGainDb, v => _project.Settings.MasterGainDb = v,
                 db, mergeKey: "master.gain"));
             _suppress = true;
             try
@@ -551,7 +551,7 @@ public sealed class MixerView : UserControl
             Get: () => _project?.Settings.MasterGainDb ?? 0.0, Set: (v, _) => Commit(v),
             Min: GainMinDb, Max: GainMaxDb, Step: GainStepDb,
             BeginDrag: BeginDrag, EndDrag: EndDrag));
-        ToolTip.SetTip(_masterGainLabel, "Drag to scrub (Shift = coarse, Ctrl = fine) · click to type a dB value");
+        ToolTip.SetTip(_masterGainLabel, "Arraste para ajustar (Shift = grosseiro, Ctrl = fino) · clique para escrever um valor em dB");
     }
 
     /// <summary>
@@ -570,7 +570,7 @@ public sealed class MixerView : UserControl
                 return;
             db = Math.Clamp(db, GainMinDb, GainMaxDb);
             _history.Execute(SetPropertyCommand<double>.Create(
-                "Track gain", () => track.GainDb, v => track.GainDb = v, db, mergeKey: (track, "GainDb")));
+                "Ganho da pista", () => track.GainDb, v => track.GainDb = v, db, mergeKey: (track, "GainDb")));
             _suppress = true;
             try
             {
@@ -598,7 +598,7 @@ public sealed class MixerView : UserControl
             Get: () => track.GainDb, Set: (v, _) => Commit(v),
             Min: GainMinDb, Max: GainMaxDb, Step: GainStepDb,
             BeginDrag: BeginDrag, EndDrag: EndDrag));
-        ToolTip.SetTip(field, "Drag to scrub (Shift = coarse, Ctrl = fine) · click to type a dB value");
+        ToolTip.SetTip(field, "Arraste para ajustar (Shift = grosseiro, Ctrl = fino) · clique para escrever um valor em dB");
     }
 
     /// <summary>The pan counterpart of <see cref="WireGainField"/>: accepts <c>"C"</c> / <c>"L50"</c> /
@@ -611,7 +611,7 @@ public sealed class MixerView : UserControl
                 return;
             pan = Math.Clamp(pan, PanMin, PanMax);
             _history.Execute(SetPropertyCommand<double>.Create(
-                "Track pan", () => track.Pan, v => track.Pan = v, pan, mergeKey: (track, "Pan")));
+                "Balanço da pista", () => track.Pan, v => track.Pan = v, pan, mergeKey: (track, "Pan")));
             _suppress = true;
             try
             {
@@ -639,7 +639,7 @@ public sealed class MixerView : UserControl
             Get: () => track.Pan, Set: (v, _) => Commit(v),
             Min: PanMin, Max: PanMax, Step: PanStep,
             BeginDrag: BeginDrag, EndDrag: EndDrag));
-        ToolTip.SetTip(field, "Drag to scrub · click to type C, L50, R25 or -100..100");
+        ToolTip.SetTip(field, "Arraste para ajustar · clique para escrever C, L50, R25 ou -100..100");
     }
 
     private void RefreshValues()
@@ -681,7 +681,7 @@ public sealed class MixerView : UserControl
         double gain = LoudnessNormalization.ComputeGainDb(m.IntegratedLufs, m.TruePeakDbtp, _targetLufs);
         if (double.IsNegativeInfinity(m.IntegratedLufs)) return; // silent track: nothing to normalize
         _history.Execute(SetPropertyCommand<double>.Create(
-            $"Normalize {track.Name}", () => track.GainDb, v => track.GainDb = v, gain));
+            $"Normalizar {track.Name}", () => track.GainDb, v => track.GainDb = v, gain));
     }
 
     private void NormalizeMaster()
@@ -691,7 +691,7 @@ public sealed class MixerView : UserControl
         if (double.IsNegativeInfinity(m.IntegratedLufs)) return;
         double gain = LoudnessNormalization.ComputeGainDb(m.IntegratedLufs, m.TruePeakDbtp, _targetLufs);
         _history.Execute(SetPropertyCommand<double>.Create(
-            "Normalize master", () => _project.Settings.MasterGainDb, v => _project.Settings.MasterGainDb = v, gain));
+            "Normalizar master", () => _project.Settings.MasterGainDb, v => _project.Settings.MasterGainDb = v, gain));
     }
 
     // ── meters ────────────────────────────────────────────────────────────────────────────────────────

@@ -27,7 +27,7 @@ internal static class ImageSequenceImportDialog
     {
         var asSequence = new CheckBox
         {
-            Content = "Import as image sequence",
+            Content = "Importar como sequência de imagens",
             IsChecked = true,
             Foreground = Palette.TextBrush,
         };
@@ -51,12 +51,12 @@ internal static class ImageSequenceImportDialog
         if (fps.SelectedIndex < 0)
             fps.SelectedIndex = rates.Count - 1;
 
-        var fpsRow = Labeled("Frame rate", fps);
+        var fpsRow = Labeled("Cadência de fotogramas", fps);
         asSequence.IsCheckedChanged += (_, _) => fpsRow.IsEnabled = asSequence.IsChecked == true;
 
         var ok = new Button
         {
-            Content = "Import",
+            Content = "Importar",
             Padding = new Thickness(18, 5),
             Foreground = Brushes.White,
             Background = Palette.AccentBrush,
@@ -64,7 +64,7 @@ internal static class ImageSequenceImportDialog
         };
         var cancel = new Button
         {
-            Content = "Cancel",
+            Content = "Cancelar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -74,7 +74,7 @@ internal static class ImageSequenceImportDialog
         string dims = width > 0 && height > 0 ? $"  ·  {width}×{height}" : "";
         var dialog = new Window
         {
-            Title = "Import Image Sequence",
+            Title = "Importar sequência de imagens",
             Icon = AppIcon.Window,
             Width = 460,
             Height = 240,
@@ -102,7 +102,7 @@ internal static class ImageSequenceImportDialog
                         {
                             new TextBlock
                             {
-                                Text = $"Detected {sequence.FrameCount} numbered frames{dims}.",
+                                Text = $"Detetados {sequence.FrameCount} fotogramas numerados{dims}.",
                                 Foreground = Palette.TextBrush,
                                 FontSize = Typography.Title,
                                 FontWeight = FontWeight.SemiBold,

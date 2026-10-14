@@ -786,7 +786,7 @@ public sealed class TimelineControl : Control
             if (reverse is { } r && r != c.Reverse && (!r || c.SupportsReverse))
                 commands.Add(new SetClipReverseCommand(c, r));
         }
-        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Change speed", commands));
+        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Alterar velocidade", commands));
     }
 
     /// <summary>Flips the selected clip's playback direction (and its linked companions', PLAN.md step 21
@@ -800,7 +800,7 @@ public sealed class TimelineControl : Control
         members.AddRange(_project.Timeline.ClipsLinkedTo(_selected).Select(l => l.Clip));
         var commands = members.Where(c => c.SupportsReverse || !reverse)
             .Select(c => (IEditCommand)new SetClipReverseCommand(c, reverse)).ToList();
-        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand(reverse ? "Reverse clip" : "Play clip forward", commands));
+        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand(reverse ? "Inverter velocidade" : "Reproduzir para a frente", commands));
     }
 
     /// <summary>The selected clip's current playback speed (1/1 when nothing is selected), for the Speed dialog.</summary>
@@ -850,7 +850,7 @@ public sealed class TimelineControl : Control
     {
         if (_selected is not { } clip || _history is null || !CanFrameHold(clip) || holdAt.Ticks < 0)
             return;
-        Execute(new SetClipHoldCommand(clip, holdAt, clip.Duration, "Frame hold"));
+        Execute(new SetClipHoldCommand(clip, holdAt, clip.Duration, "Congelação de fotograma"));
     }
 
     /// <summary>Removes the selected clip's frame hold: the retained source span and speed take over again, so
@@ -859,7 +859,7 @@ public sealed class TimelineControl : Control
     {
         if (_selected is not { IsHeld: true } clip || _history is null)
             return;
-        Execute(new SetClipHoldCommand(clip, null, default, "Remove frame hold"));
+        Execute(new SetClipHoldCommand(clip, null, default, "Remover congelação de fotograma"));
     }
 
     /// <summary>
@@ -878,7 +878,7 @@ public sealed class TimelineControl : Control
             return;
         if (at == clip.TimelineStart)
         {
-            Execute(new SetClipHoldCommand(clip, clip.MapToSourceVideo(at), clip.Duration, "Add frame hold"));
+            Execute(new SetClipHoldCommand(clip, clip.MapToSourceVideo(at), clip.Duration, "Adicionar congelação de fotograma"));
             return;
         }
 
@@ -897,7 +897,7 @@ public sealed class TimelineControl : Control
             var commands = new List<IEditCommand> { primary };
             foreach ((Track ctrack, Clip cclip) in companions)
                 commands.Add(new SplitClipCommand(ctrack, cclip, at, rightGroup));
-            Execute(new CompositeCommand("Add frame hold", commands));
+            Execute(new CompositeCommand("Adicionar congelação de fotograma", commands));
         }
         Select(held);
     }
@@ -934,7 +934,7 @@ public sealed class TimelineControl : Control
         (IEditCommand insert, Clip held) =
             FrameHoldEdits.InsertFrameHoldSegment(track, clip, at, HoldSegmentDuration, downstream, rightGroup);
         commands.Add(insert);
-        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Insert frame hold segment", commands));
+        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Inserir segmento de congelação de fotograma", commands));
         Select(held);
     }
 
@@ -1023,7 +1023,7 @@ public sealed class TimelineControl : Control
     {
         if (_selected is null || _project is null)
         {
-            Status?.Invoke("Select a clip beside a cut to add a transition.");
+            Status?.Invoke("Selecione um clipe junto a um corte para adicionar uma transição.");
             return;
         }
         if (TrackOf(_selected) is not { } track)
@@ -1038,7 +1038,7 @@ public sealed class TimelineControl : Control
             return;
         if (hasPrev && ApplyTransitionAt(track, start, transitionTypeId))
             return;
-        Status?.Invoke("The selected clip has no adjacent clip to transition with.");
+        Status?.Invoke("O clipe selecionado não tem um clipe adjacente com o qual fazer a transição.");
     }
 
     /// <summary>
@@ -1056,7 +1056,7 @@ public sealed class TimelineControl : Control
         Clip? to = track.ResolveActiveClip(cut);
         if (from is null || to is null || ReferenceEquals(from, to))
         {
-            Status?.Invoke("A transition needs two adjacent clips that share a cut.");
+            Status?.Invoke("Uma transição precisa de dois clips adjacentes que partilhem um corte.");
             return false;
         }
 
@@ -1071,7 +1071,7 @@ public sealed class TimelineControl : Control
         var transition = new Transition(transitionTypeId, cut, new Timecode(dur));
         Execute(new AddTransitionCommand(track, transition));
         SelectTransition(transition, track);
-        Status?.Invoke($"Added {TransitionCatalog.DisplayName(transitionTypeId)}.");
+        Status?.Invoke($"{TransitionCatalog.DisplayName(transitionTypeId)} adicionada.");
         return true;
     }
 
@@ -1103,7 +1103,7 @@ public sealed class TimelineControl : Control
     {
         ArgumentNullException.ThrowIfNull(descriptor);
         InsertSyntheticVideoClip(
-            t => descriptor.CreateClip(GeneratorCatalog.DefaultDuration, t), $"Insert {descriptor.DisplayName}");
+            t => descriptor.CreateClip(GeneratorCatalog.DefaultDuration, t), $"Inserir {descriptor.DisplayName}");
     }
 
     /// <summary>
@@ -1121,7 +1121,7 @@ public sealed class TimelineControl : Control
         Execute(insertion.Command);
         Select(insertion.Clips[0]);
         ClipPlaced?.Invoke();
-        Status?.Invoke($"Inserted {descriptor.DisplayName}. {descriptor.PlacementHint}");
+        Status?.Invoke($"{descriptor.DisplayName} inserido. {descriptor.PlacementHint}");
     }
 
     /// <summary>Inserts an adjustment layer at the playhead (PLAN.md step 19): its effects grade the tracks below
@@ -1239,7 +1239,7 @@ public sealed class TimelineControl : Control
         if (commands.Count == 0)
             return;
 
-        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Switch angle", commands));
+        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Mudar de ângulo", commands));
         if (newPrimary is not null)
             Select(newPrimary);
     }
@@ -1642,7 +1642,7 @@ public sealed class TimelineControl : Control
                     DrawFadeOverlay(ctx, clip, rect);
                     double badgeRight = rect.Right - 4;
                     if (clip.IsHeld)
-                        badgeRight = DrawBadge(ctx, rect, "HOLD", badgeRight);
+                        badgeRight = DrawBadge(ctx, rect, "FIXA", badgeRight);
                     if (RetimeBadgeText(clip) is { } retime)
                         DrawBadge(ctx, rect, retime, badgeRight);
                 }
@@ -1682,7 +1682,7 @@ public sealed class TimelineControl : Control
     /// "RAMP" for a keyframed speed, else the percentage when it isn't 100%, with a ◀ prefix when reversed.</summary>
     public static string? RetimeBadgeText(Clip clip)
     {
-        string? body = clip.HasSpeedRamp ? "RAMP"
+        string? body = clip.HasSpeedRamp ? "RAMPA"
             : clip.SpeedRatio != Rational.One ? SpeedFormat.ToPercentString(clip.SpeedRatio) + "%"
             : null;
         if (clip.Reverse)
@@ -2449,17 +2449,17 @@ public sealed class TimelineControl : Control
         {
             if (EnableBox(top).Contains(p))
                 Execute(SetPropertyCommand<bool>.Create(
-                    "Toggle track", () => track.Enabled, v => track.Enabled = v, !track.Enabled));
+                    "Alternar pista", () => track.Enabled, v => track.Enabled = v, !track.Enabled));
         }
         else
         {
             var audio = (AudioTrack)track;
             if (MuteBox(top).Contains(p))
                 Execute(SetPropertyCommand<bool>.Create(
-                    "Toggle mute", () => audio.Muted, v => audio.Muted = v, !audio.Muted));
+                    "Alternar silêncio", () => audio.Muted, v => audio.Muted = v, !audio.Muted));
             else if (SoloBox(top).Contains(p))
                 Execute(SetPropertyCommand<bool>.Create(
-                    "Toggle solo", () => audio.Solo, v => audio.Solo = v, !audio.Solo));
+                    "Alternar solo", () => audio.Solo, v => audio.Solo = v, !audio.Solo));
         }
     }
 
@@ -2486,7 +2486,7 @@ public sealed class TimelineControl : Control
     /// <summary>Targets or untargets <paramref name="track"/> for range edits (Lift / Extract, Mark Clip) and as the
     /// default paste destination — one undo step, from the header's V1 / A1 toggle or the track menu.</summary>
     public void SetTrackTargeted(Track track, bool on) =>
-        SetTrackFlag(track, on, "Toggle track targeting", () => track.Targeted, v => track.Targeted = v);
+        SetTrackFlag(track, on, "Alternar pista de destino", () => track.Targeted, v => track.Targeted = v);
 
     /// <summary>Sync-locks or unlocks <paramref name="track"/> (whether ripples on other tracks shift it too) — one
     /// undo step.</summary>
@@ -2496,7 +2496,7 @@ public sealed class TimelineControl : Control
     /// <summary>Locks or unlocks <paramref name="track"/> — one undo step. Locking drops the track's clips and
     /// transitions from the selection (a locked track's clips can't be selected, as in leading editors).</summary>
     public void SetTrackLocked(Track track, bool on) =>
-        SetTrackFlag(track, on, on ? "Lock track" : "Unlock track", () => track.Locked, v => track.Locked = v);
+        SetTrackFlag(track, on, on ? "Bloquear pista" : "Desbloquear pista", () => track.Locked, v => track.Locked = v);
 
     /// <summary>Sets <see cref="Track.Targeted"/> on every track at once (the track menu's Target All Tracks /
     /// Target No Tracks) as one undo step.</summary>
@@ -2507,7 +2507,7 @@ public sealed class TimelineControl : Control
         var commands = _project.Timeline.Tracks
             .Where(t => t.Targeted != on)
             .Select(t => (IEditCommand)SetPropertyCommand<bool>.Create(
-                "Target tracks", () => t.Targeted, v => t.Targeted = v, on))
+                "Pistas de destino", () => t.Targeted, v => t.Targeted = v, on))
             .ToList();
         if (commands.Count > 0)
             Execute(new CompositeCommand(on ? "Target all tracks" : "Target no tracks", commands));
@@ -2534,7 +2534,7 @@ public sealed class TimelineControl : Control
         if (trimmed == track.Name)
             return;
         Execute(SetPropertyCommand<string>.Create(
-            "Rename track", () => track.Name, v => track.Name = v, trimmed));
+            "Renomear pista", () => track.Name, v => track.Name = v, trimmed));
     }
 
     /// <summary>Whether <paramref name="track"/> can be deleted — never the last video or audio track.</summary>
@@ -2730,7 +2730,7 @@ public sealed class TimelineControl : Control
                 newHeldStart = TimelineMath.ClampNonNegative(Math.Min(newHeldStart, origEnd - _minDurTicks));
                 newDur = origEnd - newHeldStart;
             }
-            Execute(new TrimHeldClipCommand(_dragClip, new Timecode(newHeldStart), new Timecode(newDur), "Trim clip"));
+            Execute(new TrimHeldClipCommand(_dragClip, new Timecode(newHeldStart), new Timecode(newDur), "Aparar clipe"));
             return;
         }
 
@@ -2795,11 +2795,11 @@ public sealed class TimelineControl : Control
         }
 
         var placement = new SetClipPlacementCommand(
-            dc, new Timecode(newIn), new Timecode(newOut), new Timecode(newStart), "Trim clip");
+            dc, new Timecode(newIn), new Timecode(newOut), new Timecode(newStart), "Aparar clipe");
         // A ramped start trim always commits the same composite shape (placement + curve), so every move of the
         // drag coalesces into one undo entry — a plain→composite switch mid-drag would split it.
         if (_dragOrigCurve is not null && _dragMode == ClipDragMode.TrimStart)
-            Execute(new CompositeCommand("Trim clip", [placement, new SetClipSpeedCurveCommand(dc, newCurve)]));
+            Execute(new CompositeCommand("Aparar clipe", [placement, new SetClipSpeedCurveCommand(dc, newCurve)]));
         else
             Execute(placement);
     }
@@ -2920,7 +2920,7 @@ public sealed class TimelineControl : Control
         {
             long media = MediaDurationTicks(_dragClip);
             long newHoldAt = Math.Clamp(_dragOrigHoldAt + rawDelta, 0, Math.Max(0, media - 1));
-            Execute(new SetClipHoldCommand(_dragClip, new Timecode(newHoldAt), _dragClip.HoldDuration, "Slip clip"));
+            Execute(new SetClipHoldCommand(_dragClip, new Timecode(newHoldAt), _dragClip.HoldDuration, "Deslizar clipe"));
             return;
         }
 
@@ -2931,7 +2931,7 @@ public sealed class TimelineControl : Control
             new Timecode(_dragOrigIn.Ticks + slip),
             new Timecode(_dragOrigOut.Ticks + slip),
             _dragOrigStart,
-            "Slip clip"));
+            "Deslizar clipe"));
     }
 
     // ── Fade handles & opacity rubber-band (PLAN.md step 39) ───────────────────────────────────────
@@ -3001,7 +3001,7 @@ public sealed class TimelineControl : Control
         {
             // Add a point at the pointer, then let the rest of the drag move it — one coalesced undo entry.
             AnimatableValue added = FadeOps.WithAddedPoint(opacity, pressTicks);
-            Execute(new SetClipFadeCommand(clip, added, "Add fade point"));
+            Execute(new SetClipFadeCommand(clip, added, "Adicionar ponto de desvanecimento"));
             _fadeOrigOpacity = added;
             _bandGrabTimes = [pressTicks];
         }
@@ -3139,7 +3139,7 @@ public sealed class TimelineControl : Control
             }
             commands.Add(new RippleTrimCommand(u.Clip, newIn, newOut, u.Downstream, shift));
         }
-        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Ripple trim", commands));
+        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Aparar em cadeia", commands));
     }
 
     // Begins a roll gesture: resolves the two clips sharing the dragged cut. Leaves the gesture inert (DragKind
@@ -3404,7 +3404,7 @@ public sealed class TimelineControl : Control
             return;
         if (TrackAndKindAtY(p.Y).track is { Locked: true })
         {
-            Status?.Invoke("That track is locked.");
+            Status?.Invoke("Essa pista está bloqueada.");
             return;
         }
 
@@ -3445,7 +3445,7 @@ public sealed class TimelineControl : Control
         if (TryFindCutNear(track, tTicks, out Timecode cut))
             ApplyTransitionAt(track, cut, transitionId);
         else
-            Status?.Invoke("Drop a transition on a cut between two clips.");
+            Status?.Invoke("Largue uma transição num corte entre dois clips.");
     }
 
     private void ClearDropPreview()
@@ -3568,7 +3568,7 @@ public sealed class TimelineControl : Control
             return;
         if (!TryHitClip(p, out Clip? clip, out _) || clip is null)
         {
-            Status?.Invoke($"Drop {stack.Title} onto a clip to apply it.");
+            Status?.Invoke($"Largue {stack.Title} sobre um clipe para o aplicar.");
             return;
         }
         Status?.Invoke(MediaBrowser.PresetStackBrowserModel.ApplyToClip(stack, clip, _project!, _history!));
@@ -3583,7 +3583,7 @@ public sealed class TimelineControl : Control
             return;
         if (!TryHitClip(p, out Clip? clip, out _) || clip is null)
         {
-            Status?.Invoke("Drop a look onto a clip to apply it.");
+            Status?.Invoke("Largue um estilo sobre um clipe para o aplicar.");
             return;
         }
         Status?.Invoke(MediaBrowser.LooksBrowserModel.ApplyToClip(look, clip, _project!, _history!));
@@ -3800,7 +3800,7 @@ public sealed class TimelineControl : Control
         switch (clip.Kind)
         {
             case ClipKind.Adjustment:
-                return "Adjustment Layer";
+                return "Camada de ajuste";
             case ClipKind.Generator when clip.Generator is not null:
                 // Prefer a title's text, else the generator's display name.
                 string text = clip.Generator.GetString(GeneratorParamNames.Text);
@@ -3808,15 +3808,15 @@ public sealed class TimelineControl : Control
             case ClipKind.Sequence:
                 // A nested-sequence clip is labelled with the child sequence's name; a dangling reference
                 // (the child was deleted) falls back to a neutral label (it renders as nothing, §15).
-                return (clip.SourceSequenceId is { } sid ? _project?.GetSequence(sid)?.Name : null) ?? "Nested sequence";
+                return (clip.SourceSequenceId is { } sid ? _project?.GetSequence(sid)?.Name : null) ?? "Sequência aninhada";
             case ClipKind.Multicam:
                 // A multicam clip is labelled with its source name + the active angle's name (the live angle).
                 MulticamSource? mc = clip.SourceMulticamId is { } mid ? _project?.GetMulticam(mid) : null;
-                string angle = mc?.AngleAt(clip.ActiveAngle)?.Name ?? $"Angle {clip.ActiveAngle + 1}";
-                return mc is null ? "Multicam" : $"{mc.Name} · {angle}";
+                string angle = mc?.AngleAt(clip.ActiveAngle)?.Name ?? $"Ângulo {clip.ActiveAngle + 1}";
+                return mc is null ? "Multicâmara" : $"{mc.Name} · {angle}";
         }
         MediaRef? media = _project?.MediaPool.Get(clip.MediaRefId);
-        return media is null ? "clip" : System.IO.Path.GetFileName(media.AbsolutePath);
+        return media is null ? "clipe" : System.IO.Path.GetFileName(media.AbsolutePath);
     }
 
     private static string TrackName(Track track, bool isVideo) =>

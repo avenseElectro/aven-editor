@@ -62,7 +62,7 @@ internal static class MacMenuBridge
     private static NativeMenuItemBase[] WindowMenuExtras(Window window)
     {
         var separator = new NativeMenuItemSeparator();
-        var minimize = new NativeMenuItem("Minimize") { Gesture = KeyGesture.Parse("Cmd+M") };
+        var minimize = new NativeMenuItem("Minimizar") { Gesture = KeyGesture.Parse("Cmd+M") };
         minimize.Click += (_, _) => window.WindowState = WindowState.Minimized;
         var zoom = new NativeMenuItem("Zoom");
         zoom.Click += (_, _) => window.WindowState =
@@ -74,11 +74,11 @@ internal static class MacMenuBridge
     {
         var menu = new NativeMenu();
         if (aboutItem is not null)
-            menu.Items.Add(Forward(aboutItem, "About Sprocket"));
+            menu.Items.Add(Forward(aboutItem, "Acerca do Sprocket"));
         if (aboutItem is not null && preferencesItem is not null)
             menu.Items.Add(new NativeMenuItemSeparator());
         if (preferencesItem is not null)
-            menu.Items.Add(Forward(preferencesItem, "Preferences…"));
+            menu.Items.Add(Forward(preferencesItem, "Preferências…"));
         return menu;
     }
 

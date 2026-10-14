@@ -109,8 +109,8 @@ public sealed class KeyframeLane : Control
     }
 
     private void UpdateTip() => ToolTip.SetTip(this, _graphMode
-        ? "Drag a keyframe to move it (Shift-click / rubber-band to multi-select) · drag a handle to shape the curve · double-click empty to add · double-click a keyframe to cycle interpolation · right-click to delete"
-        : "Drag a keyframe to move it (Shift-click / rubber-band to multi-select) · double-click to add · double-click a keyframe to cycle interpolation · right-click to delete");
+        ? "Arraste um fotograma-chave para o mover (Shift-clique / faixa elástica para multisseleção) · arraste uma pega para moldar a curva · duplo clique num espaço vazio para adicionar · duplo clique num fotograma-chave para alternar a interpolação · clique com o botão direito para eliminar"
+        : "Arraste um fotograma-chave para o mover (Shift-clique / faixa elástica para multisseleção) · duplo clique para adicionar · duplo clique num fotograma-chave para alternar a interpolação · clique com o botão direito para eliminar");
 
     /// <summary>Updates what the lane displays (called by the Inspector's value refresher); triggers a redraw.
     /// <paramref name="valueMin"/>/<paramref name="valueMax"/> bound the graph-mode value axis.</summary>

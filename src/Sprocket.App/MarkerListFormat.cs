@@ -17,7 +17,7 @@ public static class MarkerListFormat
     public static string Describe(Marker marker, int index)
     {
         ArgumentNullException.ThrowIfNull(marker);
-        string name = string.IsNullOrWhiteSpace(marker.Name) ? $"Marker {index + 1}" : marker.Name.Trim();
+        string name = string.IsNullOrWhiteSpace(marker.Name) ? $"Marcador {index + 1}" : marker.Name.Trim();
         string label = $"{Time(marker.Time)} · {name}";
         if (marker.IsSpan)
             label += $"  (+{Time(marker.Duration)})";

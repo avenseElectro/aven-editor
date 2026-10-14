@@ -878,7 +878,7 @@ public class SprocketToolsExtendedTests
         Assert.Single(fade["effect_types"]!.AsArray());
 
         // Step/unit descriptor fields are emitted now.
-        JsonNode color = JsonNode.Parse(await tools.ListEffectTypes(nameQuery: "white balance"))!;
+        JsonNode color = JsonNode.Parse(await tools.ListEffectTypes(nameQuery: "balanço de brancos"))!;
         JsonNode temperature = color["effect_types"]!.AsArray().Single()!["parameters"]!.AsArray()
             .Single(p => (string)p!["name"]! == EffectParamNames.Temperature)!;
         Assert.Equal(1.0, (double)temperature["step"]!, 6);
@@ -891,7 +891,7 @@ public class SprocketToolsExtendedTests
     {
         var tools = new SprocketTools(new FakeEditorSession());
 
-        JsonNode night = JsonNode.Parse(await tools.ListEffectTypes(nameQuery: "day for night"))!;
+        JsonNode night = JsonNode.Parse(await tools.ListEffectTypes(nameQuery: "dia para noite"))!;
         JsonArray presets = night["effect_types"]!.AsArray().Single()!["presets"]!.AsArray();
         Assert.Equal(DayForNightPresets.All.Select(p => p.Name), presets.Select(p => (string)p!));
 

@@ -46,7 +46,7 @@ public static class ClipEdits
         var commands = new List<IEditCommand> { primary };
         foreach ((Track ctrack, Clip cclip) in companions)
             commands.Add(new SplitClipCommand(ctrack, cclip, at, rightGroup));
-        return new SplitResult(new CompositeCommand("Split clips", commands), primary.RightClip);
+        return new SplitResult(new CompositeCommand("Dividir clipes", commands), primary.RightClip);
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public static class ClipEdits
             primaryCopy ??= copy;
         }
 
-        return (commands.Count == 1 ? commands[0] : new CompositeCommand("Duplicate clips", commands), primaryCopy!);
+        return (commands.Count == 1 ? commands[0] : new CompositeCommand("Duplicar clipes", commands), primaryCopy!);
     }
 
     // ── Batch operations over the multi-selection (PLAN.md step 54) ─────────────────────────────────
@@ -139,7 +139,7 @@ public static class ClipEdits
         var commands = members
             .Select(m => (IEditCommand)new RemoveClipCommand(m.Track, m.Clip))
             .ToList();
-        return commands.Count == 1 ? commands[0] : new CompositeCommand("Delete clips", commands);
+        return commands.Count == 1 ? commands[0] : new CompositeCommand("Eliminar clipes", commands);
     }
 
     /// <summary>
@@ -176,10 +176,10 @@ public static class ClipEdits
                 if (shift > 0)
                     commands.Add(new SetClipPlacementCommand(
                         survivor, survivor.SourceIn, survivor.SourceOut,
-                        new Timecode(survivor.TimelineStart.Ticks - shift), "Ripple"));
+                        new Timecode(survivor.TimelineStart.Ticks - shift), "Deslocar em cadeia"));
             }
         }
-        return commands.Count == 1 ? commands[0] : new CompositeCommand("Ripple delete", commands);
+        return commands.Count == 1 ? commands[0] : new CompositeCommand("Eliminar em cadeia", commands);
     }
 
     /// <summary>
@@ -202,9 +202,9 @@ public static class ClipEdits
         var commands = members
             .Select(m => (IEditCommand)new SetClipPlacementCommand(
                 m.Clip, m.Clip.SourceIn, m.Clip.SourceOut,
-                new Timecode(m.Clip.TimelineStart.Ticks + delta), "Nudge clip"))
+                new Timecode(m.Clip.TimelineStart.Ticks + delta), "Mover clipe"))
             .ToList();
-        return commands.Count == 1 ? commands[0] : new CompositeCommand("Nudge clips", commands);
+        return commands.Count == 1 ? commands[0] : new CompositeCommand("Mover clipes", commands);
     }
 
     /// <summary>
@@ -311,7 +311,7 @@ public static class ClipEdits
                     "Link", () => c.LinkGroupId, v => c.LinkGroupId = v, group);
             })
             .ToList();
-        return new CompositeCommand("Link clips", commands);
+        return new CompositeCommand("Ligar clipes", commands);
     }
 
     /// <summary>
@@ -330,7 +330,7 @@ public static class ClipEdits
             .Select(c => (IEditCommand)SetPropertyCommand<Guid?>.Create(
                 "Unlink", () => c.LinkGroupId, v => c.LinkGroupId = v, null))
             .ToList();
-        return commands.Count == 1 ? commands[0] : new CompositeCommand("Unlink clips", commands);
+        return commands.Count == 1 ? commands[0] : new CompositeCommand("Desligar clipes", commands);
     }
 
     /// <summary>

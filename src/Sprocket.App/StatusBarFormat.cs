@@ -22,9 +22,9 @@ public static class StatusBarFormat
     {
         string label = state switch
         {
-            PlaybackState.Playing => "Playing",
-            PlaybackState.Paused => "Paused",
-            _ => "Ready",
+            PlaybackState.Playing => "Em reprodução",
+            PlaybackState.Paused => "Em pausa",
+            _ => "Pronto",
         };
         if (decode is { } d)
             label += d.IsHardwareAccelerated

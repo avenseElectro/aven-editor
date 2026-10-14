@@ -23,7 +23,7 @@ public class EffectCatalogTests
     {
         EffectDescriptor? brightness = EffectCatalog.Find(EffectTypeIds.Brightness);
         Assert.NotNull(brightness);
-        Assert.Equal("Brightness", brightness!.DisplayName);
+        Assert.Equal("Brilho", brightness!.DisplayName);
         Assert.Equal(EffectCategory.Color, brightness.Category);
     }
 
@@ -168,7 +168,7 @@ public class EffectCatalogTests
     public void StudioReverb_Is_Registered_As_An_Audio_Effect_With_The_Step41_Parameters()
     {
         EffectDescriptor reverb = EffectCatalog.Find(EffectTypeIds.AudioStudioReverb)!;
-        Assert.Equal("Studio Reverb", reverb.DisplayName);
+        Assert.Equal("Reverberação de estúdio", reverb.DisplayName);
         Assert.Equal(EffectCategory.Audio, reverb.Category);
         Assert.True(EffectTypeIds.IsAudio(EffectTypeIds.AudioStudioReverb)); // routes to the mixer, not the shaders
 
@@ -187,7 +187,7 @@ public class EffectCatalogTests
     [Fact]
     public void Freeverb_Reverb_Is_Now_Labelled_As_The_Lite_Tier()
     {
-        Assert.Equal("Reverb (Lite)", EffectCatalog.Find(EffectTypeIds.AudioReverb)!.DisplayName);
+        Assert.Equal("Reverberação (leve)", EffectCatalog.Find(EffectTypeIds.AudioReverb)!.DisplayName);
     }
 
     [Fact]
@@ -240,10 +240,10 @@ public class EffectCatalogTests
             Assert.Equal(EffectCategory.Audio, d!.Category);
             Assert.True(EffectTypeIds.IsAudio(id)); // routes to the mixer, not the shaders
         }
-        Assert.Equal("Digital Delay", EffectCatalog.DisplayName(EffectTypeIds.AudioDelayDigital));
-        Assert.Equal("Tape Delay", EffectCatalog.DisplayName(EffectTypeIds.AudioDelayTape));
-        Assert.Equal("Multi-Tap Delay", EffectCatalog.DisplayName(EffectTypeIds.AudioDelayMultiTap));
-        Assert.Equal("Stereo Delay", EffectCatalog.DisplayName(EffectTypeIds.AudioDelayStereo));
+        Assert.Equal("Atraso digital", EffectCatalog.DisplayName(EffectTypeIds.AudioDelayDigital));
+        Assert.Equal("Atraso de fita", EffectCatalog.DisplayName(EffectTypeIds.AudioDelayTape));
+        Assert.Equal("Atraso multitap", EffectCatalog.DisplayName(EffectTypeIds.AudioDelayMultiTap));
+        Assert.Equal("Atraso estéreo", EffectCatalog.DisplayName(EffectTypeIds.AudioDelayStereo));
     }
 
     [Fact]
@@ -311,7 +311,7 @@ public class EffectCatalogTests
         Assert.NotNull(gate);
         Assert.Equal(EffectCategory.Audio, gate!.Category);
         Assert.True(EffectTypeIds.IsAudio(EffectTypeIds.AudioNoiseGate)); // routes to the mixer, not the shaders
-        Assert.Equal("Noise Gate", EffectCatalog.DisplayName(EffectTypeIds.AudioNoiseGate));
+        Assert.Equal("Porta de ruído", EffectCatalog.DisplayName(EffectTypeIds.AudioNoiseGate));
     }
 
     [Fact]
@@ -336,7 +336,7 @@ public class EffectCatalogTests
         Assert.NotNull(eq);
         Assert.Equal(EffectCategory.Audio, eq!.Category);
         Assert.True(EffectTypeIds.IsAudio(EffectTypeIds.AudioShelvingEq)); // routes to the mixer, not the shaders
-        Assert.Equal("Shelving EQ", EffectCatalog.DisplayName(EffectTypeIds.AudioShelvingEq));
+        Assert.Equal("Equalização de prateleiras", EffectCatalog.DisplayName(EffectTypeIds.AudioShelvingEq));
     }
 
     [Fact]
@@ -362,7 +362,7 @@ public class EffectCatalogTests
         Assert.NotNull(shimmer);
         Assert.Equal(EffectCategory.Audio, shimmer!.Category);
         Assert.True(EffectTypeIds.IsAudio(EffectTypeIds.AudioShimmerReverb)); // routes to the mixer, not the shaders
-        Assert.Equal("Shimmer Reverb", EffectCatalog.DisplayName(EffectTypeIds.AudioShimmerReverb));
+        Assert.Equal("Reverberação cintilante", EffectCatalog.DisplayName(EffectTypeIds.AudioShimmerReverb));
     }
 
     [Fact]
@@ -398,7 +398,7 @@ public class EffectCatalogTests
     {
         EffectDescriptor? bw = EffectCatalog.Find(EffectTypeIds.BlackWhite);
         Assert.NotNull(bw);
-        Assert.Equal("Black & White", bw!.DisplayName);
+        Assert.Equal("Preto e branco", bw!.DisplayName);
         Assert.Equal(EffectCategory.Color, bw.Category);
         Assert.False(EffectTypeIds.IsAudio(EffectTypeIds.BlackWhite)); // a video shader stage, not the mixer
         Assert.Equal("BW", bw.ShortCode);
@@ -415,7 +415,7 @@ public class EffectCatalogTests
         // Edge Softness (defaulting off, so a fresh Mosaic reads exactly like AE's).
         EffectDescriptor? mosaic = EffectCatalog.Find(EffectTypeIds.Mosaic);
         Assert.NotNull(mosaic);
-        Assert.Equal("Mosaic", mosaic!.DisplayName);
+        Assert.Equal("Mosaico", mosaic!.DisplayName);
         Assert.Equal(EffectCategory.Video, mosaic.Category);
         Assert.False(EffectTypeIds.IsAudio(EffectTypeIds.Mosaic));
         Assert.Equal("MO", mosaic.ShortCode);
@@ -424,10 +424,10 @@ public class EffectCatalogTests
         Assert.Equal(
             new[]
             {
-                (EffectParamNames.HorizontalBlocks, "Horizontal Blocks", 10.0, ParameterKind.Integer),
-                (EffectParamNames.VerticalBlocks, "Vertical Blocks", 10.0, ParameterKind.Integer),
-                (EffectParamNames.SharpColors, "Sharp Colors", 0.0, ParameterKind.Toggle),
-                (EffectParamNames.EdgeSoftness, "Edge Softness", 0.0, ParameterKind.Continuous),
+                (EffectParamNames.HorizontalBlocks, "Blocos horizontais", 10.0, ParameterKind.Integer),
+                (EffectParamNames.VerticalBlocks, "Blocos verticais", 10.0, ParameterKind.Integer),
+                (EffectParamNames.SharpColors, "Cores nítidas", 0.0, ParameterKind.Toggle),
+                (EffectParamNames.EdgeSoftness, "Suavidade das arestas", 0.0, ParameterKind.Continuous),
             },
             mosaic.Parameters.Select(p => (p.Name, p.DisplayName, p.Default, p.Kind)));
         Assert.Equal((1.0, 1920.0), Range(EffectParamNames.HorizontalBlocks));
@@ -447,7 +447,7 @@ public class EffectCatalogTests
         // enough a step for 23.976; a time modifier (read by the clip's video map, not a shader, not keyframeable).
         EffectDescriptor? posterize = EffectCatalog.Find(EffectTypeIds.PosterizeTime);
         Assert.NotNull(posterize);
-        Assert.Equal("Posterize Time", posterize!.DisplayName);
+        Assert.Equal("Tempo posterizado", posterize!.DisplayName);
         Assert.Equal(EffectCategory.Video, posterize.Category);
         Assert.False(EffectTypeIds.IsAudio(EffectTypeIds.PosterizeTime));
         Assert.Equal("PT", posterize.ShortCode);
@@ -456,7 +456,7 @@ public class EffectCatalogTests
 
         EffectParameterDescriptor rate = Assert.Single(posterize.Parameters);
         Assert.Equal(
-            (EffectParamNames.PosterizeFrameRate, "Frame Rate", 12.0, 1.0, 60.0, 0.001, "fps", ParameterKind.Continuous),
+            (EffectParamNames.PosterizeFrameRate, "Taxa de fotogramas", 12.0, 1.0, 60.0, 0.001, "fps", ParameterKind.Continuous),
             (rate.Name, rate.DisplayName, rate.Default, rate.Min, rate.Max, rate.Step, rate.Unit, rate.Kind));
     }
 
@@ -467,30 +467,30 @@ public class EffectCatalogTests
         // the description), 120×90 picture pixels by default, and the Clean / Worn Tape / Low Light looks.
         EffectDescriptor? toy = EffectCatalog.Find(EffectTypeIds.ToyCam);
         Assert.NotNull(toy);
-        Assert.Equal("Toy Cassette Camera", toy!.DisplayName);
+        Assert.Equal("Câmara de cassete de brincar", toy!.DisplayName);
         Assert.Equal(EffectCategory.Video, toy.Category);
         Assert.False(EffectTypeIds.IsAudio(EffectTypeIds.ToyCam));
         Assert.False(toy.IsTimeModifier);
         Assert.Equal("TC", toy.ShortCode);
-        Assert.StartsWith("Inspired by the Fisher-Price PXL 2000", toy.Description);
+        Assert.StartsWith("Inspirada na Fisher-Price PXL 2000", toy.Description);
 
         Assert.Equal(
             new[]
             {
-                (EffectParamNames.HorizontalPixels, "Horizontal Pixels", 120.0, ParameterKind.Integer),
-                (EffectParamNames.VerticalPixels, "Vertical Pixels", 90.0, ParameterKind.Integer),
-                (EffectParamNames.PixelSoftness, "Pixel Softness", 0.15, ParameterKind.Continuous),
-                (EffectParamNames.Contrast, "Contrast", 1.15, ParameterKind.Continuous),
-                (EffectParamNames.BlackCrush, "Black Crush", 0.08, ParameterKind.Continuous),
-                (EffectParamNames.HighlightBloom, "Highlight Bloom", 0.5, ParameterKind.Continuous),
-                (EffectParamNames.SmearLength, "Smear Length", 0.35, ParameterKind.Continuous),
-                (EffectParamNames.SmearThreshold, "Smear Threshold", 0.78, ParameterKind.Continuous),
-                (EffectParamNames.NoiseLines, "Noise Lines", 0.2, ParameterKind.Continuous),
-                (EffectParamNames.Dropouts, "Dropouts", 0.15, ParameterKind.Continuous),
-                (EffectParamNames.GrainAmount, "Grain", 0.3, ParameterKind.Continuous),
-                (EffectParamNames.BorderSize, "Border Size", 0.25, ParameterKind.Continuous),
-                (EffectParamNames.BorderSoftness, "Border Softness", 0.2, ParameterKind.Continuous),
-                (EffectParamNames.Seed, "Seed", 0.0, ParameterKind.Integer),
+                (EffectParamNames.HorizontalPixels, "Pixéis horizontais", 120.0, ParameterKind.Integer),
+                (EffectParamNames.VerticalPixels, "Pixéis verticais", 90.0, ParameterKind.Integer),
+                (EffectParamNames.PixelSoftness, "Suavidade dos pixéis", 0.15, ParameterKind.Continuous),
+                (EffectParamNames.Contrast, "Contraste", 1.15, ParameterKind.Continuous),
+                (EffectParamNames.BlackCrush, "Esmagamento dos pretos", 0.08, ParameterKind.Continuous),
+                (EffectParamNames.HighlightBloom, "Resplandecência das altas luzes", 0.5, ParameterKind.Continuous),
+                (EffectParamNames.SmearLength, "Comprimento do rasto", 0.35, ParameterKind.Continuous),
+                (EffectParamNames.SmearThreshold, "Limiar do rasto", 0.78, ParameterKind.Continuous),
+                (EffectParamNames.NoiseLines, "Linhas de ruído", 0.2, ParameterKind.Continuous),
+                (EffectParamNames.Dropouts, "Quedas de sinal", 0.15, ParameterKind.Continuous),
+                (EffectParamNames.GrainAmount, "Grão", 0.3, ParameterKind.Continuous),
+                (EffectParamNames.BorderSize, "Tamanho da margem", 0.25, ParameterKind.Continuous),
+                (EffectParamNames.BorderSoftness, "Suavidade da margem", 0.2, ParameterKind.Continuous),
+                (EffectParamNames.Seed, "Semente", 0.0, ParameterKind.Integer),
             },
             toy.Parameters.Select(p => (p.Name, p.DisplayName, p.Default, p.Kind)));
         EffectParameterDescriptor seed = toy.Parameters.Single(p => p.Name == EffectParamNames.Seed);
@@ -514,7 +514,7 @@ public class EffectCatalogTests
         // tape parameter names, with presets named after the video looks so the phase-5 stacks pair them.
         EffectDescriptor? cassette = EffectCatalog.Find(EffectTypeIds.AudioCassette);
         Assert.NotNull(cassette);
-        Assert.Equal("Cassette", cassette!.DisplayName);
+        Assert.Equal("Cassete", cassette!.DisplayName);
         Assert.Equal(EffectCategory.Audio, cassette.Category);
         Assert.True(EffectTypeIds.IsAudio(EffectTypeIds.AudioCassette)); // routes to the mixer, not the shaders
         Assert.Equal("CS", cassette.ShortCode);
@@ -523,15 +523,15 @@ public class EffectCatalogTests
             new[]
             {
                 (EffectParamNames.Mono, "Mono", 1.0, ParameterKind.Toggle),
-                (EffectParamNames.AgcAmount, "AGC Amount", 0.5, ParameterKind.Continuous),
-                (EffectParamNames.ReleaseMs, "AGC Release", 600.0, ParameterKind.Continuous),
-                (EffectParamNames.Drive, "Saturation", 0.3, ParameterKind.Continuous),
-                (EffectParamNames.LowCutHz, "Low Cut", 100.0, ParameterKind.Continuous),
-                (EffectParamNames.HighCutHz, "High Cut", 5000.0, ParameterKind.Continuous),
-                (EffectParamNames.HissDb, "Hiss", -42.0, ParameterKind.Continuous),
+                (EffectParamNames.AgcAmount, "Quantidade de AGC", 0.5, ParameterKind.Continuous),
+                (EffectParamNames.ReleaseMs, "Libertação do AGC", 600.0, ParameterKind.Continuous),
+                (EffectParamNames.Drive, "Saturação", 0.3, ParameterKind.Continuous),
+                (EffectParamNames.LowCutHz, "Corte grave", 100.0, ParameterKind.Continuous),
+                (EffectParamNames.HighCutHz, "Corte agudo", 5000.0, ParameterKind.Continuous),
+                (EffectParamNames.HissDb, "Sopro", -42.0, ParameterKind.Continuous),
                 (EffectParamNames.WowFlutterDepth, "Wow / Flutter", 0.25, ParameterKind.Continuous),
-                (EffectParamNames.WowFlutterRateHz, "Wow Rate", 0.9, ParameterKind.Continuous),
-                (EffectParamNames.Mix, "Mix", 1.0, ParameterKind.Continuous),
+                (EffectParamNames.WowFlutterRateHz, "Taxa de wow", 0.9, ParameterKind.Continuous),
+                (EffectParamNames.Mix, "Mistura", 1.0, ParameterKind.Continuous),
             },
             cassette.Parameters.Select(p => (p.Name, p.DisplayName, p.Default, p.Kind)));
 
@@ -669,7 +669,7 @@ public class EffectCatalogTests
         // Every film preset carries a non-empty description (the only presets that do); the non-film ones stay
         // null.
         Assert.All(BlackWhitePresets.Film, p => Assert.False(string.IsNullOrWhiteSpace(p.Description)));
-        Assert.All(BlackWhitePresets.Film, p => Assert.StartsWith("Inspired by ", p.Description!, StringComparison.Ordinal));
+        Assert.All(BlackWhitePresets.Film, p => Assert.StartsWith("Inspirado em ", p.Description!, StringComparison.Ordinal));
         foreach (EffectPreset p in bw.Presets.Where(p => !BlackWhitePresets.Film.Contains(p)))
             Assert.Null(p.Description);
     }
@@ -710,7 +710,7 @@ public class EffectCatalogTests
                 Assert.False(name.Contains(token, StringComparison.OrdinalIgnoreCase),
                     $"toy camera name '{name}' leaks the brand token '{token}' — it belongs only in Description");
         Assert.Contains("PXL", toy.Description); // …which is where the reference does live
-        Assert.All(ToyCassetteCameraStacks.All, s => Assert.StartsWith("Inspired by the Fisher-Price PXL 2000", s.Description));
+        Assert.All(ToyCassetteCameraStacks.All, s => Assert.StartsWith("Inspirado na Fisher-Price PXL 2000", s.Description));
     }
 
     [Fact]

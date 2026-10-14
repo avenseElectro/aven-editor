@@ -29,15 +29,15 @@ public static class ToyCassetteCameraStacks
 
     /// <summary>A camera in good order on fresh tape.</summary>
     public static PresetStack Clean { get; } = Create(ToyCamPresets.Clean.Name, CassettePresets.Clean.Name, echoes: 3, decay: 0.5,
-        "Inspired by the Fisher-Price PXL 2000: a well-kept camera on fresh tape — blocky black-and-white pixels at 15 fps, the black border, narrow mono sound with a faint hiss.");
+        "Inspirado na Fisher-Price PXL 2000: uma câmara bem conservada com fita nova — píxeis pretos e brancos blocados a 15 fps, a moldura preta, som mono estreitado com um sopro ténue.");
 
     /// <summary>A tape played to death.</summary>
     public static PresetStack WornTape { get; } = Create(ToyCamPresets.WornTape.Name, CassettePresets.WornTape.Name, echoes: 3, decay: 0.5,
-        "Inspired by the Fisher-Price PXL 2000: a cassette replayed too often — noise lines and dropouts at 15 fps, dull hissy sound with a seasick wobble.");
+        "Inspirado na Fisher-Price PXL 2000: uma cassete reproduzida demasiadas vezes — linhas de ruído e quedas de sinal a 15 fps, som surdo e cheio de sopro com uma oscilação enjoativa.");
 
     /// <summary>A dim room or dusk — the sensor lags most, so lights trail longest.</summary>
     public static PresetStack LowLight { get; } = Create(ToyCamPresets.LowLight.Name, CassettePresets.LowLight.Name, echoes: 4, decay: 0.6,
-        "Inspired by the Fisher-Price PXL 2000: shooting in a dim room — crushed shadows, shimmer and trailing lights at 15 fps, with the automatic gain pumping up the hiss.");
+        "Inspirado na Fisher-Price PXL 2000: gravação num quarto escuro — sombras esmagadas, cintilação e luzes com rasto a 15 fps, com o ganho automático a fazer subir o sopro.");
 
     /// <summary>All stacks, in browser order.</summary>
     public static IReadOnlyList<PresetStack> All { get; } = [Clean, WornTape, LowLight];

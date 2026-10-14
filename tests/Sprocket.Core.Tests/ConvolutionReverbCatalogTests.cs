@@ -24,7 +24,7 @@ public class ConvolutionReverbCatalogTests
         Assert.NotNull(conv);
         Assert.Equal(EffectCategory.Audio, conv!.Category);
         Assert.True(EffectTypeIds.IsAudio(EffectTypeIds.AudioConvolutionReverb));
-        Assert.Equal("Convolution Reverb", EffectCatalog.DisplayName(EffectTypeIds.AudioConvolutionReverb));
+        Assert.Equal("Reverberação por convolução", EffectCatalog.DisplayName(EffectTypeIds.AudioConvolutionReverb));
         Assert.Equal("IR", conv.ShortCode);
         Assert.Empty(conv.Presets); // with user IRs the impulse response IS the preset
     }

@@ -31,7 +31,7 @@ internal static class UpdateAvailableDialog
     {
         var install = new Button
         {
-            Content = "Install & Restart",
+            Content = "Instalar e Reiniciar",
             Padding = new Thickness(18, 5),
             Foreground = Brushes.White,
             Background = Palette.AccentBrush,
@@ -39,7 +39,7 @@ internal static class UpdateAvailableDialog
         };
         var releaseNotes = new Button
         {
-            Content = "Full Release Notes",
+            Content = "Notas de Versão Completas",
             Padding = new Thickness(14, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -47,7 +47,7 @@ internal static class UpdateAvailableDialog
         };
         var skip = new Button
         {
-            Content = "Skip This Version",
+            Content = "Ignorar Esta Versão",
             Padding = new Thickness(14, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -55,7 +55,7 @@ internal static class UpdateAvailableDialog
         };
         var later = new Button
         {
-            Content = "Later",
+            Content = "Mais tarde",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -71,7 +71,7 @@ internal static class UpdateAvailableDialog
         };
         var status = new TextBlock
         {
-            Text = "The update downloads in the background and applies on restart.",
+            Text = "A atualização é transferida em segundo plano e aplicada ao reiniciar.",
             Foreground = Palette.MutedTextBrush,
             FontSize = Typography.Caption,
             TextWrapping = TextWrapping.Wrap,
@@ -109,7 +109,7 @@ internal static class UpdateAvailableDialog
 
         var dialog = new Window
         {
-            Title = "Update Available",
+            Title = "Atualização Disponível",
             Icon = AppIcon.Window,
             Width = 640,
             Height = hasNotes ? 440 : 240,
@@ -138,14 +138,14 @@ internal static class UpdateAvailableDialog
                         {
                             new TextBlock
                             {
-                                Text = $"Sprocket {service.AvailableVersion} is available.",
+                                Text = $"O Sprocket {service.AvailableVersion} está disponível.",
                                 Foreground = Palette.TextBrush,
                                 FontSize = Typography.Title,
                                 FontWeight = FontWeight.SemiBold,
                             },
                             new TextBlock
                             {
-                                Text = $"You are running {Program.AppVersion}.",
+                                Text = $"Está a usar a versão {Program.AppVersion}.",
                                 Foreground = Palette.MutedTextBrush,
                                 FontSize = Typography.Body,
                             },
@@ -169,18 +169,18 @@ internal static class UpdateAvailableDialog
         {
             install.IsEnabled = skip.IsEnabled = later.IsEnabled = false;
             progress.IsVisible = true;
-            status.Text = "Downloading update…";
+            status.Text = "A transferir a atualização…";
             try
             {
                 // Progress arrives on a worker thread; marshal onto the UI thread for the bar.
                 await service.DownloadAsync(p => Dispatcher.UIThread.Post(() => progress.Value = p));
-                status.Text = "Restarting to apply the update…";
+                status.Text = "A reiniciar para aplicar a atualização…";
                 service.ApplyAndRestart(); // exits the process on success
             }
             catch (Exception ex)
             {
                 CrashLog.Write("Update download/apply failed", ex);
-                status.Text = $"The update failed: {ex.Message} You can download it manually from the releases page.";
+                status.Text = $"A atualização falhou: {ex.Message} Pode transferi-la manualmente na página de lançamentos.";
                 progress.IsVisible = false;
                 install.IsEnabled = skip.IsEnabled = later.IsEnabled = true;
             }
@@ -254,7 +254,7 @@ internal static class UpdateNotInstalledDialog
     {
         var open = new Button
         {
-            Content = "Open Releases Page",
+            Content = "Abrir Página de Lançamentos",
             Padding = new Thickness(16, 5),
             Foreground = Brushes.White,
             Background = Palette.AccentBrush,
@@ -262,7 +262,7 @@ internal static class UpdateNotInstalledDialog
         };
         var close = new Button
         {
-            Content = "Close",
+            Content = "Fechar",
             Padding = new Thickness(16, 5),
             Foreground = Palette.TextBrush,
             Background = Palette.PanelBgBrush,
@@ -271,7 +271,7 @@ internal static class UpdateNotInstalledDialog
 
         var dialog = new Window
         {
-            Title = "Check for Updates",
+            Title = "Procurar Atualizações",
             Icon = AppIcon.Window,
             Width = 460,
             Height = 190,
@@ -294,9 +294,9 @@ internal static class UpdateNotInstalledDialog
                     },
                     new TextBlock
                     {
-                        Text = $"You are running {Program.AppVersion}. This is a portable or development " +
-                               "build, so it doesn't update itself — new releases can be downloaded from " +
-                               "the Sprocket releases page.",
+                        Text = $"Está a usar a versão {Program.AppVersion}. Esta é uma versão portátil ou de " +
+                               "desenvolvimento, por isso não se atualiza automaticamente — os novos lançamentos " +
+                               "podem ser transferidos na página de lançamentos do Sprocket.",
                         Foreground = Palette.TextBrush,
                         FontSize = Typography.Body,
                         TextWrapping = TextWrapping.Wrap,

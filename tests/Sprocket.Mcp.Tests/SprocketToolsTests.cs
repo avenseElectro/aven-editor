@@ -88,7 +88,7 @@ public class SprocketToolsTests
         Assert.Equal(240000 + 120000, clip.TimelineStart.Ticks);
         Assert.Equal(120000, clip.SourceIn.Ticks); // the source in moved with the edge
         Assert.Equal(originalEnd, clip.TimelineEnd.Ticks); // out edge untouched
-        Assert.Equal("Trim linked clips", session.History.UndoLabel); // the placed pair trims together
+        Assert.Equal("Aparar clipes ligados", session.History.UndoLabel); // the placed pair trims together
 
         session.History.Undo();
         Assert.Equal(240000, clip.TimelineStart.Ticks);

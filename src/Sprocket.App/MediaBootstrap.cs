@@ -153,8 +153,8 @@ internal static class MediaBootstrap
         engine.Start();
 
         string status = attemptedPath is not null
-            ? $"Could not open {Path.GetFileName(attemptedPath)}: {error}  ·  opened an empty project — use File ▸ Import to add media"
-            : "New project — use File ▸ Import to add media, or File ▸ Open Sample Project for a demo clip";
+            ? $"Não foi possível abrir {Path.GetFileName(attemptedPath)}: {error}  ·  abriu-se um projeto vazio — use Ficheiro ▸ Importar para adicionar multimédia"
+            : "Novo projeto — use Ficheiro ▸ Importar para adicionar multimédia, ou Ficheiro ▸ Abrir Projeto de Exemplo para um clipe de demonstração";
         return new Result(engine, project, status, proxy, Stab: new StabilizationService());
     }
 
@@ -176,7 +176,7 @@ internal static class MediaBootstrap
         bool hasAudio = project.Timeline.AudioTracks.Any(
             t => t.Clips.Any(c => project.MediaPool.Get(c.MediaRefId) is { Info.HasAudio: true }));
         if (hasAudio && !audioWired)
-            status += "  ·  Audio device unavailable — playing without audio";
+            status += "  ·  Dispositivo de áudio indisponível — a reproduzir sem áudio";
 
         var proxy = new ProxyService(project.Settings.UseProxies, project.Settings.ProxyTier);
         var engine = new PlaybackEngine(project, (id, reverse) => OpenVideoFeed(project, id, proxy, reverse), clock) // engine owns + disposes the clock

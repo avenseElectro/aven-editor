@@ -247,7 +247,7 @@ public sealed partial class SprocketTools(IEditorSession session)
                 foreach ((Track _, Clip partner) in api.Project.Timeline.ClipsLinkedTo(clip))
                     commands.Add(BuildTrimCommand(api.Project, partner, trimIn, at));
 
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Trim linked clips", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Aparar clipes ligados", commands));
             api.RefreshPreview();
             return ClipResult(api, clip, "trimmed clip");
         });
@@ -279,7 +279,7 @@ public sealed partial class SprocketTools(IEditorSession session)
             throw new McpException(
                 $"that trim runs clip {RuntimeIds.IdOf(clip)} past the end of its source media (pass " +
                 "includeLinked=false to trim only the addressed clip).");
-        return new SetClipPlacementCommand(clip, newIn, newOut, trimIn ? at : clip.TimelineStart, "Trim clip");
+        return new SetClipPlacementCommand(clip, newIn, newOut, trimIn ? at : clip.TimelineStart, "Aparar clipe");
     }
 
     [McpServerTool(Name = "move_clip")]
@@ -329,7 +329,7 @@ public sealed partial class SprocketTools(IEditorSession session)
                 }
             }
 
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Move linked clips", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Mover clipes ligados", commands));
             api.RefreshPreview();
             return ClipResult(api, clip, "moved clip");
         });
@@ -365,7 +365,7 @@ public sealed partial class SprocketTools(IEditorSession session)
                 companionSplits.Add(split);
                 commands.Add(split);
             }
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Blade linked clips", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Cortar clipes ligados", commands));
             api.RefreshPreview();
 
             var payload = new JsonObject
@@ -397,7 +397,7 @@ public sealed partial class SprocketTools(IEditorSession session)
             if (includeLinked)
                 foreach ((Track ctrack, Clip cclip) in api.Project.Timeline.ClipsLinkedTo(clip))
                     commands.Add(new RemoveClipCommand(ctrack, cclip));
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Delete clips", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Eliminar clipes", commands));
             api.RefreshPreview();
             return StateFormatter.HistoryState(api.History,
                 commands.Count == 1 ? $"deleted clip {clipId}" : $"deleted clip {clipId} and {commands.Count - 1} linked clip(s)");
@@ -582,7 +582,7 @@ public sealed partial class SprocketTools(IEditorSession session)
                 throw new McpException($"media '{mediaId}' is not in the pool — call list_media.");
             long? limit = media.HasUnboundedDuration ? null : media.Info.Duration.Ticks;
             (Timecode? markIn, Timecode? markOut) = ValidateMarks(inTicks, outTicks, limit, "the media's duration");
-            api.History.Execute(new SetSourceMarksCommand(media, markIn, markOut, "Set Source In/Out"));
+            api.History.Execute(new SetSourceMarksCommand(media, markIn, markOut, "Definir entrada/saída de origem"));
             return StateFormatter.HistoryState(api.History, $"source marks {StateFormatter.MarksText(markIn, markOut)}");
         });
 
@@ -596,7 +596,7 @@ public sealed partial class SprocketTools(IEditorSession session)
         _session.OnModelThreadAsync(api =>
         {
             (Timecode? markIn, Timecode? markOut) = ValidateMarks(inTicks, outTicks, null, null);
-            api.History.Execute(new SetSequenceMarksCommand(api.Project.ActiveSequence, markIn, markOut, "Set In/Out"));
+            api.History.Execute(new SetSequenceMarksCommand(api.Project.ActiveSequence, markIn, markOut, "Definir entrada/saída"));
             return StateFormatter.HistoryState(api.History, $"sequence marks {StateFormatter.MarksText(markIn, markOut)}");
         });
 

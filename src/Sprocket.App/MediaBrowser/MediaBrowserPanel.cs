@@ -101,11 +101,22 @@ public sealed class MediaBrowserPanel : UserControl
 
     private enum Tab { Media, Effects, Looks, Transitions, Audio }
 
+    // The visible PT label for a tab (the enum names stay as internal identifiers).
+    private static string TabLabel(Tab tab) => tab switch
+    {
+        Tab.Media => "Multimédia",
+        Tab.Effects => "Efeitos",
+        Tab.Looks => "Estilos",
+        Tab.Transitions => "Transições",
+        Tab.Audio => "Áudio",
+        _ => tab.ToString(),
+    };
+
     public MediaBrowserPanel()
     {
         _searchBox = new TextBox
         {
-            PlaceholderText = "Search media…",
+            PlaceholderText = "Pesquisar multimédia…",
             FontSize = Typography.Body,
             Margin = new Avalonia.Thickness(8, 6),
             Background = PanelBg,
@@ -235,7 +246,7 @@ public sealed class MediaBrowserPanel : UserControl
     {
         var button = new Button
         {
-            Content = tab.ToString(),
+            Content = TabLabel(tab),
             FontSize = Typography.Body,
             Background = Brushes.Transparent,
             BorderThickness = default,
@@ -256,7 +267,7 @@ public sealed class MediaBrowserPanel : UserControl
         }
 
         _searchBox.IsVisible = tab is Tab.Media or Tab.Looks || (tab == Tab.Audio && _mixer is null);
-        _searchBox.PlaceholderText = tab == Tab.Looks ? "Search looks…" : "Search media…";
+        _searchBox.PlaceholderText = tab == Tab.Looks ? "Pesquisar estilos…" : "Pesquisar multimédia…";
         _searchBox.Text = tab == Tab.Looks ? _lookSearch : _search;
         _content.Child = tab switch
         {
@@ -303,7 +314,7 @@ public sealed class MediaBrowserPanel : UserControl
         }
 
         if (_mediaGrid.Children.Count == 0)
-            _mediaGrid.Children.Add(EmptyNote(_search.Length > 0 ? "No media matches the search." : "No media imported."));
+            _mediaGrid.Children.Add(EmptyNote(_search.Length > 0 ? "Nenhuma multimédia corresponde à pesquisa." : "Sem multimédia importada."));
 
         EnsureAudioGrid();
     }
@@ -325,7 +336,7 @@ public sealed class MediaBrowserPanel : UserControl
                 _audioGrid.Children.Add(BuildTile(media, name, audioView: true));
         }
         if (_audioGrid.Children.Count == 0)
-            _audioGrid.Children.Add(EmptyNote("No audio sources."));
+            _audioGrid.Children.Add(EmptyNote("Sem fontes de áudio."));
     }
 
     private List<MediaRef> SortedItems() => _project!.MediaPool.Items
@@ -408,7 +419,7 @@ public sealed class MediaBrowserPanel : UserControl
             CornerRadius = new Avalonia.CornerRadius(5),
             Child = stack,
         };
-        ToolTip.SetTip(tile, "Double-click to preview in the Source monitor · Drag onto a timeline track to place a clip.");
+        ToolTip.SetTip(tile, "Faça duplo clique para pré-visualizar no monitor Origem · Arraste para uma pista da linha do tempo para colocar um clipe.");
         // Double-click loads the source into the Source monitor (Premiere/Resolve gesture) — see the Effects/
         // Transitions rows for the same pattern.
         tile.DoubleTapped += (_, _) => MediaActivated?.Invoke(media);
@@ -419,11 +430,11 @@ public sealed class MediaBrowserPanel : UserControl
         // source (it re-times image sequences and is the whole-clip "shoot on twos" lever); audio-only has no rate.
         if (media.Info.HasVideo)
         {
-            var interpret = new MenuItem { Header = "Interpret Footage…" };
+            var interpret = new MenuItem { Header = "Interpretar metragem…" };
             interpret.Click += (_, _) => InterpretFootageRequested?.Invoke(media);
             // Analyze for Stabilization (FCP's browser "Analyze for stabilization"): pre-warm the per-user analysis
             // cache from the bin, before the effect is applied, so it's ready the moment the user adds Stabilization.
-            var analyze = new MenuItem { Header = "Analyze for Stabilization" };
+            var analyze = new MenuItem { Header = "Analisar para estabilização" };
             analyze.Click += (_, _) => AnalyzeForStabilizationRequested?.Invoke(media);
             tile.ContextMenu = new ContextMenu { ItemsSource = new MenuItem[] { interpret, analyze } };
         }
@@ -508,7 +519,7 @@ public sealed class MediaBrowserPanel : UserControl
         _effectsList.Children.Clear();
         _effectsList.Children.Add(new TextBlock
         {
-            Text = "Double-click an effect to add it to the selected clip.",
+            Text = "Faça duplo clique num efeito para o adicionar ao clipe selecionado.",
             FontSize = Typography.Caption,
             Foreground = FaintText,
             TextWrapping = TextWrapping.Wrap,
@@ -523,7 +534,7 @@ public sealed class MediaBrowserPanel : UserControl
         // to the selection, because each is a stack of new layers above the shot.
         _effectsList.Children.Add(new TextBlock
         {
-            Text = "ACTION VFX",
+            Text = "VFX DE AÇÃO",
             FontSize = Typography.Micro,
             Foreground = MutedText,
             FontWeight = FontWeight.SemiBold,
@@ -531,7 +542,7 @@ public sealed class MediaBrowserPanel : UserControl
         });
         _effectsList.Children.Add(new TextBlock
         {
-            Text = "Double-click to insert at the playhead, parked on the impact frame. Each layer stays editable.",
+            Text = "Faça duplo clique para inserir no indicador de reprodução, estacionado no fotograma de impacto. Cada camada mantém-se editável.",
             FontSize = Typography.Caption,
             Foreground = FaintText,
             TextWrapping = TextWrapping.Wrap,
@@ -547,7 +558,7 @@ public sealed class MediaBrowserPanel : UserControl
         {
             _effectsList.Children.Add(new TextBlock
             {
-                Text = "DAY FOR NIGHT",
+                Text = "DIA PARA NOITE",
                 FontSize = Typography.Micro,
                 Foreground = MutedText,
                 FontWeight = FontWeight.SemiBold,
@@ -555,7 +566,7 @@ public sealed class MediaBrowserPanel : UserControl
             });
             _effectsList.Children.Add(new TextBlock
             {
-                Text = "Double-click to grade the selected clip (or an adjustment layer, for a whole scene). Fine-tune in the Inspector.",
+                Text = "Faça duplo clique para gradar o clipe selecionado (ou uma camada de ajuste, para uma cena inteira). Afine no inspetor.",
                 FontSize = Typography.Caption,
                 Foreground = FaintText,
                 TextWrapping = TextWrapping.Wrap,
@@ -579,7 +590,7 @@ public sealed class MediaBrowserPanel : UserControl
             });
             _effectsList.Children.Add(new TextBlock
             {
-                Text = "Double-click to apply to the selected clip and its linked audio, or drag onto a clip. Each part stays editable in the Inspector.",
+                Text = "Faça duplo clique para aplicar ao clipe selecionado e ao respetivo áudio ligado, ou arraste para um clipe. Cada parte mantém-se editável no inspetor.",
                 FontSize = Typography.Caption,
                 Foreground = FaintText,
                 TextWrapping = TextWrapping.Wrap,
@@ -625,7 +636,7 @@ public sealed class MediaBrowserPanel : UserControl
     {
         if (_selectedClip is null || _history is null || _project is null)
         {
-            Status?.Invoke($"Select a clip in the timeline to apply {stack.Title}.");
+            Status?.Invoke($"Selecione um clipe na linha do tempo para aplicar {stack.Title}.");
             return;
         }
         Status?.Invoke(PresetStackBrowserModel.ApplyToClip(stack, _selectedClip, _project, _history));
@@ -662,14 +673,14 @@ public sealed class MediaBrowserPanel : UserControl
             data.Add(DataTransferItem.Create(DragFormats.EffectId, effect.Id));
             data.Add(DataTransferItem.Create(DragFormats.EffectPresetName, preset.Name));
         });
-        ToolTip.SetTip(row, $"Double-click to add {effect.DisplayName} ({preset.Name}) to the selected clip, or drag it onto a clip.");
+        ToolTip.SetTip(row, $"Faça duplo clique para adicionar {effect.DisplayName} ({preset.Name}) ao clipe selecionado, ou arraste-o para um clipe.");
         return row;
     }
 
     private Control ActionVfxRow(ActionVfxDescriptor preset)
     {
         var title = new TextBlock { Text = preset.DisplayName, FontSize = Typography.Body, Foreground = TextBrush, FontWeight = FontWeight.SemiBold };
-        var layers = new TextBlock { Text = $"{preset.Layers.Count} layer{(preset.Layers.Count == 1 ? "" : "s")}", FontSize = Typography.Micro, Foreground = Accent };
+        var layers = new TextBlock { Text = $"{preset.Layers.Count} camada{(preset.Layers.Count == 1 ? "" : "s")}", FontSize = Typography.Micro, Foreground = Accent };
         var header = new DockPanel();
         DockPanel.SetDock(layers, Dock.Right);
         header.Children.Add(layers);
@@ -692,7 +703,7 @@ public sealed class MediaBrowserPanel : UserControl
             Child = new StackPanel { Children = { header, desc } },
         };
         row.DoubleTapped += (_, _) => ActionVfxActivated?.Invoke(preset);
-        ToolTip.SetTip(row, $"Double-click to insert at the playhead. {preset.PlacementHint}");
+        ToolTip.SetTip(row, $"Faça duplo clique para inserir no indicador de reprodução. {preset.PlacementHint}");
         return row;
     }
 
@@ -722,7 +733,7 @@ public sealed class MediaBrowserPanel : UserControl
             Child = new StackPanel { Children = { header, desc } },
         };
         row.DoubleTapped += (_, _) => ApplyEffect(effect);
-        ToolTip.SetTip(row, "Double-click to add to the selected clip, or drag onto a timeline clip.");
+        ToolTip.SetTip(row, "Faça duplo clique para adicionar ao clipe selecionado, ou arraste para um clipe da linha do tempo.");
         // Drag the effect onto a timeline clip to append it (PLAN.md step 16b), complementing double-click.
         EnableDrag(row, DragFormats.EffectId, () => effect.Id);
         return row;
@@ -736,14 +747,14 @@ public sealed class MediaBrowserPanel : UserControl
         if (_looks is null)
             return;
 
-        var save = ToolbarButton("Save Look…", "Save the selected clip's grade (its colour effects, not the input transform) as a look.");
+        var save = ToolbarButton("Guardar estilo…", "Guardar a gradação do clipe selecionado (os seus efeitos de cor, não a transformação de entrada) como um estilo.");
         save.Click += (_, _) => _ = SaveLookAsync();
-        var import = ToolbarButton("Import LUT…", "Add a creative .cube LUT (made for Rec.709 footage) as a look.");
+        var import = ToolbarButton("Importar LUT…", "Adicionar uma LUT .cube criativa (feita para metragem Rec.709) como um estilo.");
         import.Click += (_, _) => _ = ImportLutAsync();
         _looksList.Children.Add(new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Children = { save, import } });
         _looksList.Children.Add(new TextBlock
         {
-            Text = "Double-click a look to grade the selected clip, or drag it onto a clip. Each look adds ordinary effects you can fine-tune in the Inspector.",
+            Text = "Faça duplo clique num estilo para gradar o clipe selecionado, ou arraste-o para um clipe. Cada estilo adiciona efeitos normais que pode afinar no inspetor.",
             FontSize = Typography.Caption,
             Foreground = FaintText,
             TextWrapping = TextWrapping.Wrap,
@@ -760,7 +771,7 @@ public sealed class MediaBrowserPanel : UserControl
             if (looks.Count == 0 && userGroup)
                 _looksList.Children.Add(new TextBlock
                 {
-                    Text = "No saved looks yet. Grade a clip and choose Save Look…, or import a creative LUT.",
+                    Text = "Ainda não há estilos guardados. Grade um clipe e escolha Guardar estilo…, ou importe uma LUT criativa.",
                     FontSize = Typography.Caption,
                     Foreground = FaintText,
                     TextWrapping = TextWrapping.Wrap,
@@ -772,7 +783,7 @@ public sealed class MediaBrowserPanel : UserControl
             }
         }
         if (!any && _lookSearch.Length > 0)
-            _looksList.Children.Add(EmptyNote("No looks match the search."));
+            _looksList.Children.Add(EmptyNote("Nenhum estilo corresponde à pesquisa."));
     }
 
     private Control LookRow(Look look)
@@ -805,13 +816,13 @@ public sealed class MediaBrowserPanel : UserControl
         };
         row.DoubleTapped += (_, _) => ApplyLook(look);
         EnableDrag(row, DragFormats.LookId, () => look.Id);
-        ToolTip.SetTip(row, $"Double-click to apply {look.Name} to the selected clip, or drag it onto a clip.");
+        ToolTip.SetTip(row, $"Faça duplo clique para aplicar {look.Name} ao clipe selecionado, ou arraste-o para um clipe.");
 
         if (!look.IsBuiltIn)
         {
-            var rename = new MenuItem { Header = "Rename…" };
+            var rename = new MenuItem { Header = "Renomear…" };
             rename.Click += (_, _) => _ = RenameLookAsync(look);
-            var delete = new MenuItem { Header = "Delete" };
+            var delete = new MenuItem { Header = "Eliminar" };
             delete.Click += (_, _) => _ = DeleteLookAsync(look);
             row.ContextMenu = new ContextMenu { ItemsSource = new MenuItem[] { rename, delete } };
         }
@@ -822,7 +833,7 @@ public sealed class MediaBrowserPanel : UserControl
     {
         if (_selectedClip is null || _history is null || _project is null)
         {
-            Status?.Invoke("Select a clip in the timeline to apply a look.");
+            Status?.Invoke("Selecione um clipe na linha do tempo para aplicar um estilo.");
             return;
         }
         Status?.Invoke(LooksBrowserModel.ApplyToClip(look, _selectedClip, _project, _history));
@@ -836,7 +847,7 @@ public sealed class MediaBrowserPanel : UserControl
         {
             if (_looks is null || _selectedClip is not { } clip)
             {
-                Status?.Invoke("Select a graded clip in the timeline to save its look.");
+                Status?.Invoke("Selecione um clipe gradado na linha do tempo para guardar o seu estilo.");
                 return;
             }
             Timecode at = _playhead?.Invoke() ?? clip.TimelineStart;
@@ -844,17 +855,17 @@ public sealed class MediaBrowserPanel : UserControl
                 at = clip.TimelineStart; // keyframes are sampled on the clip, never off either end
             if (LookApplication.Capture(clip, "Look", at) is not { } captured)
             {
-                Status?.Invoke("The selected clip has no colour effects to save as a look.");
+                Status?.Invoke("O clipe selecionado não tem efeitos de cor para guardar como estilo.");
                 return;
             }
             if (TopLevel.GetTopLevel(this) is not Window owner
-                || await NamePromptDialog.Show(owner, "Save Look", "Look name", "e.g. Warm Interview",
+                || await NamePromptDialog.Show(owner, "Guardar estilo", "Nome do estilo", "ex.: Entrevista quente",
                     _looks.UniqueName("My Look")) is not { } name)
                 return;
             Look stored = _looks.Add(captured with { Name = name });
             Status?.Invoke(_looks.LastSaveFailed
-                ? $"Saved look {stored.Name} for this session, but the looks file could not be written."
-                : $"Saved look {stored.Name} ({LooksBrowserModel.Badge(stored)}).");
+                ? $"Estilo {stored.Name} guardado para esta sessão, mas não foi possível escrever o ficheiro de estilos."
+                : $"Estilo {stored.Name} guardado ({LooksBrowserModel.Badge(stored)}).");
         }
         catch (Exception ex)
         {
@@ -872,9 +883,9 @@ public sealed class MediaBrowserPanel : UserControl
                 return;
             IReadOnlyList<IStorageFile> files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = "Import Creative LUT",
+                Title = "Importar LUT criativa",
                 AllowMultiple = true,
-                FileTypeFilter = [new FilePickerFileType("Cube LUT") { Patterns = ["*.cube"] }, FilePickerFileTypes.All],
+                FileTypeFilter = [new FilePickerFileType("LUT Cube") { Patterns = ["*.cube"] }, FilePickerFileTypes.All],
             });
             var added = new List<string>();
             foreach (IStorageFile file in files)
@@ -885,13 +896,13 @@ public sealed class MediaBrowserPanel : UserControl
                 bool ok = await Task.Run(() => CreativeLuts.TryGet(path, out _, out _));
                 if (!ok)
                 {
-                    Status?.Invoke($"Couldn't import {Path.GetFileName(path)}: {CreativeLuts.Error(path) ?? "not a readable 3D .cube LUT"}");
+                    Status?.Invoke($"Não foi possível importar {Path.GetFileName(path)}: {CreativeLuts.Error(path) ?? "não é uma LUT 3D .cube legível"}");
                     continue;
                 }
                 added.Add(_looks.Add(LooksBrowserModel.FromLutFile(path)).Name);
             }
             if (added.Count > 0)
-                Status?.Invoke((added.Count == 1 ? $"Imported LUT look {added[0]}." : $"Imported {added.Count} LUT looks.") + UnsavedNote());
+                Status?.Invoke((added.Count == 1 ? $"Estilo de LUT {added[0]} importado." : $"{added.Count} estilos de LUT importados.") + UnsavedNote());
         }
         catch (Exception ex)
         {
@@ -906,9 +917,9 @@ public sealed class MediaBrowserPanel : UserControl
         {
             if (_looks is null || TopLevel.GetTopLevel(this) is not Window owner)
                 return;
-            if (await NamePromptDialog.Show(owner, "Rename Look", "Look name", look.Name, look.Name) is { } name
+            if (await NamePromptDialog.Show(owner, "Renomear estilo", "Nome do estilo", look.Name, look.Name) is { } name
                 && _looks.Rename(look.Id, name) is { } renamed)
-                Status?.Invoke($"Renamed look to {renamed.Name}.{UnsavedNote()}");
+                Status?.Invoke($"Estilo renomeado para {renamed.Name}.{UnsavedNote()}");
         }
         catch (Exception ex)
         {
@@ -923,11 +934,11 @@ public sealed class MediaBrowserPanel : UserControl
             if (_looks is null || TopLevel.GetTopLevel(this) is not Window owner)
                 return;
             // Saved looks live outside the project's undo history, so deleting one is confirmed.
-            if (await ConfirmDialog.Show(owner, "Delete Look",
-                    $"Delete the look “{look.Name}”? This can't be undone. Clips it was applied to keep their effects.",
-                    "Delete", "Cancel")
+            if (await ConfirmDialog.Show(owner, "Eliminar estilo",
+                    $"Tem a certeza de que pretende eliminar o estilo “{look.Name}”? Não é possível anular. Os clips a que foi aplicado mantêm os seus efeitos.",
+                    "Eliminar", "Cancelar")
                 && _looks.Remove(look.Id))
-                Status?.Invoke($"Deleted look {look.Name}.{UnsavedNote()}");
+                Status?.Invoke($"Estilo {look.Name} eliminado.{UnsavedNote()}");
         }
         catch (Exception ex)
         {
@@ -937,7 +948,7 @@ public sealed class MediaBrowserPanel : UserControl
 
     /// <summary>The suffix for a library edit whose file write failed (the change holds for this session only).</summary>
     private string UnsavedNote() => _looks?.LastSaveFailed == true
-        ? " The looks file could not be written, so this change lasts for this session only."
+        ? " Não foi possível escrever o ficheiro de estilos, pelo que esta alteração durará apenas esta sessão."
         : string.Empty;
 
     private static Button ToolbarButton(string text, string tip)
@@ -969,7 +980,7 @@ public sealed class MediaBrowserPanel : UserControl
         _transitionsList.Children.Clear();
         _transitionsList.Children.Add(new TextBlock
         {
-            Text = "Drag a transition onto a cut between two clips, or double-click to add it to the selected clip's cut.",
+            Text = "Arraste uma transição para um corte entre dois clips, ou faça duplo clique para a adicionar ao corte do clipe selecionado.",
             FontSize = Typography.Caption,
             Foreground = FaintText,
             TextWrapping = TextWrapping.Wrap,
@@ -1000,7 +1011,7 @@ public sealed class MediaBrowserPanel : UserControl
             Child = new StackPanel { Children = { title, desc } },
         };
         row.DoubleTapped += (_, _) => TransitionActivated?.Invoke(transition.Id);
-        ToolTip.SetTip(row, "Drag onto a cut between two clips, or double-click to add it to the selected clip's cut.");
+        ToolTip.SetTip(row, "Arraste para um corte entre dois clips, ou faça duplo clique para a adicionar ao corte do clipe selecionado.");
         // Drag the transition onto a timeline cut to apply it (PLAN.md step 25), complementing double-click.
         EnableDrag(row, DragFormats.TransitionId, () => transition.Id);
         return row;
@@ -1051,7 +1062,7 @@ public sealed class MediaBrowserPanel : UserControl
     {
         if (_selectedClip is null || _history is null || _project is null)
         {
-            Status?.Invoke("Select a clip in the timeline to apply an effect.");
+            Status?.Invoke("Selecione um clipe na linha do tempo para aplicar um efeito.");
             return;
         }
 
@@ -1059,7 +1070,7 @@ public sealed class MediaBrowserPanel : UserControl
         _history.Execute(new AddEffectCommand(_selectedClip, instance));
         string clip = Path.GetFileName(_project.MediaPool.Get(_selectedClip.MediaRefId)?.AbsolutePath ?? "clip");
         string name = preset is null ? effect.DisplayName : $"{effect.DisplayName} ({preset.Name})";
-        Status?.Invoke($"Added {name} to {clip}.");
+        Status?.Invoke($"{name} adicionado a {clip}.");
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────────────────────────────

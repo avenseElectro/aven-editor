@@ -27,7 +27,7 @@ public class MediaBadgesSequenceTests
 
         var badges = MediaBadges.Describe(media);
 
-        Assert.Equal("SEQ · 240 frames @ 12", badges[0]); // sequence tag leads
+        Assert.Equal("SEQ · 240 fotogramas @ 12", badges[0]); // sequence tag leads
         Assert.Contains("1080p", badges);
     }
 
@@ -53,7 +53,7 @@ public class MediaBadgesSequenceTests
 
         var badges = MediaBadges.Describe(media);
 
-        Assert.Equal("STILL", badges[0]);
+        Assert.Equal("FIXA", badges[0]);
     }
 
     [Fact]
@@ -61,6 +61,6 @@ public class MediaBadgesSequenceTests
     {
         var media = new MediaRef(MediaRefId.New(), @"C:\v\clip.mp4", VideoInfo(new Rational(30, 1), 10));
         var badges = MediaBadges.Describe(media);
-        Assert.DoesNotContain(badges, b => b == "STILL" || b.StartsWith("SEQ"));
+        Assert.DoesNotContain(badges, b => b == "FIXA" || b.StartsWith("SEQ"));
     }
 }

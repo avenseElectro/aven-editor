@@ -25,7 +25,7 @@ public class StabilizationTests
     {
         EffectDescriptor? stab = EffectCatalog.Find(EffectTypeIds.Stabilization);
         Assert.NotNull(stab);
-        Assert.Equal("Stabilization", stab!.DisplayName);
+        Assert.Equal("Estabilização", stab!.DisplayName);
         Assert.Equal(EffectCategory.Video, stab.Category);
         Assert.False(EffectTypeIds.IsAudio(EffectTypeIds.Stabilization)); // a pipeline stage, not the mixer
         Assert.Equal("ST", stab.ShortCode);

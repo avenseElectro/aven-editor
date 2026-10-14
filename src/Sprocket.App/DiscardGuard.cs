@@ -28,12 +28,12 @@ internal static class DiscardGuard
     /// if the answer is "Don't Save".
     /// </summary>
     internal static string UnsavedChangesMessage(string documentName) =>
-        $"Do you want to save the changes you made to “{documentName}”?"
-        + "\n\nYour changes will be lost if you don't save them.";
+        $"Pretende guardar as alterações feitas a “{documentName}”?"
+        + "\n\nAs suas alterações serão perdidas se não as guardar.";
 
     /// <summary>The running-export prompt body. Names the one thing that is actually lost (the file being
     /// written) and, just as important, the thing that is not — exports that already finished.</summary>
     internal const string RunningExportMessage =
-        "An export is still running. Closing now cancels it and deletes the partly-written file.\n\n"
-        + "Exports that have already finished are not affected.";
+        "Ainda está a decorrer uma exportação. Fechar agora cancela-a e elimina o ficheiro parcialmente escrito.\n\n"
+        + "As exportações já terminadas não são afetadas.";
 }

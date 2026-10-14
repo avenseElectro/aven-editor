@@ -27,7 +27,7 @@ public sealed class DayForNightCatalogTests
     {
         EffectDescriptor d = Descriptor;
         Assert.NotNull(d);
-        Assert.Equal("Day for Night", d.DisplayName);
+        Assert.Equal("Dia para noite", d.DisplayName);
         Assert.Equal(EffectCategory.Color, d.Category);
         Assert.Equal("DN", d.ShortCode);
         Assert.False(EffectTypeIds.IsAudio(EffectTypeIds.DayForNight));

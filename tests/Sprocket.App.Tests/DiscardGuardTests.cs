@@ -53,17 +53,17 @@ public class DiscardGuardTests
         string message = DiscardGuard.UnsavedChangesMessage("Wedding Cut");
 
         Assert.Contains("Wedding Cut", message);
-        Assert.Contains("save the changes", message);
-        Assert.Contains("lost", message);
+        Assert.Contains("guardar as alterações", message);
+        Assert.Contains("perdidas", message);
     }
 
     /// <summary>The export prompt has to say both halves: the partial file goes, finished exports do not.</summary>
     [Fact]
     public void ExportMessageCoversWhatIsLostAndWhatIsNot()
     {
-        Assert.Contains("cancels it", DiscardGuard.RunningExportMessage);
-        Assert.Contains("partly-written", DiscardGuard.RunningExportMessage);
-        Assert.Contains("already finished are not affected", DiscardGuard.RunningExportMessage);
+        Assert.Contains("cancela-a", DiscardGuard.RunningExportMessage);
+        Assert.Contains("parcialmente escrito", DiscardGuard.RunningExportMessage);
+        Assert.Contains("já terminadas não são afetadas", DiscardGuard.RunningExportMessage);
     }
 
     /// <summary>Cancel must be the enum's default: <c>ShowDialog&lt;T&gt;</c> returns <c>default</c> when the

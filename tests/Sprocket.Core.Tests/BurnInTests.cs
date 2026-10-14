@@ -100,7 +100,7 @@ public sealed class BurnInTests
 
         Sequence sequence = project.ActiveSequence;
         Assert.Equal("Opening Card", BurnInResolver.TopmostClipName(project, sequence, Timecode.FromSeconds(1)));
-        Assert.Equal("Color Matte", BurnInResolver.TopmostClipName(project, sequence, Timecode.FromSeconds(3)));
+        Assert.Equal("Cor sólida", BurnInResolver.TopmostClipName(project, sequence, Timecode.FromSeconds(3)));
     }
 
     [Fact]

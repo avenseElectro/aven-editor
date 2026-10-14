@@ -79,7 +79,7 @@ internal sealed class ProxyStatusWindow : Window
         _setTier = setTier;
         _stab = stab;
 
-        Title = "Background Tasks";
+        Title = "Tarefas em Segundo Plano";
         Icon = AppIcon.Window;
         Width = 600;
         Height = 480;
@@ -91,7 +91,7 @@ internal sealed class ProxyStatusWindow : Window
         _stateLabel = new TextBlock { FontSize = Typography.Emphasis, FontWeight = FontWeight.SemiBold, VerticalAlignment = VerticalAlignment.Center };
         _summary = new TextBlock { FontSize = Typography.Caption, Foreground = Palette.FaintTextBrush };
 
-        _enableToggle = new CheckBox { Content = "Use proxies", Foreground = Palette.TextBrush, VerticalAlignment = VerticalAlignment.Center };
+        _enableToggle = new CheckBox { Content = "Usar proxies", Foreground = Palette.TextBrush, VerticalAlignment = VerticalAlignment.Center };
         _enableToggle.IsCheckedChanged += (_, _) =>
         {
             if (!_syncing)
@@ -106,13 +106,13 @@ internal sealed class ProxyStatusWindow : Window
         };
         _tierBox.SelectionChanged += (_, _) => OnTierSelected();
 
-        _pauseButton = ToolButton("Pause", accent: false);
-        _rebuildButton = ToolButton("Rebuild All", accent: true);
-        _deleteAllButton = ToolButton("Delete All Proxies", accent: false);
+        _pauseButton = ToolButton("Pausar", accent: false);
+        _rebuildButton = ToolButton("Reconstruir Todos", accent: true);
+        _deleteAllButton = ToolButton("Eliminar Todos os Proxies", accent: false);
         _pauseButton.Click += (_, _) => _proxy.SetPaused(!_proxy.Paused);
         _rebuildButton.Click += (_, _) => _proxy.RebuildAll();
         _rebuildButton.SetValue(ToolTip.TipProperty,
-            "Builds every missing or failed proxy. Ready proxies are left alone — use Delete All Proxies first to re-encode those.");
+            "Constrói todos os proxies em falta ou falhados. Os proxies prontos não são tocados — use primeiro Eliminar Todos os Proxies para os recodificar.");
         _deleteAllButton.Click += (_, _) => _ = DeleteAllAsync();
 
         var header = new StackPanel
@@ -129,7 +129,7 @@ internal sealed class ProxyStatusWindow : Window
                     Children =
                     {
                         _enableToggle,
-                        new TextBlock { Text = "Resolution", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, VerticalAlignment = VerticalAlignment.Center },
+                        new TextBlock { Text = "Resolução", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body, VerticalAlignment = VerticalAlignment.Center },
                         _tierBox,
                     },
                 },
@@ -162,7 +162,7 @@ internal sealed class ProxyStatusWindow : Window
         _list = new StackPanel { Spacing = 8, Margin = new Thickness(16, 0, 16, 12) };
         _emptyHint = new TextBlock
         {
-            Text = "No media in this project needs a proxy. Sources in easily decoded formats at 1080p or smaller preview in real time on the original.",
+            Text = "Nenhuma multimédia deste projeto precisa de proxy. As fontes em formatos fáceis de descodificar a 1080p ou menos fazem pré-visualização em tempo real no original.",
             Foreground = Palette.MutedTextBrush,
             FontSize = Typography.Body,
             TextWrapping = TextWrapping.Wrap,
@@ -171,7 +171,7 @@ internal sealed class ProxyStatusWindow : Window
 
         _stabHeader = new TextBlock
         {
-            Text = "Stabilization analysis",
+            Text = "Análise de estabilização",
             FontSize = Typography.Emphasis,
             FontWeight = FontWeight.SemiBold,
             Foreground = Palette.TextBrush,
@@ -243,10 +243,10 @@ internal sealed class ProxyStatusWindow : Window
         if (picked == _proxy.Tier)
             return;
 
-        bool confirmed = await ConfirmDialog.Show(this, "Change Proxy Resolution",
-            $"Build proxies at {ProxySettingsOps.TierLabel(picked)}?\n\n" +
-            "The resolution is part of each proxy's cache key, so existing proxies stop applying and rebuild in " +
-            "the background. The preview falls back to originals until they finish.", "Change", "Cancel");
+        bool confirmed = await ConfirmDialog.Show(this, "Alterar Resolução do Proxy",
+            $"Construir proxies em {ProxySettingsOps.TierLabel(picked)}?\n\n" +
+            "A resolução faz parte da chave de cache de cada proxy, pelo que os proxies existentes deixam de se aplicar "
+            + "e são reconstruídos em segundo plano. A pré-visualização recorre aos originais até isso terminar.", "Alterar", "Cancelar");
         if (!confirmed)
         {
             Refresh(); // put the dropdown back where the service still is
@@ -258,9 +258,9 @@ internal sealed class ProxyStatusWindow : Window
 
     private async System.Threading.Tasks.Task DeleteAllAsync()
     {
-        bool confirmed = await ConfirmDialog.Show(this, "Delete All Proxies",
-            "Delete every cached proxy file?\n\nThe preview falls back to originals. Proxies rebuild on Rebuild " +
-            "All, on the next project load, or when proxies are switched back on.", "Delete", "Cancel");
+        bool confirmed = await ConfirmDialog.Show(this, "Eliminar Todos os Proxies",
+            "Eliminar todos os ficheiros proxy em cache?\n\nA pré-visualização recorre aos originais. Os proxies são "
+            + "reconstruídos em Reconstruir Todos, na próxima abertura do projeto, ou quando os proxies forem reativados.", "Eliminar", "Cancelar");
         if (confirmed)
             _proxy.DeleteAllProxies();
     }
@@ -304,14 +304,14 @@ internal sealed class ProxyStatusWindow : Window
         _stabList.Children.Clear();
         foreach (AnalysisSnapshot s in snaps)
         {
-            string name = DisplayName(s.Media) + (s.Detailed ? " · Detailed" : "");
+            string name = DisplayName(s.Media) + (s.Detailed ? " · Detalhada" : "");
             (string text, IBrush colour) = s.State switch
             {
-                AnalysisState.Ready => ("Analyzed", Palette.GoodBrush),
-                AnalysisState.Analyzing => (string.Create(CultureInfo.InvariantCulture, $"Analyzing… {s.Progress * 100:0}%"), Palette.AccentBrush),
-                AnalysisState.Queued => ("Queued", Palette.MutedTextBrush),
-                AnalysisState.Failed => ("Failed — clip renders unstabilized", Palette.BadBrush),
-                _ => ("Not analyzed", Palette.MutedTextBrush),
+                AnalysisState.Ready => ("Analisada", Palette.GoodBrush),
+                AnalysisState.Analyzing => (string.Create(CultureInfo.InvariantCulture, $"A analisar… {s.Progress * 100:0}%"), Palette.AccentBrush),
+                AnalysisState.Queued => ("Na fila", Palette.MutedTextBrush),
+                AnalysisState.Failed => ("Falhou — o clipe é processado sem estabilização", Palette.BadBrush),
+                _ => ("Não analisada", Palette.MutedTextBrush),
             };
 
             var title = new TextBlock { Text = name, Foreground = Palette.TextBrush, FontSize = Typography.Emphasis, TextTrimming = TextTrimming.CharacterEllipsis };
@@ -330,7 +330,7 @@ internal sealed class ProxyStatusWindow : Window
                 (MediaRefId media, bool detailed) = (s.Media, s.Detailed);
                 var cancel = new Button
                 {
-                    Content = "Cancel",
+                    Content = "Cancelar",
                     Padding = new Thickness(10, 4),
                     FontSize = Typography.Body,
                     Foreground = Palette.MutedTextBrush,
@@ -396,9 +396,9 @@ internal sealed class ProxyStatusWindow : Window
 
         (_stateLabel.Text, _stateLabel.Foreground) = (_proxy.Enabled, _proxy.Paused) switch
         {
-            (false, _) => ("Proxies off — previewing originals", Palette.MutedTextBrush),
-            (true, true) => ("Proxies on · generation paused", Palette.WarnBrush),
-            _ => ("Proxies on", Palette.GoodBrush),
+            (false, _) => ("Proxies desativados — a pré-visualizar originais", Palette.MutedTextBrush),
+            (true, true) => ("Proxies ativados · geração em pausa", Palette.WarnBrush),
+            _ => ("Proxies ativados", Palette.GoodBrush),
         };
 
         long totalSize = rows.Sum(r => r.SizeBytes);
@@ -409,12 +409,12 @@ internal sealed class ProxyStatusWindow : Window
         // Recommended is counted separately and never folded into "not generated": those are what Rebuild All
         // builds, and an unconfirmed recommendation is deliberately not among them.
         int recommended = rows.Count(r => r.State == ProxyState.Recommended);
-        string recommendedPart = recommended > 0 ? $" · {recommended} recommended" : "";
+        string recommendedPart = recommended > 0 ? $" · {recommended} recomendados" : "";
         _summary.Text = string.Create(CultureInfo.InvariantCulture,
-            $"{ready} ready · {pending} pending · {missing} not generated · {failed} failed{recommendedPart}  ·  " +
-            $"{PreferencesFormat.Bytes(totalSize)} on disk");
+            $"{ready} prontos · {pending} pendentes · {missing} não gerados · {failed} falhados{recommendedPart}  ·  " +
+            $"{PreferencesFormat.Bytes(totalSize)} no disco");
 
-        _pauseButton.Content = _proxy.Paused ? "Resume" : "Pause";
+        _pauseButton.Content = _proxy.Paused ? "Retomar" : "Pausar";
         _pauseButton.IsEnabled = _proxy.Enabled;
         _rebuildButton.IsEnabled = _proxy.Enabled && (missing > 0 || failed > 0);
         _deleteAllButton.IsEnabled = ready > 0;
@@ -443,7 +443,7 @@ internal sealed class ProxyStatusWindow : Window
 
         string eta = EtaText(building.Id, building.Progress);
         _buildingDetail.Text = string.Create(CultureInfo.InvariantCulture,
-            $"Building {building.Target.Width}×{building.Target.Height} · {building.Progress * 100:0}%{eta}");
+            $"A construir {building.Target.Width}×{building.Target.Height} · {building.Progress * 100:0}%{eta}");
     }
 
     /// <summary>
@@ -471,8 +471,8 @@ internal sealed class ProxyStatusWindow : Window
         if (remainingSeconds is <= 0 or > 24 * 3600)
             return "";
         return remainingSeconds < 90
-            ? string.Create(CultureInfo.InvariantCulture, $" · about {remainingSeconds:0}s left")
-            : string.Create(CultureInfo.InvariantCulture, $" · about {remainingSeconds / 60:0} min left");
+            ? string.Create(CultureInfo.InvariantCulture, $" · cerca de {remainingSeconds:0}s restantes")
+            : string.Create(CultureInfo.InvariantCulture, $" · cerca de {remainingSeconds / 60:0} min restantes");
     }
 
     private string DisplayName(MediaRefId id) =>
@@ -507,13 +507,13 @@ internal sealed class ProxyStatusWindow : Window
             _status = new TextBlock { FontSize = Typography.Body };
             _bar = new ProgressBar { Minimum = 0, Maximum = 1, Height = 4, Margin = new Thickness(0, 6, 0, 0) };
 
-            _delete = RowButton("Delete", Palette.MutedTextBrush);
-            _generate = RowButton("Generate", Palette.TextBrush);
+            _delete = RowButton("Eliminar", Palette.MutedTextBrush);
+            _generate = RowButton("Gerar", Palette.TextBrush);
             _delete.Click += (_, _) => delete();
             _generate.Click += (_, _) => generate();
             // Deletion is not persisted in the project, so the honest promise is that it comes back.
             _delete.SetValue(ToolTip.TipProperty,
-                "Deletes the proxy file. It will rebuild on Generate, when proxies are switched back on, or on the next project load.");
+                "Elimina o ficheiro proxy. Será reconstruído em Gerar, quando os proxies forem reativados, ou na próxima abertura do projeto.");
 
             var buttons = new StackPanel
             {
@@ -557,12 +557,12 @@ internal sealed class ProxyStatusWindow : Window
             // Same state→colour mapping the Export Queue's rows use (Palette health tokens).
             (_status.Text, _status.Foreground) = row.State switch
             {
-                ProxyState.Ready => ($"{target}Ready{size}", Palette.GoodBrush),
-                ProxyState.Building => (string.Create(CultureInfo.InvariantCulture, $"{target}Building… {row.Progress * 100:0}%"), Palette.AccentBrush),
-                ProxyState.Queued => ($"{target}Queued{reason}", Palette.MutedTextBrush),
-                ProxyState.Recommended => ($"{target}Recommended — playback dropped frames", Palette.WarnBrush),
-                ProxyState.NotGenerated => ($"{target}Not generated{reason}", Palette.MutedTextBrush),
-                ProxyState.Failed => ($"{target}Failed — previewing the original", Palette.BadBrush),
+                ProxyState.Ready => ($"{target}Pronto{size}", Palette.GoodBrush),
+                ProxyState.Building => (string.Create(CultureInfo.InvariantCulture, $"{target}A construir… {row.Progress * 100:0}%"), Palette.AccentBrush),
+                ProxyState.Queued => ($"{target}Na fila{reason}", Palette.MutedTextBrush),
+                ProxyState.Recommended => ($"{target}Recomendado — a reprodução perdeu fotogramas", Palette.WarnBrush),
+                ProxyState.NotGenerated => ($"{target}Não gerado{reason}", Palette.MutedTextBrush),
+                ProxyState.Failed => ($"{target}Falhou — a pré-visualizar o original", Palette.BadBrush),
                 _ => ($"{target}{row.State}", Palette.MutedTextBrush),
             };
 
@@ -572,16 +572,16 @@ internal sealed class ProxyStatusWindow : Window
             _generate.IsEnabled = serviceEnabled
                 && row.State is ProxyState.NotGenerated or ProxyState.Failed or ProxyState.Recommended;
             _generate.SetValue(ToolTip.TipProperty, row.State == ProxyState.Recommended
-                ? "Playback dropped frames on this source. Build a proxy for it?"
+                ? "A reprodução perdeu fotogramas nesta fonte. Construir um proxy para ela?"
                 : null);
         }
 
         /// <summary>The " — why" suffix for a queued / not-generated row, from the policy's decision reason.</summary>
         private static string ReasonSuffix(ProxyReason reason) => reason switch
         {
-            ProxyReason.DemandingCodec => " — demanding codec",
+            ProxyReason.DemandingCodec => " — codec exigente",
             ProxyReason.DeepColor => " — 10-bit / 4:2:2",
-            ProxyReason.Performance => " — playback dropped frames",
+            ProxyReason.Performance => " — a reprodução perdeu fotogramas",
             _ => "",
         };
 

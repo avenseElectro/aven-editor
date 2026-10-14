@@ -30,11 +30,11 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Summary(ExportAcceleration.Hardware, "h264_nvenc", hardware: true);
 
-        Assert.Equal("Exported with h264_nvenc in 00:42", ExportSummaryText.Compact(s));
+        Assert.Equal("Exportado com h264_nvenc em 00:42", ExportSummaryText.Compact(s));
         Assert.Equal(
-            "Encoder: h264_nvenc (hardware)\n" +
-            "Elapsed: 00:42 · 30.0 fps average\n" +
-            "Time: total 42000 ms · decode 1200 ms · render 15000 ms · encode 20000 ms · audio 500 ms",
+            "Codificador: h264_nvenc (hardware)\n" +
+            "Decorrido: 00:42 · 30.0 fps em média\n" +
+            "Tempo: total 42000 ms · descodificação 1200 ms · composição 15000 ms · codificação 20000 ms · áudio 500 ms",
             ExportSummaryText.CompletionDetails(s));
     }
 
@@ -43,9 +43,9 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Summary(ExportAcceleration.Hardware, "libx264", hardware: false);
 
-        Assert.Equal("Exported with libx264 (hardware unavailable) in 00:42", ExportSummaryText.Compact(s));
+        Assert.Equal("Exportado com libx264 (hardware indisponível) em 00:42", ExportSummaryText.Compact(s));
         Assert.StartsWith(
-            "Encoder: libx264 (software — hardware was requested but no GPU encoder opened)\n",
+            "Codificador: libx264 (software — o hardware foi pedido mas nenhum codificador GPU abriu)\n",
             ExportSummaryText.CompletionDetails(s));
     }
 
@@ -54,8 +54,8 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Summary(ExportAcceleration.Software, "libx264", hardware: false);
 
-        Assert.Equal("Exported with libx264 in 00:42", ExportSummaryText.Compact(s));
-        Assert.StartsWith("Encoder: libx264 (software)\n", ExportSummaryText.CompletionDetails(s));
+        Assert.Equal("Exportado com libx264 em 00:42", ExportSummaryText.Compact(s));
+        Assert.StartsWith("Codificador: libx264 (software)\n", ExportSummaryText.CompletionDetails(s));
     }
 
     [Fact]
@@ -63,10 +63,10 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Summary(ExportAcceleration.Software, "", hardware: false, frames: 0);
 
-        Assert.Equal("Exported in 00:42", ExportSummaryText.Compact(s));
+        Assert.Equal("Exportado em 00:42", ExportSummaryText.Compact(s));
         Assert.Equal(
-            "Audio only · elapsed 00:42\n" +
-            "Time: total 42000 ms · audio 500 ms (mix 300 ms, encode 200 ms)",
+            "Apenas áudio · decorrido 00:42\n" +
+            "Tempo: total 42000 ms · áudio 500 ms (mistura 300 ms, codificação 200 ms)",
             ExportSummaryText.CompletionDetails(s));
     }
 
@@ -88,11 +88,11 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Fast(new ExportDecodeSummary(true, 2, 0, 0, "d3d11va"));
 
-        Assert.Equal("Fast export with h264_nvenc in 00:42 · GPU decode", ExportSummaryText.Compact(s));
+        Assert.Equal("Exportação rápida com h264_nvenc em 00:42 · descodificação GPU", ExportSummaryText.Compact(s));
         Assert.StartsWith(
-            "Mode: Fast Export\n" +
-            "Decode: hardware (d3d11va) for 2 sources\n" +
-            "Encoder: h264_nvenc (hardware)\n",
+            "Modo: Exportação Rápida\n" +
+            "Descodificação: hardware (d3d11va) para 2 fontes\n" +
+            "Codificador: h264_nvenc (hardware)\n",
             ExportSummaryText.CompletionDetails(s));
     }
 
@@ -101,8 +101,8 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Fast(new ExportDecodeSummary(true, 2, 1, 0, "cuda"));
 
-        Assert.Equal("Fast export with h264_nvenc in 00:42 · 1 of 3 sources decoded in software", ExportSummaryText.Compact(s));
-        Assert.Contains("Decode: hardware (cuda) for 2 of 3 sources, software for 1\n", ExportSummaryText.CompletionDetails(s));
+        Assert.Equal("Exportação rápida com h264_nvenc em 00:42 · 1 de 3 fontes descodificadas em software", ExportSummaryText.Compact(s));
+        Assert.Contains("Descodificação: hardware (cuda) para 2 de 3 fontes, software para 1\n", ExportSummaryText.CompletionDetails(s));
     }
 
     [Fact]
@@ -111,11 +111,11 @@ public class ExportSummaryTextTests
         ExportRunSummary s = Fast(new ExportDecodeSummary(true, 0, 1, 0, null), actual: "libx264", hardware: false);
 
         Assert.Equal(
-            "Fast export with libx264 (hardware unavailable) in 00:42 · 1 of 1 source decoded in software",
+            "Exportação rápida com libx264 (hardware indisponível) em 00:42 · 1 de 1 fonte descodificada em software",
             ExportSummaryText.Compact(s));
         string details = ExportSummaryText.CompletionDetails(s);
-        Assert.Contains("Decode: software for 1 source — no GPU decoder was available\n", details);
-        Assert.Contains("Encoder: libx264 (software — hardware was requested but no GPU encoder opened)\n", details);
+        Assert.Contains("Descodificação: software para 1 fonte — nenhum descodificador GPU estava disponível\n", details);
+        Assert.Contains("Codificador: libx264 (software — o hardware foi pedido mas nenhum codificador GPU abriu)\n", details);
     }
 
     [Fact]
@@ -123,11 +123,11 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Fast(new ExportDecodeSummary(true, 1, 1, 1, "cuda"));
 
-        Assert.Equal("Fast export with h264_nvenc in 00:42 · GPU decode failed for 1 source, finished in software",
+        Assert.Equal("Exportação rápida com h264_nvenc em 00:42 · a descodificação GPU falhou para 1 fonte, terminada em software",
             ExportSummaryText.Compact(s));
         Assert.Contains(
-            "Decode: hardware (cuda) for 1 of 2 sources, software for 1\n" +
-            "GPU decode failed during the export for 1 source — reopened in software at the same frame\n",
+            "Descodificação: hardware (cuda) para 1 de 2 fontes, software para 1\n" +
+            "A descodificação GPU falhou durante a exportação para 1 fonte — reaberta em software no mesmo fotograma\n",
             ExportSummaryText.CompletionDetails(s));
     }
 
@@ -137,10 +137,10 @@ public class ExportSummaryTextTests
         ExportRunSummary s = Fast(new ExportDecodeSummary(true, 0, 1, 1, "cuda"));
 
         string details = ExportSummaryText.CompletionDetails(s);
-        Assert.DoesNotContain("no GPU decoder was available", details);
+        Assert.DoesNotContain("nenhum descodificador GPU estava disponível", details);
         Assert.Contains(
-            "Decode: software for 1 source\n" +
-            "GPU decode (cuda) failed during the export for 1 source — reopened in software at the same frame\n",
+            "Descodificação: software para 1 fonte\n" +
+            "A descodificação GPU (cuda) falhou durante a exportação para 1 fonte — reaberta em software no mesmo fotograma\n",
             details);
     }
 
@@ -149,8 +149,8 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Fast(new ExportDecodeSummary(true, 0, 2, 0, null, DisabledByUser: true));
 
-        Assert.EndsWith(" · GPU decode off (SPROCKET_HWACCEL)", ExportSummaryText.Compact(s));
-        Assert.Contains("Decode: software for 2 sources — GPU decode disabled by SPROCKET_HWACCEL\n",
+        Assert.EndsWith(" · descodificação GPU desativada (SPROCKET_HWACCEL)", ExportSummaryText.Compact(s));
+        Assert.Contains("Descodificação: software para 2 fontes — descodificação GPU desativada por SPROCKET_HWACCEL\n",
             ExportSummaryText.CompletionDetails(s));
     }
 
@@ -159,8 +159,8 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Fast(new ExportDecodeSummary(true, 0, 0, 0, null));
 
-        Assert.Equal("Fast export with h264_nvenc in 00:42", ExportSummaryText.Compact(s));
-        Assert.Contains("Decode: no video sources\n", ExportSummaryText.CompletionDetails(s));
+        Assert.Equal("Exportação rápida com h264_nvenc em 00:42", ExportSummaryText.Compact(s));
+        Assert.Contains("Descodificação: sem fontes de vídeo\n", ExportSummaryText.CompletionDetails(s));
     }
 
     [Fact]
@@ -168,11 +168,11 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Fast(new ExportDecodeSummary(false, 0, 2, 0, null));
 
-        Assert.Equal("Fast export with h264_nvenc in 00:42", ExportSummaryText.Compact(s));
+        Assert.Equal("Exportação rápida com h264_nvenc em 00:42", ExportSummaryText.Compact(s));
         Assert.StartsWith(
-            "Mode: Fast Export\n" +
-            "Decode: software for 2 sources\n" +
-            "Encoder: h264_nvenc (hardware)\n",
+            "Modo: Exportação Rápida\n" +
+            "Descodificação: software para 2 fontes\n" +
+            "Codificador: h264_nvenc (hardware)\n",
             ExportSummaryText.CompletionDetails(s));
     }
 
@@ -184,9 +184,9 @@ public class ExportSummaryTextTests
             SoftwarePreset = "veryfast",
         };
 
-        Assert.Equal("Fast export with libx264 (veryfast — hardware unavailable) in 00:42", ExportSummaryText.Compact(s));
+        Assert.Equal("Exportação rápida com libx264 (veryfast — hardware indisponível) em 00:42", ExportSummaryText.Compact(s));
         Assert.Contains(
-            "Encoder: libx264 (software, veryfast preset — hardware was requested but no GPU encoder opened)\n",
+            "Codificador: libx264 (software, predefinição veryfast — o hardware foi pedido mas nenhum codificador GPU abriu)\n",
             ExportSummaryText.CompletionDetails(s));
     }
 
@@ -195,8 +195,8 @@ public class ExportSummaryTextTests
     {
         ExportRunSummary s = Summary(ExportAcceleration.Software, "libx264", hardware: false) with { SoftwarePreset = "medium" };
 
-        Assert.Equal("Exported with libx264 in 00:42", ExportSummaryText.Compact(s));
-        Assert.StartsWith("Encoder: libx264 (software)\n", ExportSummaryText.CompletionDetails(s));
+        Assert.Equal("Exportado com libx264 em 00:42", ExportSummaryText.Compact(s));
+        Assert.StartsWith("Codificador: libx264 (software)\n", ExportSummaryText.CompletionDetails(s));
     }
 
     [Fact]
@@ -207,8 +207,8 @@ public class ExportSummaryTextTests
             Decode = new ExportDecodeSummary(false, 0, 1, 0, null),
         };
         string details = ExportSummaryText.CompletionDetails(s);
-        Assert.DoesNotContain("Mode:", details);
-        Assert.DoesNotContain("Decode:", details);
+        Assert.DoesNotContain("Modo:", details);
+        Assert.DoesNotContain("Descodificação:", details);
     }
 
     [Theory]

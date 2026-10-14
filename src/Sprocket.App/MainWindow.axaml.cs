@@ -112,7 +112,7 @@ public partial class MainWindow : Window
     private Export.ExportQueue? _exportQueue;         // lazily built on first Export Queue use (PLAN.md step 29)
     private ExportQueueWindow? _exportQueueWindow;    // the (reused) queue window, or null when closed
     private int _savedUndoCount;       // history depth at the last save; document is clean while it matches
-    private string _projectName = "Untitled";
+    private string _projectName = "Sem título";
     private string? _currentProjectPath; // the file this project was loaded from / last saved to (null = untitled)
     private bool _closeApproved;       // the close/quit gate has already been answered for this window's close
     private bool _closePromptOpen;     // the close/quit gate is on screen — never stack a second one
@@ -203,12 +203,12 @@ public partial class MainWindow : Window
 
     /// <summary>The Sprocket project file type (a JSON sidecar) for the open / save-as pickers.</summary>
     private static readonly FilePickerFileType SprocketProjectFileType =
-        new("Sprocket project") { Patterns = ["*.sprocket.json", "*.json"] };
+        new("Projeto Sprocket") { Patterns = ["*.sprocket.json", "*.json"] };
 
     /// <summary>Import file-type filters for the media open dialog (PLAN.md step 27 import coverage): the common
     /// containers and audio-only formats the FFmpeg 8 decode path handles. Unsupported / corrupt files still fail
     /// gracefully per file (see <see cref="Import"/>), so the "All files" fall-through stays available.</summary>
-    private static readonly FilePickerFileType VideoFileType = new("Video")
+    private static readonly FilePickerFileType VideoFileType = new("Vídeo")
     {
         Patterns =
         [
@@ -216,14 +216,14 @@ public partial class MainWindow : Window
             "*.ts", "*.m2ts", "*.mts", "*.mpg", "*.mpeg", "*.wmv", "*.flv", "*.ogv", "*.3gp",
         ],
     };
-    private static readonly FilePickerFileType AudioFileType = new("Audio")
+    private static readonly FilePickerFileType AudioFileType = new("Áudio")
     {
         Patterns = ["*.wav", "*.mp3", "*.aac", "*.m4a", "*.flac", "*.ac3", "*.opus", "*.ogg", "*.wma", "*.aif", "*.aiff"],
     };
 
     /// <summary>Image import filter (PLAN.md step 42): single stills and numbered image-sequence frames. EXR is
     /// intentionally excluded (unreliable decoder coverage in the bundled gpl natives).</summary>
-    private static readonly FilePickerFileType ImageFileType = new("Images")
+    private static readonly FilePickerFileType ImageFileType = new("Imagens")
     {
         Patterns = ["*.png", "*.jpg", "*.jpeg", "*.tif", "*.tiff", "*.bmp", "*.tga", "*.webp", "*.dpx"],
     };
@@ -652,7 +652,7 @@ public partial class MainWindow : Window
         exitMenuItem.Click += (_, _) => Close();
         if (OperatingSystem.IsLinux())
         {
-            exitMenuItem.Header = "_Quit";
+            exitMenuItem.Header = "Sai_r";
             exitMenuItem.InputGesture = new KeyGesture(Key.Q, KeyModifiers.Control);
         }
 
@@ -792,7 +792,7 @@ public partial class MainWindow : Window
             item.Click += (_, _) => _timeline?.InsertGenerator(g);
             insertItems.Add(item);
         }
-        var adjustmentItem = new MenuItem { Header = "Adjustment Layer" };
+        var adjustmentItem = new MenuItem { Header = "Camada de ajuste" };
         adjustmentItem.Click += (_, _) => _timeline?.InsertAdjustmentLayer();
         insertItems.Add(adjustmentItem);
         // Action VFX presets (plan/features/special-effects.md, phase 3): multi-layer stacks inserted at the playhead.
@@ -805,7 +805,7 @@ public partial class MainWindow : Window
             item.Click += (_, _) => _timeline?.InsertActionVfx(p);
             actionVfxItems.Add(item);
         }
-        insertItems.Add(new MenuItem { Header = "Action VFX", ItemsSource = actionVfxItems });
+        insertItems.Add(new MenuItem { Header = "VFX de ação", ItemsSource = actionVfxItems });
         this.FindControl<MenuItem>("ClipInsertMenuItem")!.ItemsSource = insertItems;
 
         // ── Effects (populated from the registry incl. plugins, PLAN.md steps 15–16, 33; rebuilt on open so
@@ -875,10 +875,10 @@ public partial class MainWindow : Window
             this.FindControl<MenuItem>("PreferencesMenuItem")!.InputGesture = KeyGesture.Parse("Cmd+,");
 
             // Tooltips that spell out Ctrl-based shortcuts get the same treatment.
-            ToolTip.SetTip(this.FindControl<Button>("ZoomOutButton")!, "Zoom Out (- or Cmd+-)");
-            ToolTip.SetTip(this.FindControl<Button>("ZoomInButton")!, "Zoom In (= or Cmd+=)");
+            ToolTip.SetTip(this.FindControl<Button>("ZoomOutButton")!, "Reduzir zoom (- ou Cmd+-)");
+            ToolTip.SetTip(this.FindControl<Button>("ZoomInButton")!, "Ampliar zoom (= ou Cmd+=)");
             ToolTip.SetTip(this.FindControl<Button>("MarkersButton")!,
-                "Markers panel (M adds at the playhead; Shift+M / Cmd+Shift+M navigate)");
+                "Painel de marcadores (M adiciona no indicador; Shift+M / Cmd+Shift+M navegam)");
         }
         this.FindControl<MenuItem>("ViewMenu")!.SubmenuOpened += (_, _) => RefreshViewMenu();
 
@@ -1156,8 +1156,8 @@ public partial class MainWindow : Window
         {
             bool switched = audioClock.SwitchOutputDevice(updated.AudioOutputDevice);
             SetStatus(switched
-                ? (updated.AudioOutputDevice.Length == 0 ? "Audio output: System Default" : $"Audio output: {updated.AudioOutputDevice}")
-                : "Could not switch the audio output device — keeping the current one.");
+                ? (updated.AudioOutputDevice.Length == 0 ? "Saída de áudio: predefinição do sistema" : $"Saída de áudio: {updated.AudioOutputDevice}")
+                : "Não foi possível mudar o dispositivo de saída de áudio — a manter o atual.");
         }
 
         // A changed update setting takes effect now, not next launch: re-check when just enabled,
@@ -1176,8 +1176,8 @@ public partial class MainWindow : Window
         {
             await mcpService.ApplyAsync(updated);
             if (mcpService.State == McpServerService.McpState.Error)
-                await MessageDialog.Show(this, "MCP Server",
-                    mcpService.LastError ?? "The MCP server failed to start.");
+                await MessageDialog.Show(this, "Servidor MCP",
+                    mcpService.LastError ?? "O servidor MCP não arrancou.");
         }
     }
 
@@ -1192,7 +1192,7 @@ public partial class MainWindow : Window
     {
         if (PluginService.Manager is not { } manager)
         {
-            await MessageDialog.Show(this, "Plugins", "The plugin host is not available in this session.");
+            await MessageDialog.Show(this, "Plugins", "O anfitrião de plugins não está disponível nesta sessão.");
             return;
         }
 
@@ -1467,7 +1467,7 @@ public partial class MainWindow : Window
     private void AddMarker()
     {
         if (_timeline?.AddMarkerAtPlayhead() is { } marker)
-            SetStatus($"Marker added at {FormatTime(marker.Time)}");
+            SetStatus($"Marcador adicionado em {FormatTime(marker.Time)}");
     }
 
     /// <summary>
@@ -1617,12 +1617,12 @@ public partial class MainWindow : Window
                 _mcpStatusPanel.IsVisible = true;
                 if (_mcpDot is not null) _mcpDot.Fill = Palette.GoodBrush;
                 if (_mcpLabel is not null) _mcpLabel.Text = $"MCP :{_mcpService.Port}";
-                ToolTip.SetTip(_mcpStatusPanel, "AI control (MCP) is enabled — a local client can inspect and edit this project.");
+                ToolTip.SetTip(_mcpStatusPanel, "O controlo por IA (MCP) está ativado — um cliente local pode inspecionar e editar este projeto.");
                 break;
             case McpServerService.McpState.Error:
                 _mcpStatusPanel.IsVisible = true;
                 if (_mcpDot is not null) _mcpDot.Fill = Palette.BadBrush;
-                if (_mcpLabel is not null) _mcpLabel.Text = "MCP error";
+                if (_mcpLabel is not null) _mcpLabel.Text = "Erro MCP";
                 ToolTip.SetTip(_mcpStatusPanel, _mcpService.LastError);
                 break;
             default:
@@ -1688,7 +1688,7 @@ public partial class MainWindow : Window
             if (_updateBadgeDot is not null)
                 _updateBadgeDot.Fill = dotBrush;
             if (_updateBadgeLabel is not null)
-                _updateBadgeLabel.Text = tier == UpdateTier.Stale ? "Update recommended" : $"Update {version}";
+                _updateBadgeLabel.Text = tier == UpdateTier.Stale ? "Atualização recomendada" : $"Atualização {version}";
         }
 
         // Help-menu discoverability dot (+ the in-menu Check-for-Updates dot), same show flag + tier colour.
@@ -1721,7 +1721,7 @@ public partial class MainWindow : Window
         if (_updateToast is null)
             return;
         if (_updateToastText is not null)
-            _updateToastText.Text = $"Sprocket {version} is available.";
+            _updateToastText.Text = $"O Sprocket {version} está disponível.";
         _updateToast.IsVisible = true;
         _updateToastTimer ??= new DispatcherTimer { Interval = TimeSpan.FromSeconds(9) };
         _updateToastTimer.Tick -= OnUpdateToastTick;
@@ -1753,15 +1753,15 @@ public partial class MainWindow : Window
                 await ShowUpdateDialogAsync();
                 break;
             case UpdateService.Outcome.UpToDate:
-                await MessageDialog.Show(this, "Check for Updates",
-                    $"You are running the latest version ({Program.AppVersion}).");
+                await MessageDialog.Show(this, "Verificar atualizações",
+                    $"Está a usar a versão mais recente ({Program.AppVersion}).");
                 break;
             case UpdateService.Outcome.NotInstalled:
                 await UpdateNotInstalledDialog.Show(this);
                 break;
             case UpdateService.Outcome.Failed:
-                await MessageDialog.Show(this, "Check for Updates",
-                    service.LastError ?? "The update check failed.");
+                await MessageDialog.Show(this, "Verificar atualizações",
+                    service.LastError ?? "A verificação de atualizações falhou.");
                 break;
         }
     }
@@ -1810,10 +1810,10 @@ public partial class MainWindow : Window
             return;
         }
 
-        bool add = await ConfirmDialog.Show(this, "Add to Applications Menu",
-            "Add Sprocket to your applications menu so you can launch it like any installed app? "
-            + "This adds a launcher and icon for your user account — you can remove it later from the Help menu.",
-            "Add", "Not Now");
+        bool add = await ConfirmDialog.Show(this, "Adicionar ao menu de aplicações",
+            "Adicionar o Sprocket ao menu de aplicações para poder iniciá-lo como qualquer aplicação instalada? "
+            + "Isto adiciona um iniciador e um ícone para a sua conta de utilizador — pode removê-lo mais tarde no menu Ajuda.",
+            "Adicionar", "Agora não");
 
         _userSettings = _userSettings with { LinuxDesktopIntegrationPrompted = true };
         UserSettingsFile.Save(_userSettings);
@@ -1838,19 +1838,19 @@ public partial class MainWindow : Window
             CrashLog.Write("Linux desktop integration install failed", ex);
             ok = false;
         }
-        await MessageDialog.Show(this, "Applications Menu", ok
-            ? "Sprocket was added to your applications menu. If it doesn't appear right away, log out and back "
-              + "in (or restart the desktop shell) to refresh the menu."
-            : "Sprocket could not be added to the applications menu. See Help ▸ About ▸ Open Logs Folder for details.");
+        await MessageDialog.Show(this, "Menu de aplicações", ok
+            ? "O Sprocket foi adicionado ao menu de aplicações. Se não aparecer de imediato, termine a sessão e "
+              + " volte a iniciar (ou reinicie a shell do ambiente de trabalho) para atualizar o menu."
+            : "Não foi possível adicionar o Sprocket ao menu de aplicações. Consulte Ajuda ▸ Acerca ▸ Abrir pasta de registos para detalhes.");
     }
 
     /// <summary>Help ▸ Remove from Applications Menu: removes the launcher + icon this user installed.</summary>
     private async Task RemoveFromApplicationsMenuAsync()
     {
         bool ok = await Task.Run(LinuxDesktopIntegration.Uninstall);
-        await MessageDialog.Show(this, "Applications Menu", ok
-            ? "Sprocket was removed from your applications menu."
-            : "Sprocket could not be removed from the applications menu. See Help ▸ About ▸ Open Logs Folder for details.");
+        await MessageDialog.Show(this, "Menu de aplicações", ok
+            ? "O Sprocket foi removido do menu de aplicações."
+            : "Não foi possível remover o Sprocket do menu de aplicações. Consulte Ajuda ▸ Acerca ▸ Abrir pasta de registos para detalhes.");
     }
 
     /// <summary>
@@ -1950,8 +1950,8 @@ public partial class MainWindow : Window
         {
             string name = Path.GetFileName(media.AbsolutePath);
             SetStatus(proxy.Enabled
-                ? $"Playback is dropping frames on {name} — a proxy is recommended (View ▸ Proxy ▸ Generate)"
-                : $"Playback is dropping frames on {name} — turn proxies on, then Generate (View ▸ Proxy)");
+                ? $"A reprodução está a perder fotogramas em {name} — recomenda-se um proxy (Ver ▸ Proxy ▸ Gerar)"
+                : $"A reprodução está a perder fotogramas em {name} — ative os proxies e depois Gerar (Ver ▸ Proxy)");
         }
     }
 
@@ -1960,7 +1960,7 @@ public partial class MainWindow : Window
         if (_project is null)
             return;
         int tracks = _project.Timeline.Tracks.Count;
-        _timelineHeader!.Text = $"Timeline · {_projectName} · {tracks} track{(tracks == 1 ? "" : "s")}";
+        _timelineHeader!.Text = $"Linha do tempo · {_projectName} · {tracks} pista{(tracks == 1 ? "" : "s")}";
     }
 
     /// <summary>
@@ -1996,7 +1996,7 @@ public partial class MainWindow : Window
         _looks = new LooksLibrary();
         browser.AttachLooks(_looks, () => _engine?.Position ?? Timecode.Zero);
         if (_looks.LoadWarnings.Count > 0)
-            SetStatus($"Looks: {_looks.LoadWarnings[0]}{(_looks.LoadWarnings.Count > 1 ? $" (+{_looks.LoadWarnings.Count - 1} more)" : "")} The original is kept as {Path.GetFileName(_looks.BackupPath)} before it is next saved.");
+            SetStatus($"Aspetos: {_looks.LoadWarnings[0]}{(_looks.LoadWarnings.Count > 1 ? $" (+{_looks.LoadWarnings.Count - 1} mais)" : "")} O original é mantido como {Path.GetFileName(_looks.BackupPath)} até ser guardado de novo.");
 
         WireMixer(browser);
     }
@@ -2178,7 +2178,7 @@ public partial class MainWindow : Window
 
         // A pump iteration can fault (e.g. the audio device hiccupping during the end-of-timeline stop); the
         // engine keeps the transport alive rather than dying, so surface the reason instead of swallowing it.
-        _engine!.PumpError += ex => Dispatcher.UIThread.Post(() => SetStatus($"Playback recovered from an error: {ex.Message}"));
+        _engine!.PumpError += ex => Dispatcher.UIThread.Post(() => SetStatus($"A reprodução recuperou de um erro: {ex.Message}"));
 
         // Audio device loss/recovery (ARCHITECTURE.md §8): the master clock recovers in place — reopening the
         // default device, or falling back to software timing so the timeline keeps advancing without audio — but
@@ -2187,9 +2187,9 @@ public partial class MainWindow : Window
         {
             _audioClock.OutputStatusChanged += status => Dispatcher.UIThread.Post(() => SetStatus(status switch
             {
-                Sprocket.Audio.AudioEngine.OutputStatus.Recovering => "Audio device lost — reconnecting…",
-                Sprocket.Audio.AudioEngine.OutputStatus.Recovered => "Audio device reconnected.",
-                Sprocket.Audio.AudioEngine.OutputStatus.SoftwareFallback => "Audio device unavailable — playing without audio.",
+                Sprocket.Audio.AudioEngine.OutputStatus.Recovering => "Dispositivo de áudio perdido — a religar…",
+                Sprocket.Audio.AudioEngine.OutputStatus.Recovered => "Dispositivo de áudio religado.",
+                Sprocket.Audio.AudioEngine.OutputStatus.SoftwareFallback => "Dispositivo de áudio indisponível — a reproduzir sem áudio.",
                 _ => "",
             }));
         }
@@ -2294,24 +2294,24 @@ public partial class MainWindow : Window
             switch (s.State)
             {
                 case AnalysisState.Analyzing:
-                    banner = string.Create(CultureInfo.InvariantCulture, $"Stabilizing — analyzing {s.Progress * 100:0}%…");
+                    banner = string.Create(CultureInfo.InvariantCulture, $"A estabilizar — a analisar {s.Progress * 100:0}%…");
                     break;
                 case AnalysisState.Queued:
-                    banner = "Stabilizing — queued for analysis…";
+                    banner = "A estabilizar — em fila para análise…";
                     break;
                 case AnalysisState.NotAnalyzed:
-                    banner = "Stabilization needs analysis";
+                    banner = "A estabilização precisa de análise";
                     warn = true;
                     break;
                 case AnalysisState.Failed:
-                    banner = "Stabilization analysis failed";
+                    banner = "A análise da estabilização falhou";
                     warn = true;
                     break;
                 case AnalysisState.Ready:
                     int low = _stab.LowConfidenceFrames(clip.MediaRefId, detailed);
                     if (low > 0)
                     {
-                        banner = string.Create(CultureInfo.InvariantCulture, $"Stabilization: low confidence on {low} frame(s)");
+                        banner = string.Create(CultureInfo.InvariantCulture, $"Estabilização: baixa confiança em {low} fotograma{(low == 1 ? "" : "s")}");
                         warn = true;
                     }
                     break;
@@ -2561,7 +2561,7 @@ public partial class MainWindow : Window
         // instead of the sequence (the bin would otherwise keep the active work area). Posted so it lands after the
         // double-click's own input handling, which would otherwise leave focus in the bin list.
         Dispatcher.UIThread.Post(() => FocusWorkArea(WorkArea.Monitor), DispatcherPriority.Background);
-        SetStatus($"Source: {name}");
+        SetStatus($"Origem: {name}");
     }
 
     /// <summary>Switches between the Program and Source monitors (UI.md §3.4): pauses the outgoing monitor,
@@ -2727,7 +2727,7 @@ public partial class MainWindow : Window
                 UpdateMarkDisplay(); // the Insert / Overwrite items and the header patch chips follow the source
 
             string? name = media is null ? null : Path.GetFileName(media.AbsolutePath ?? "clip");
-            SetStatus(name is null ? "" : $"Selected: {name}");
+            SetStatus(name is null ? "" : $"Selecionado: {name}");
         };
     }
 
@@ -2864,7 +2864,7 @@ public partial class MainWindow : Window
             if (button.IsChecked == true)
             {
                 timeline.ActiveTool = tool;
-                SetStatus($"{tool} tool");
+                SetStatus($"Ferramenta {tool}");
             }
         };
     }
@@ -2873,9 +2873,9 @@ public partial class MainWindow : Window
     private void WireAddTrackButton()
     {
         var button = this.FindControl<Button>("AddTrackButton")!;
-        var videoItem = new MenuItem { Header = "Add _Video Track" };
+        var videoItem = new MenuItem { Header = "Adicionar pista de _vídeo" };
         videoItem.Click += (_, _) => AddTrack(video: true);
-        var audioItem = new MenuItem { Header = "Add _Audio Track" };
+        var audioItem = new MenuItem { Header = "Adicionar pista de _áudio" };
         audioItem.Click += (_, _) => AddTrack(video: false);
         button.Flyout = new MenuFlyout { ItemsSource = new[] { videoItem, audioItem } };
     }
@@ -2917,10 +2917,10 @@ public partial class MainWindow : Window
         var root = new StackPanel { Spacing = 6, MinWidth = 260, MaxWidth = 320, Margin = new Thickness(4) };
         root.Children.Add(new TextBlock
         {
-            Text = "Markers", FontWeight = Avalonia.Media.FontWeight.SemiBold, FontSize = Typography.Body,
+            Text = "Marcadores", FontWeight = Avalonia.Media.FontWeight.SemiBold, FontSize = Typography.Body,
         });
 
-        var addButton = new Button { Content = "+ Add at playhead", FontSize = Typography.Body, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var addButton = new Button { Content = "+ Adicionar no indicador", FontSize = Typography.Body, HorizontalAlignment = HorizontalAlignment.Stretch };
         addButton.Click += (_, _) => { AddMarker(); if (this.FindControl<Button>("MarkersButton")?.Flyout is Flyout f) f.Content = BuildMarkersPanel(); };
         root.Children.Add(addButton);
 
@@ -2929,7 +2929,7 @@ public partial class MainWindow : Window
         {
             root.Children.Add(new TextBlock
             {
-                Text = "No markers yet. Press M to add one at the playhead.",
+                Text = "Ainda não há marcadores. Prima M para adicionar um no indicador.",
                 FontSize = Typography.Caption, Foreground = Avalonia.Media.Brushes.Gray, TextWrapping = Avalonia.Media.TextWrapping.Wrap,
             });
             return root;
@@ -2969,7 +2969,7 @@ public partial class MainWindow : Window
                 },
                 Padding = new Thickness(6, 2),
             };
-            ToolTip.SetTip(remove, "Remove marker");
+            ToolTip.SetTip(remove, "Remover marcador");
             remove.Click += (_, _) => { _timeline?.RemoveMarker(captured); if (this.FindControl<Button>("MarkersButton")?.Flyout is Flyout f) f.Content = BuildMarkersPanel(); };
             Grid.SetColumn(remove, 2);
             row.Children.Add(remove);
@@ -3056,7 +3056,7 @@ public partial class MainWindow : Window
 
         var enableItem = new MenuItem
         {
-            Header = "_Enable",
+            Header = "_Ativar",
             ToggleType = MenuItemToggleType.CheckBox,
             IsChecked = timeline.SelectedIsEnabled,
             InputGesture = KeyGesture.Parse("Shift+E"),
@@ -3065,23 +3065,23 @@ public partial class MainWindow : Window
 
         var items = new System.Collections.Generic.List<Control>
         {
-            Item("Cu_t", timeline.CutSelected, gesture: _cutMenuItem?.InputGesture),
-            Item("_Copy", timeline.CopySelected, gesture: _copyMenuItem?.InputGesture),
-            Item("_Paste", timeline.PasteAtPlayhead, timeline.CanPaste, _pasteMenuItem?.InputGesture),
-            Item("Du_plicate", timeline.DuplicateSelected),
+            Item("Cor_tar", timeline.CutSelected, gesture: _cutMenuItem?.InputGesture),
+            Item("_Copiar", timeline.CopySelected, gesture: _copyMenuItem?.InputGesture),
+            Item("Co_lar", timeline.PasteAtPlayhead, timeline.CanPaste, _pasteMenuItem?.InputGesture),
+            Item("_Duplicar", timeline.DuplicateSelected),
             new Separator(),
-            Item("_Delete", timeline.DeleteSelected, gesture: KeyGesture.Parse("Delete")),
-            Item("_Ripple Delete", timeline.RippleDeleteSelected, gesture: KeyGesture.Parse("Shift+Delete")),
+            Item("_Eliminar", timeline.DeleteSelected, gesture: KeyGesture.Parse("Delete")),
+            Item("Eliminar em _cadeia", timeline.RippleDeleteSelected, gesture: KeyGesture.Parse("Shift+Delete")),
             new Separator(),
-            Item("Spli_t at Playhead", timeline.SplitAtPlayhead, timeline.CanSplitAtPlayhead,
+            Item("Dividir no indicador de reprodução", timeline.SplitAtPlayhead, timeline.CanSplitAtPlayhead,
                 _clipSplitMenuItem?.InputGesture),
             new Separator(),
             enableItem,
-            Item("_Unlink", timeline.UnlinkSelected, timeline.SelectedIsLinked, _unlinkMenuItem?.InputGesture),
-            Item("_Link", timeline.LinkSelected, timeline.CanLinkSelection, _linkMenuItem?.InputGesture),
+            Item("_Desligar", timeline.UnlinkSelected, timeline.SelectedIsLinked, _unlinkMenuItem?.InputGesture),
+            Item("_Ligar", timeline.LinkSelected, timeline.CanLinkSelection, _linkMenuItem?.InputGesture),
             new Separator(),
-            Item("_Speed / Duration…", () => _ = ShowSpeedDialogAsync()),
-            Item(timeline.SelectedClipReverse ? "Play For_ward" : "Re_verse Speed", timeline.ToggleSelectedReverse,
+            Item("_Velocidade / duração…", () => _ = ShowSpeedDialogAsync()),
+            Item(timeline.SelectedClipReverse ? "Reproduzir para a frente" : "Inverter velocidade", timeline.ToggleSelectedReverse,
                 timeline.SelectedCanReverse),
         };
 
@@ -3093,30 +3093,30 @@ public partial class MainWindow : Window
             bool held = timeline.SelectedIsHeld;
             items.Add(new MenuItem
             {
-                Header = "Frame _Hold",
+                Header = "Congelação de fotograma",
                 ItemsSource = new[]
                 {
-                    Item("Frame Hold _Options…", () => _ = ShowFrameHoldOptionsAsync(), canHold),
-                    Item("_Add Frame Hold", timeline.AddFrameHoldAtPlayhead, canHold && !held),
-                    Item("Insert Frame Hold Se_gment", timeline.InsertFrameHoldSegmentAtPlayhead, canHold && !held),
-                    Item("_Duplicate Frame", timeline.DuplicateFrameAtPlayhead, canHold && !held),
-                    Item("Remo_ve Frame", timeline.RemoveFrameAtPlayhead, canHold && !held),
+                    Item("Opções de congelação de fotograma…", () => _ = ShowFrameHoldOptionsAsync(), canHold),
+                    Item("Adicionar congelação de fotograma", timeline.AddFrameHoldAtPlayhead, canHold && !held),
+                    Item("Inserir segmento de congelação", timeline.InsertFrameHoldSegmentAtPlayhead, canHold && !held),
+                    Item("Duplicar fotograma", timeline.DuplicateFrameAtPlayhead, canHold && !held),
+                    Item("Remover fotograma", timeline.RemoveFrameAtPlayhead, canHold && !held),
                 },
             });
         }
 
         items.Add(new Separator());
-        items.Add(Item("_Nest", NestSelection));
+        items.Add(Item("_Aninhar", NestSelection));
 
         if (isVideoLane)
         {
-            items.Add(Item("Interpret _Footage…", InterpretSelectedClipFootage, SelectedClipVideoMedia() is not null));
+            items.Add(Item("Interpretar metragem…", InterpretSelectedClipFootage, SelectedClipVideoMedia() is not null));
 
             // Multicam (PLAN.md step 24): Create mirrors the Clip menu; on a multicam clip the angles are listed
             // (the active one checked) so a right-click can switch without the 1–9 keys or the Inspector.
             var multicamItems = new System.Collections.Generic.List<MenuItem>
             {
-                Item("Create _Multicam Source", CreateMulticamSource, timeline.CanCreateMulticam),
+                Item("Criar fonte _multicâmara", CreateMulticamSource, timeline.CanCreateMulticam),
             };
             if (timeline.SelectedIsMulticam && _project is not null && clip.SourceMulticamId is { } multicamId
                 && _project.MulticamSources.Find(s => s.Id == multicamId) is { } multicamSource)
@@ -3127,7 +3127,7 @@ public partial class MainWindow : Window
                     var angleItem = new MenuItem
                     {
                         Header = string.IsNullOrEmpty(multicamSource.Angles[i].Name)
-                            ? $"Angle {i + 1}"
+                            ? $"Ângulo {i + 1}"
                             : multicamSource.Angles[i].Name,
                         ToggleType = MenuItemToggleType.Radio,
                         IsChecked = clip.ActiveAngle == i,
@@ -3136,13 +3136,13 @@ public partial class MainWindow : Window
                     multicamItems.Add(angleItem);
                 }
             }
-            items.Add(new MenuItem { Header = "M_ulticam", ItemsSource = multicamItems });
+            items.Add(new MenuItem { Header = "Multicâmara", ItemsSource = multicamItems });
         }
         else
         {
             // Audio lanes only: on a linked pair the audio companion is where gain acts — normalizing the
             // video clip's GainDb would be a silent no-op (video-track clips contribute no audio).
-            items.Add(Item("N_ormalize Audio", NormalizeSelectedClip, SelectedClipHasAudio()));
+            items.Add(Item("_Normalizar áudio", NormalizeSelectedClip, SelectedClipHasAudio()));
         }
 
         // This menu is opened detached (not set as a control's ContextMenu property), so Avalonia won't
@@ -3164,13 +3164,13 @@ public partial class MainWindow : Window
         if (_timeline is not { } timeline)
             return;
 
-        var deleteTrack = new MenuItem { Header = "_Delete Track", IsEnabled = timeline.CanDeleteTrack(track) };
+        var deleteTrack = new MenuItem { Header = "_Eliminar pista", IsEnabled = timeline.CanDeleteTrack(track) };
         deleteTrack.Click += (_, _) => _ = DeleteTrackAsync(track);
-        var deleteEmpty = new MenuItem { Header = "Delete _Empty Tracks", IsEnabled = timeline.CanDeleteEmptyTracks };
+        var deleteEmpty = new MenuItem { Header = "Eliminar pistas _vazias", IsEnabled = timeline.CanDeleteEmptyTracks };
         deleteEmpty.Click += (_, _) =>
         {
             int removed = timeline.DeleteEmptyTracks();
-            SetStatus($"Deleted {removed} empty track{(removed == 1 ? "" : "s")}");
+            SetStatus($"Eliminada{(removed == 1 ? "" : "s")} {removed} pista{(removed == 1 ? "" : "s")} vazia{(removed == 1 ? "" : "s")}");
         };
 
         // Editing state (track targeting / sync lock / lock) — the same undoable toggles as the header buttons,
@@ -3181,12 +3181,12 @@ public partial class MainWindow : Window
             item.Click += (_, _) => onClick();
             return item;
         }
-        MenuItem target = Toggle("_Target Track", track.Targeted, () => timeline.SetTrackTargeted(track, !track.Targeted));
-        MenuItem syncLock = Toggle("_Sync Lock", track.SyncLocked, () => timeline.SetTrackSyncLocked(track, !track.SyncLocked));
-        MenuItem lockTrack = Toggle("_Lock Track", track.Locked, () => timeline.SetTrackLocked(track, !track.Locked));
-        var targetAll = new MenuItem { Header = "Target _All Tracks" };
+        MenuItem target = Toggle("Pista de _destino", track.Targeted, () => timeline.SetTrackTargeted(track, !track.Targeted));
+        MenuItem syncLock = Toggle("Bloqueio de _sincronização", track.SyncLocked, () => timeline.SetTrackSyncLocked(track, !track.SyncLocked));
+        MenuItem lockTrack = Toggle("_Bloquear pista", track.Locked, () => timeline.SetTrackLocked(track, !track.Locked));
+        var targetAll = new MenuItem { Header = "Visar _todas as pistas" };
         targetAll.Click += (_, _) => timeline.SetAllTracksTargeted(true);
-        var targetNone = new MenuItem { Header = "Target _No Tracks" };
+        var targetNone = new MenuItem { Header = "Visar _nenhuma pista" };
         targetNone.Click += (_, _) => timeline.SetAllTracksTargeted(false);
 
         // Shares the clip menu's slot so a right-click on either never stacks two open menus.
@@ -3209,13 +3209,13 @@ public partial class MainWindow : Window
         if (_timeline is not { } timeline || !timeline.CanDeleteTrack(track))
             return;
         int clips = track.Clips.Count;
-        if (clips > 0 && !await ConfirmDialog.Show(this, "Delete Track",
-                $"Track \"{track.Name}\" contains {clips} clip{(clips == 1 ? "" : "s")}. Delete the track and its clips?\n\n" +
-                "You can undo this with Edit ▸ Undo.",
-                "Delete", "Cancel"))
+        if (clips > 0 && !await ConfirmDialog.Show(this, "Eliminar pista",
+                $"A pista \"{track.Name}\" contém {clips} clipe{(clips == 1 ? "" : "s")}. Eliminar a pista e os seus clipes?\n\n" +
+                "Pode anular isto com Editar ▸ Anular.",
+                "Eliminar", "Cancelar"))
             return;
         timeline.DeleteTrack(track);
-        SetStatus($"Deleted track {track.Name}");
+        SetStatus($"Pista {track.Name} eliminada");
     }
 
     /// <summary>Whether the timeline selection is a clip whose source carries audio (so Clip ▸ Normalize Audio can act).</summary>
@@ -3252,7 +3252,7 @@ public partial class MainWindow : Window
         using IPcmReader? reader = MediaBootstrap.OpenPcmReaderFor(_project, clip.MediaRefId);
         if (reader is null)
         {
-            SetStatus("Cannot normalize: the clip's audio could not be opened.");
+            SetStatus("Não é possível normalizar: o áudio do clipe não pôde ser aberto.");
             return;
         }
 
@@ -3260,16 +3260,16 @@ public partial class MainWindow : Window
             reader, clip.SourceIn, clip.SourceOut - clip.SourceIn);
         if (double.IsNegativeInfinity(m.IntegratedLufs))
         {
-            SetStatus("Clip is silent — nothing to normalize.");
+            SetStatus("O clipe está silencioso — nada a normalizar.");
             return;
         }
 
         double target = _mixer?.TargetLufs ?? LoudnessNormalization.StreamingMinus14Lufs;
         double gain = LoudnessNormalization.ComputeGainDb(m.IntegratedLufs, m.TruePeakDbtp, target);
         _history.Execute(SetPropertyCommand<double>.Create(
-            "Normalize clip audio", () => clip.GainDb, v => clip.GainDb = v, gain));
+            "Normalizar áudio do clipe", () => clip.GainDb, v => clip.GainDb = v, gain));
         SetStatus(string.Format(
-            CultureInfo.InvariantCulture, "Normalized clip to {0:0.#} LUFS ({1}).", target, MixerFormat.GainDbLabel(gain)));
+            CultureInfo.InvariantCulture, "Clipe normalizado para {0:0.#} LUFS ({1}).", target, MixerFormat.GainDbLabel(gain)));
     }
 
     /// <summary>Rebuilds the Effects menu for the current selection: only the effects relevant to the selected
@@ -3308,7 +3308,7 @@ public partial class MainWindow : Window
         {
             timeline.SetSelectedClipSpeed(r.Speed, r.Reverse);
             SetStatus(string.Format(
-                CultureInfo.InvariantCulture, "Clip speed set to {0:0.##}%{1}.", r.Speed.ToDouble() * 100, r.Reverse ? ", reversed" : ""));
+                CultureInfo.InvariantCulture, "Velocidade do clipe definida para {0:0.##}%{1}.", r.Speed.ToDouble() * 100, r.Reverse ? ", invertida" : ""));
         }
     }
 
@@ -3323,7 +3323,7 @@ public partial class MainWindow : Window
 
         string name = clip.Kind == ClipKind.Media
             ? System.IO.Path.GetFileName(_project.MediaPool.Get(clip.MediaRefId)?.AbsolutePath ?? "clip")
-            : "Selected clip";
+            : "Clipe selecionado";
         FrameHoldOptionsResult? result = await FrameHoldOptionsDialog.Show(
             this, name, clip.IsHeld, clip.HoldFrameAt, clip.SourceIn, timeline.SelectedClipSourceAtPlayhead);
         if (result is null)
@@ -3334,7 +3334,7 @@ public partial class MainWindow : Window
             if (clip.IsHeld)
             {
                 timeline.UnholdSelectedClip();
-                SetStatus("Frame hold removed.");
+                SetStatus("Congelação de fotograma removida.");
             }
             return;
         }
@@ -3342,7 +3342,7 @@ public partial class MainWindow : Window
             return; // nothing changed — keep the undo history clean
         timeline.HoldSelectedClip(result.HoldAt);
         SetStatus(string.Format(
-            CultureInfo.InvariantCulture, "Clip held on the frame at {0:0.###} s.", result.HoldAt.ToSeconds()));
+            CultureInfo.InvariantCulture, "Clipe congelado no fotograma em {0:0.###} s.", result.HoldAt.ToSeconds()));
     }
 
     private void RefreshViewMenu()
@@ -3507,7 +3507,7 @@ public partial class MainWindow : Window
             _outerGrid.RowDefinitions[2].Height = new GridLength(240);
         SetPanelVisible(project: true, true);
         SetPanelVisible(project: false, true);
-        SetStatus("Layout reset.");
+        SetStatus("Disposição reposta.");
     }
 
     /// <summary>A pane's size in px: its definition's absolute size (what a splitter drag writes), else the laid-out
@@ -3627,11 +3627,11 @@ public partial class MainWindow : Window
 
         _undoMenuItem!.IsEnabled = _history.CanUndo;
         _redoMenuItem!.IsEnabled = _history.CanRedo;
-        _undoMenuItem.Header = _history.CanUndo ? $"_Undo {_history.UndoLabel}" : "_Undo";
-        _redoMenuItem.Header = _history.CanRedo ? $"_Redo {_history.RedoLabel}" : "_Redo";
+        _undoMenuItem.Header = _history.CanUndo ? $"_Anular {_history.UndoLabel}" : "_Anular";
+        _redoMenuItem.Header = _history.CanRedo ? $"_Refazer {_history.RedoLabel}" : "_Refazer";
 
         bool dirty = IsDirty;
-        _saveStateText!.Text = dirty ? "• unsaved changes" : "• all changes saved";
+        _saveStateText!.Text = dirty ? "• alterações não guardadas" : "• todas as alterações guardadas";
         UpdateTimelineHeader();
         UpdateMarkDisplay(); // a mark edit (or its undo) redraws the scrubber ticks + Source readout
         RefreshBinIfSourceMarksChanged();
@@ -3683,7 +3683,7 @@ public partial class MainWindow : Window
 
         _history.Execute(new AddSequenceCommand(_project, sequence));
         SwitchToSequence(sequence);
-        SetStatus($"New sequence: {sequence.Name}");
+        SetStatus($"Nova sequência: {sequence.Name}");
     }
 
     /// <summary>Sequence ▸ Nest: nests the timeline selection (with its linked companions) into a new child
@@ -3692,7 +3692,7 @@ public partial class MainWindow : Window
     private void NestSelection()
     {
         if (_timeline?.NestSelection() is { } child)
-            SetStatus($"Nested selection into {child.Name}");
+            SetStatus($"Seleção aninhada em {child.Name}");
     }
 
     /// <summary>Clip ▸ Create Multicam Source: collapses the stacked video angles into one synced multicam clip
@@ -3701,7 +3701,7 @@ public partial class MainWindow : Window
     private void CreateMulticamSource()
     {
         if (_timeline?.CreateMulticamSource() is { } name)
-            SetStatus($"Created {name} — press 1–9 to switch angle at the playhead");
+            SetStatus($"Criado {name} — prima 1–9 para mudar de ângulo no indicador");
     }
 
     /// <summary>
@@ -3843,14 +3843,14 @@ public partial class MainWindow : Window
         if (inPoint)
         {
             Timecode? markOut = seq.MarkOut is { } o && o <= pos ? null : seq.MarkOut;
-            _history.Execute(new SetSequenceMarksCommand(seq, pos, markOut, "Mark In"));
-            SetStatus($"In point set at {FormatTime(pos)}");
+            _history.Execute(new SetSequenceMarksCommand(seq, pos, markOut, "Marcar entrada"));
+            SetStatus($"Ponto de entrada definido em {FormatTime(pos)}");
         }
         else
         {
             Timecode? markIn = seq.MarkIn is { } i && i >= pos ? null : seq.MarkIn;
-            _history.Execute(new SetSequenceMarksCommand(seq, markIn, pos, "Mark Out"));
-            SetStatus($"Out point set at {FormatTime(pos)}");
+            _history.Execute(new SetSequenceMarksCommand(seq, markIn, pos, "Marcar saída"));
+            SetStatus($"Ponto de saída definido em {FormatTime(pos)}");
         }
     }
 
@@ -3866,22 +3866,22 @@ public partial class MainWindow : Window
             return;
         }
         _history.Execute(new SetSequenceMarksCommand(_project.ActiveSequence, s.In, s.Out, label));
-        SetStatus($"In/Out set to {FormatTime(s.In)} – {FormatTime(s.Out)}");
+        SetStatus($"Entrada/saída definidas de {FormatTime(s.In)} a {FormatTime(s.Out)}");
     }
 
     private void MarkClip()
     {
         if (_project is null || _program is null)
             return;
-        SetMarks(RangeEdits.ClipSpanAt(_project.Timeline, _program.Position), "Mark Clip",
-            "No clip under the playhead to mark.");
+        SetMarks(RangeEdits.ClipSpanAt(_project.Timeline, _program.Position), "Marcar clipe",
+            "Não há clipe sob o indicador para marcar.");
     }
 
     private void MarkSelection()
     {
         if (_timeline is null)
             return;
-        SetMarks(RangeEdits.SelectionSpan(_timeline.SelectedClips), "Mark Selection", "Select clips to mark.");
+        SetMarks(RangeEdits.SelectionSpan(_timeline.SelectedClips), "Marcar seleção", "Selecione clipes para marcar.");
     }
 
     /// <summary>Go to In (Shift+I) / Go to Out (Shift+O): moves the Program playhead to the mark (navigation, not
@@ -3894,7 +3894,7 @@ public partial class MainWindow : Window
         if ((inPoint ? seq.MarkIn : seq.MarkOut) is { } mark)
             _program.SeekTo(mark);
         else
-            SetStatus(inPoint ? "No in point set." : "No out point set.");
+            SetStatus(inPoint ? "Nenhum ponto de entrada definido." : "Nenhum ponto de saída definido.");
     }
 
     /// <summary>
@@ -3910,12 +3910,12 @@ public partial class MainWindow : Window
         Sequence seq = _project.ActiveSequence;
         if (seq.MarkIn is null && seq.MarkOut is null)
         {
-            SetStatus(extract ? "Set an in or out point to extract." : "Set an in or out point to lift.");
+            SetStatus(extract ? "Defina um ponto de entrada ou de saída para extrair." : "Defina um ponto de entrada ou de saída para elevar.");
             return;
         }
         if (!RangeEdits.HasEditableTarget(seq.Timeline))
         {
-            SetStatus("No unlocked tracks are targeted. Target a track in its header first.");
+            SetStatus("Nenhuma pista desbloqueada está visada. Vise uma pista no seu cabeçalho primeiro.");
             return;
         }
         Timecode markIn = seq.MarkIn ?? Timecode.Zero;
@@ -3925,20 +3925,20 @@ public partial class MainWindow : Window
             : RangeEdits.Lift(seq, markIn, markOut);
         if (result is null)
         {
-            SetStatus(extract ? "Nothing to extract in the marked range." : "Nothing to lift in the marked range.");
+            SetStatus(extract ? "Nada a extrair no intervalo marcado." : "Nada a elevar no intervalo marcado.");
             return;
         }
         _history.Execute(result.Command); // the timeline prunes selected clips the edit removed
         _program?.SeekTo(markIn);
-        string status = extract ? "Extracted the marked range." : "Lifted the marked range.";
+        string status = extract ? "Intervalo marcado extraído." : "Intervalo marcado elevado.";
         if (result.LockedTracksInRange > 0)
             status += result.LockedTracksInRange == 1
-                ? " 1 locked track kept."
-                : $" {result.LockedTracksInRange} locked tracks kept.";
+                ? " 1 pista bloqueada mantida."
+                : $" {result.LockedTracksInRange} pistas bloqueadas mantidas.";
         if (result.SyncBreaks > 0)
             status += result.SyncBreaks == 1
-                ? " 1 sync-locked track couldn't ripple and may be out of sync."
-                : $" {result.SyncBreaks} sync-locked tracks couldn't ripple and may be out of sync.";
+                ? " 1 pista com bloqueio de sincronização não pôde avançar em cadeia e pode estar dessincronizada."
+                : $" {result.SyncBreaks} pistas com bloqueio de sincronização não puderam avançar em cadeia e podem estar dessincronizadas.";
         SetStatus(status);
     }
 
@@ -3954,13 +3954,13 @@ public partial class MainWindow : Window
             return;
         if (_source?.Media is not { } media)
         {
-            SetStatus("Open a clip in the Source monitor first — double-click it in the bin.");
+            SetStatus("Abra primeiro um clipe no monitor Origem — faça duplo clique nele no painel.");
             return;
         }
         Sequence seq = _project.ActiveSequence;
         if (ThreePointResolver.Resolve(media, seq, _program.Position) is not { } range)
         {
-            SetStatus("The source range is empty.");
+            SetStatus("O intervalo de origem está vazio.");
             return;
         }
         ApplyThreePointEdit(media, ThreePointEdits.Build(kind, seq, media, range, null, null, usePatch: true));
@@ -3974,7 +3974,7 @@ public partial class MainWindow : Window
             return;
         if (_source?.Media is not { } media)
         {
-            SetStatus("Open a clip in the Source monitor first — double-click it in the bin.");
+            SetStatus("Abra primeiro um clipe no monitor Origem — faça duplo clique nele no painel.");
             return;
         }
         ApplyThreePointEdit(media, ThreePointEdits.FitToFill(_project.ActiveSequence, media));
@@ -4091,14 +4091,14 @@ public partial class MainWindow : Window
         if (inPoint)
         {
             Timecode? markOut = media.SourceMarkOut is { } o && o <= pos ? null : media.SourceMarkOut;
-            _history.Execute(new SetSourceMarksCommand(media, pos, markOut, "Mark Source In"));
-            SetStatus($"Source in point set at {FormatTime(pos)}");
+            _history.Execute(new SetSourceMarksCommand(media, pos, markOut, "Marcar entrada de origem"));
+            SetStatus($"Ponto de entrada de origem definido em {FormatTime(pos)}");
         }
         else
         {
             Timecode? markIn = media.SourceMarkIn is { } i && i >= pos ? null : media.SourceMarkIn;
-            _history.Execute(new SetSourceMarksCommand(media, markIn, pos, "Mark Source Out"));
-            SetStatus($"Source out point set at {FormatTime(pos)}");
+            _history.Execute(new SetSourceMarksCommand(media, markIn, pos, "Marcar saída de origem"));
+            SetStatus($"Ponto de saída de origem definido em {FormatTime(pos)}");
         }
     }
 
@@ -4110,7 +4110,7 @@ public partial class MainWindow : Window
         if ((inPoint ? media.SourceMarkIn : media.SourceMarkOut) is { } mark)
             _source.SeekTo(mark);
         else
-            SetStatus(inPoint ? "No source in point set." : "No source out point set.");
+            SetStatus(inPoint ? "Nenhum ponto de entrada de origem definido." : "Nenhum ponto de saída de origem definido.");
     }
 
     /// <summary>Clears the Source media's in (Alt+I) / out (Alt+O) mark, or both (Ctrl+Shift+X), as one undo entry.</summary>
@@ -4123,8 +4123,8 @@ public partial class MainWindow : Window
             return; // already clear — don't push an empty undo entry
         string label = clearIn && clearOut ? "Clear Source In and Out" : clearIn ? "Clear Source In" : "Clear Source Out";
         _history.Execute(new SetSourceMarksCommand(media, markIn, markOut, label));
-        SetStatus(clearIn && clearOut ? "Source in and out points cleared"
-            : clearIn ? "Source in point cleared" : "Source out point cleared");
+        SetStatus(clearIn && clearOut ? "Pontos de entrada e saída de origem limpos"
+            : clearIn ? "Ponto de entrada de origem limpo" : "Ponto de saída de origem limpo");
     }
 
     /// <summary>Play In to Out on the Source monitor (Ctrl+Shift+Space with it focused): plays the marked source
@@ -4247,7 +4247,7 @@ public partial class MainWindow : Window
             return; // already clear — don't push an empty undo entry
         string label = clearIn && clearOut ? "Clear In and Out" : clearIn ? "Clear In" : "Clear Out";
         _history.Execute(new SetSequenceMarksCommand(seq, markIn, markOut, label));
-        SetStatus(clearIn && clearOut ? "In and out points cleared" : clearIn ? "In point cleared" : "Out point cleared");
+        SetStatus(clearIn && clearOut ? "Pontos de entrada e saída limpos" : clearIn ? "Ponto de entrada limpo" : "Ponto de saída limpo");
     }
 
     /// <summary>
@@ -4267,7 +4267,7 @@ public partial class MainWindow : Window
         Timecode duration = sequence.Timeline.Duration;
         if (duration <= Timecode.Zero)
         {
-            SetStatus("Nothing to render — the timeline is empty.");
+            SetStatus("Nada a processar — a linha do tempo está vazia.");
             return;
         }
 
@@ -4276,7 +4276,7 @@ public partial class MainWindow : Window
         {
             if (_selectedClip is not { } clip)
             {
-                SetStatus("Select a clip to render.");
+                SetStatus("Selecione um clipe para processar.");
                 return;
             }
             rangeIn = clip.TimelineStart;
@@ -4293,7 +4293,7 @@ public partial class MainWindow : Window
             rangeOut = duration;
         if (rangeOut <= rangeIn)
         {
-            SetStatus("Nothing to render — the range is empty.");
+            SetStatus("Nada a processar — o intervalo está vazio.");
             return;
         }
 
@@ -4304,7 +4304,7 @@ public partial class MainWindow : Window
             scope == RenderCacheScope.Audio ? 2 : 0);
         if (_renderCache.IsAlreadyRendered(pending))
         {
-            SetStatus("That range is already rendered.");
+            SetStatus("Esse intervalo já foi processado.");
             return;
         }
         string outputPath = _renderCache.FilePathFor(pending);
@@ -4320,8 +4320,8 @@ public partial class MainWindow : Window
 
         using var cts = new CancellationTokenSource();
         string jobName = scope == RenderCacheScope.Audio
-            ? $"Audio render {FormatTime(rangeIn)}–{FormatTime(rangeOut)}"
-            : $"Preview render {FormatTime(rangeIn)}–{FormatTime(rangeOut)}";
+            ? $"Processamento de áudio {FormatTime(rangeIn)}–{FormatTime(rangeOut)}"
+            : $"Processamento de pré-visualização {FormatTime(rangeIn)}–{FormatTime(rangeOut)}";
         var dialog = new ExportProgressDialog(jobName, cts);
         var progress = new Progress<double>(p => dialog.SetProgress(p));
         _ = dialog.ShowDialog(this); // modal; dismissed in the finally
@@ -4365,16 +4365,16 @@ public partial class MainWindow : Window
         {
             _renderCache.Commit(pending); // playback picks the segment up on its next pump
             UpdateRenderBar();
-            SetStatus($"Rendered {(scope == RenderCacheScope.Audio ? "audio " : "")}{FormatTime(rangeIn)}–{FormatTime(rangeOut)}");
+            SetStatus($"Processado {(scope == RenderCacheScope.Audio ? "áudio " : "")}{FormatTime(rangeIn)}–{FormatTime(rangeOut)}");
         }
         else if (cancelled)
         {
-            SetStatus("Render cancelled");
+            SetStatus("Processamento cancelado");
         }
         else
         {
-            SetStatus($"Render failed: {error}");
-            await MessageDialog.Show(this, "Render Failed", $"The preview render could not be completed:\n{error}");
+            SetStatus($"Falha no processamento: {error}");
+            await MessageDialog.Show(this, "Falha no processamento", $"Não foi possível concluir o processamento de pré-visualização:\n{error}");
         }
     }
 
@@ -4388,8 +4388,8 @@ public partial class MainWindow : Window
         int removed = _renderCache.RemoveAudioSegments(_project.ActiveSequence.Id, clip.TimelineStart, clip.TimelineEnd);
         UpdateRenderBar();
         SetStatus(removed > 0
-            ? $"Unfroze clip audio {FormatTime(clip.TimelineStart)}–{FormatTime(clip.TimelineEnd)} — mixing live again"
-            : "No frozen audio covers the selected clip.");
+            ? $"Áudio do clipe descongelado {FormatTime(clip.TimelineStart)}–{FormatTime(clip.TimelineEnd)} — a misturar em direto novamente"
+            : "Nenhum áudio congelado cobre o clipe selecionado.");
     }
 
     /// <summary>Sequence ▸ Delete Render Files… (PLAN.md step 32): confirms with the cache's location and current
@@ -4402,20 +4402,20 @@ public partial class MainWindow : Window
         long size = _renderCache.SizeBytes();
         if (size == 0)
         {
-            SetStatus("No render files to delete.");
+            SetStatus("Não há ficheiros de processamento para eliminar.");
             return;
         }
 
-        bool confirmed = await ConfirmDialog.Show(this, "Delete Render Files",
-            $"Delete this project's preview render files?\n\n{_renderCache.Directory}\nCurrently using {FormatBytes(size)}.\n\n" +
-            "Rendered ranges will play live again until re-rendered; no project data is affected.",
-            "Delete", "Cancel");
+        bool confirmed = await ConfirmDialog.Show(this, "Eliminar ficheiros de processamento",
+            $"Eliminar os ficheiros de processamento de pré-visualização deste projeto?\n\n{_renderCache.Directory}\nAtualmente a usar {FormatBytes(size)}.\n\n" +
+            "Os intervalos processados serão novamente reproduzidos em direto até voltarem a ser processados; nenhum dado do projeto é afetado.",
+            "Eliminar", "Cancelar");
         if (!confirmed)
             return;
 
         long reclaimed = _renderCache.DeleteAll();
         UpdateRenderBar();
-        SetStatus($"Deleted render files — reclaimed {FormatBytes(reclaimed)}");
+        SetStatus($"Ficheiros de processamento eliminados — recuperado {FormatBytes(reclaimed)}");
     }
 
     /// <summary>A human disk size for the cache readout (binary units, one decimal from MB up).</summary>
@@ -4443,7 +4443,7 @@ public partial class MainWindow : Window
 
         _history.Execute(command);
         UpdateSequenceBadge();
-        SetStatus($"Sequence settings applied — {active.Name}, {active.Timeline.Resolution.Width}×{active.Timeline.Resolution.Height}");
+        SetStatus($"Definições de sequência aplicadas — {active.Name}, {active.Timeline.Resolution.Width}×{active.Timeline.Resolution.Height}");
     }
 
     // ── Import ──────────────────────────────────────────────────────────────────────────────────────
@@ -4461,11 +4461,11 @@ public partial class MainWindow : Window
 
         IReadOnlyList<IStorageFile> files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Import Media",
+            Title = "Importar multimédia",
             AllowMultiple = true,
             FileTypeFilter =
             [
-                new FilePickerFileType("Media files")
+                new FilePickerFileType("Ficheiros multimédia")
                 {
                     Patterns = [.. VideoFileType.Patterns!, .. AudioFileType.Patterns!, .. ImageFileType.Patterns!],
                 },
@@ -4528,7 +4528,7 @@ public partial class MainWindow : Window
             if (result.Succeeded)
                 added++;
             else
-                failures.Add((Path.GetFileName(path), result.Error ?? "could not open"));
+                failures.Add((Path.GetFileName(path), result.Error ?? "não foi possível abrir"));
         }
 
         _mediaBrowser?.Refresh();
@@ -4536,14 +4536,14 @@ public partial class MainWindow : Window
             _proxy?.Enqueue(_project); // queue proxies for any newly-imported heavy sources (PLAN.md step 18)
 
         if (failures.Count == 0)
-            SetStatus($"Imported {added} file{(added == 1 ? "" : "s")}.");
+            SetStatus($"Importado{(added == 1 ? "" : "s")} {added} ficheiro{(added == 1 ? "" : "s")}.");
         else if (paths.Count == 1)
-            SetStatus($"Could not import {failures[0].Name}: {failures[0].Reason}");
+            SetStatus($"Não foi possível importar {failures[0].Name}: {failures[0].Reason}");
         else
         {
             string detail = $"{failures[0].Name}: {failures[0].Reason}"
-                + (failures.Count > 1 ? $" (+{failures.Count - 1} more)" : "");
-            SetStatus($"Imported {added}, {failures.Count} failed — {detail}");
+                + (failures.Count > 1 ? $" (+{failures.Count - 1} mais)" : "");
+            SetStatus($"Importado{(added == 1 ? "" : "s")} {added}, {failures.Count} falharam — {detail}");
         }
     }
 
@@ -4561,7 +4561,7 @@ public partial class MainWindow : Window
         _history.Execute(ReinterpretFootageCommand.ForMedia(_project, media, newFps));
         _mediaBrowser?.Refresh();
         _timeline?.InvalidateVisual();
-        SetStatus($"Interpreted {Path.GetFileName(media.AbsolutePath)} at {newFps.Num}/{newFps.Den} fps.");
+        SetStatus($"Interpretado {Path.GetFileName(media.AbsolutePath)} a {newFps.Num}/{newFps.Den} fps.");
     }
 
     /// <summary>Best-effort probe of a single image's pixel dimensions for the sequence-import dialog (PLAN.md
@@ -4593,7 +4593,7 @@ public partial class MainWindow : Window
         var project = new Project();
         project.Timeline.Tracks.Add(new VideoTrack { Name = "V1" });
         project.Timeline.Tracks.Add(new AudioTrack { Name = "A1" });
-        SessionRequested?.Invoke(new SessionRequest(project, "New project", null));
+        SessionRequested?.Invoke(new SessionRequest(project, "Novo projeto", null));
     }
 
     /// <summary>
@@ -4619,14 +4619,14 @@ public partial class MainWindow : Window
                 project = MediaBootstrap.BuildProjectFromMedia(clip);
             if (project is null)
             {
-                SetStatus("Sample project is not available in this build.");
+                SetStatus("O projeto de exemplo não está disponível nesta compilação.");
                 return;
             }
-            SessionRequested?.Invoke(new SessionRequest(project, "Opened sample project", null));
+            SessionRequested?.Invoke(new SessionRequest(project, "Projeto de exemplo aberto", null));
         }
         catch (Exception ex)
         {
-            SetStatus($"Could not open the sample project: {ex.Message}");
+            SetStatus($"Não foi possível abrir o projeto de exemplo: {ex.Message}");
         }
     }
 
@@ -4658,7 +4658,7 @@ public partial class MainWindow : Window
 
         IReadOnlyList<IStorageFile> files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Open Project",
+            Title = "Abrir projeto",
             AllowMultiple = false,
             FileTypeFilter = [SprocketProjectFileType, FilePickerFileTypes.All],
         });
@@ -4679,7 +4679,7 @@ public partial class MainWindow : Window
             return;
         if (!File.Exists(path))
         {
-            SetStatus($"Not found: {path}");
+            SetStatus($"Não encontrado: {path}");
             RemoveRecentProject(path);
             return;
         }
@@ -4709,19 +4709,19 @@ public partial class MainWindow : Window
                 string autosavePath = Autosave.SidecarPath(path);
                 project = ProjectSerializer.Deserialize(
                     File.ReadAllText(autosavePath), Path.GetDirectoryName(Path.GetFullPath(path)));
-                status = $"Recovered {Path.GetFileName(path)} from autosave";
+                status = $"Recuperado {Path.GetFileName(path)} do guardar automático";
             }
             else
             {
                 project = ProjectSerializer.Load(path);
-                status = $"Opened {Path.GetFileName(path)}";
+                status = $"Aberto {Path.GetFileName(path)}";
             }
             SessionRequested?.Invoke(new SessionRequest(project, status, path, recover));
             return true;
         }
         catch (Exception ex)
         {
-            SetStatus($"Open failed: {ex.Message}");
+            SetStatus($"Falha ao abrir: {ex.Message}");
             return false;
         }
     }
@@ -4777,7 +4777,7 @@ public partial class MainWindow : Window
         var items = new List<Control>(existing.Count + 2);
         if (existing.Count == 0)
         {
-            items.Add(new MenuItem { Header = "No Recent Projects", IsEnabled = false });
+            items.Add(new MenuItem { Header = "Sem projetos recentes", IsEnabled = false });
         }
         else
         {
@@ -4793,7 +4793,7 @@ public partial class MainWindow : Window
                 items.Add(item);
             }
             items.Add(new Separator());
-            var clear = new MenuItem { Header = "_Clear Recent" };
+            var clear = new MenuItem { Header = "_Limpar recentes" };
             clear.Click += (_, _) => PersistRecent([]);
             items.Add(clear);
         }
@@ -4820,10 +4820,10 @@ public partial class MainWindow : Window
             return false;
 
         bool? choice = await ConfirmDialog.ShowOrDismiss(
-            this, "Recover unsaved changes?",
-            "A more recent autosave was found for this project — it may contain changes that weren't saved before "
-            + "the app last closed. Recover it, or discard the autosave and open the last saved version?",
-            "Recover", "Discard autosave");
+            this, "Recuperar alterações não guardadas?",
+            "Foi encontrado um guardar automático mais recente para este projeto — pode conter alterações que não "
+            + "foram guardadas antes de a aplicação fechar. Recuperá-lo, ou descartar o guardar automático e abrir a última versão guardada?",
+            "Recuperar", "Descartar guardar automático");
         if (choice == false)
             TryDeleteAutosave(autosavePath);
         return choice == true;
@@ -4858,7 +4858,7 @@ public partial class MainWindow : Window
 
         IStorageFile? file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Save Project As",
+            Title = "Guardar projeto como",
             SuggestedFileName = DocumentName + ".sprocket.json",
             DefaultExtension = "json",
             FileTypeChoices = [SprocketProjectFileType],
@@ -4884,12 +4884,12 @@ public partial class MainWindow : Window
             _autosave?.ClearDirty();
             Autosave.Delete(Autosave.SidecarPath(path));
             OnHistoryChanged(); // refresh the dirty indicator
-            SetStatus($"Saved → {path}");
+            SetStatus($"Guardado → {path}");
             return true;
         }
         catch (Exception ex)
         {
-            SetStatus($"Save failed: {ex.Message}");
+            SetStatus($"Falha ao guardar: {ex.Message}");
             return false;
         }
     }
@@ -5129,7 +5129,7 @@ public partial class MainWindow : Window
         _stab?.SetPaused(true); // the analysis worker runs its own FFmpeg decode — quiesce it for the same reason
 
         var progress = new Progress<double>(p => _mcpExportProgress = p);
-        SetStatus($"Exporting (MCP) → {outputPath}");
+        SetStatus($"A exportar (MCP) → {outputPath}");
         try
         {
             ExportRunSummary summary = await Task.Run(() => VideoExporter.ExportWithSummary(
@@ -5142,12 +5142,12 @@ public partial class MainWindow : Window
         catch (OperationCanceledException)
         {
             _mcpExportCancelled = true; // VideoExporter deletes the partial file on cancel
-            SetStatus("Export cancelled");
+            SetStatus("Exportação cancelada");
         }
         catch (Exception ex)
         {
             _mcpExportError = ex.Message; // ditto on failure — no corrupt file is left behind
-            SetStatus($"Export failed: {ex.Message}");
+            SetStatus($"Falha na exportação: {ex.Message}");
         }
         finally
         {
@@ -5210,8 +5210,8 @@ public partial class MainWindow : Window
             return true;
 
         if (!await ConfirmDialog.Show(
-                this, "Export in progress", DiscardGuard.RunningExportMessage,
-                "Cancel Export and Close", "Keep Exporting"))
+                this, "Exportação em curso", DiscardGuard.RunningExportMessage,
+                "Cancelar exportação e fechar", "Continuar a exportar"))
             return false;
 
         // Signal every pipeline that could be live: File ▸ Export and the MCP export share _exportCts, the
@@ -5314,8 +5314,8 @@ public partial class MainWindow : Window
         // Nothing to render? Say so, rather than opening a Save dialog that would only fail at encode time.
         if (_project.Timeline.Duration <= Timecode.Zero)
         {
-            await MessageDialog.Show(this, "Nothing to Export",
-                "The timeline is empty — add a clip before exporting.");
+            await MessageDialog.Show(this, "Nada para exportar",
+                "A linha do tempo está vazia — adicione um clipe antes de exportar.");
             return;
         }
 
@@ -5337,7 +5337,7 @@ public partial class MainWindow : Window
         string baseName = DocumentName;
         IStorageFile? target = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = options.AudioFormat is null ? "Export Video" : "Export Audio",
+            Title = options.AudioFormat is null ? "Exportar vídeo" : "Exportar áudio",
             SuggestedFileName = baseName + extension,
             DefaultExtension = extension.TrimStart('.'),
             FileTypeChoices = [fileType],
@@ -5354,12 +5354,12 @@ public partial class MainWindow : Window
                 Stabilization.StabilizationExportPrecheck.Unanalyzed(_project, (m, d) => _stab.StatusOf(m, d).State);
             if (pending.Count > 0)
             {
-                bool analyzeFirst = await ConfirmDialog.Show(this, "Unanalyzed Stabilization",
-                    $"{pending.Count} stabilized clip(s) aren't analyzed yet and would export unstabilized.\n\n" +
-                    "Analyze them now before exporting?", "Analyze first", "Export as-is");
+                bool analyzeFirst = await ConfirmDialog.Show(this, "Estabilização não analisada",
+                    $"{pending.Count} clipe{(pending.Count == 1 ? "" : "s")} estabilizado{(pending.Count == 1 ? "" : "s")} ainda não {(pending.Count == 1 ? "foi analisado" : "foram analisados")} e {(pending.Count == 1 ? "seria exportado" : "seriam exportados")} sem estabilização.\n\n" +
+                    "Analisar agora antes de exportar?", "Analisar primeiro", "Exportar tal como está");
                 if (analyzeFirst)
                 {
-                    SetStatus("Analyzing stabilization before export…");
+                    SetStatus("A analisar a estabilização antes de exportar…");
                     foreach (Stabilization.StabilizationScan.Item item in pending)
                         _stab.Analyze(item.Media, item.Clip.SourceIn, item.Clip.SourceOut, item.Detailed);
                     await WaitForStabilizationAnalyses(pending);
@@ -5416,18 +5416,18 @@ public partial class MainWindow : Window
         if (summary is not null)
         {
             SetStatus($"{ExportSummaryText.Compact(summary)} → {outputPath}");
-            if (await ConfirmDialog.Show(this, "Export Complete",
-                    $"Exported to:\n{outputPath}\n\n{ExportSummaryText.CompletionDetails(summary)}", "Open folder", "Close"))
+            if (await ConfirmDialog.Show(this, "Exportação concluída",
+                    $"Exportado para:\n{outputPath}\n\n{ExportSummaryText.CompletionDetails(summary)}", "Abrir pasta", "Fechar"))
                 RevealInFolder(outputPath);
         }
         else if (cancelled)
         {
-            SetStatus("Export cancelled");
+            SetStatus("Exportação cancelada");
         }
         else
         {
-            SetStatus($"Export failed: {error}");
-            await MessageDialog.Show(this, "Export Failed", $"The export could not be completed:\n{error}");
+            SetStatus($"Falha na exportação: {error}");
+            await MessageDialog.Show(this, "Falha na exportação", $"Não foi possível concluir a exportação:\n{error}");
         }
     }
 
@@ -5461,7 +5461,7 @@ public partial class MainWindow : Window
         }
 
         ExportFormat format = options.Format;
-        return (format.FileExtension, new FilePickerFileType($"{ExportCodecs.Container(format.Container).DisplayName} video")
+        return (format.FileExtension, new FilePickerFileType($"Vídeo {ExportCodecs.Container(format.Container).DisplayName}")
         {
             Patterns = ["*" + format.FileExtension],
             MimeTypes = [format.MimeType],
@@ -5514,8 +5514,8 @@ public partial class MainWindow : Window
         Sequence sequence = _project.ActiveSequence;
         if (sequence.Timeline.Duration <= Timecode.Zero)
         {
-            await MessageDialog.Show(owner, "Nothing to Queue",
-                "The active sequence is empty — add a clip before queuing an export.");
+            await MessageDialog.Show(owner, "Nada para pôr em fila",
+                "A sequência ativa está vazia — adicione um clipe antes de pôr uma exportação em fila.");
             return;
         }
 
@@ -5531,7 +5531,7 @@ public partial class MainWindow : Window
         string baseName = DocumentName;
         IStorageFile? target = await owner.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Queue Export",
+            Title = "Pôr exportação em fila",
             SuggestedFileName = $"{baseName} - {sequence.Name}{extension}",
             DefaultExtension = extension.TrimStart('.'),
             FileTypeChoices = [fileType],
@@ -5545,7 +5545,7 @@ public partial class MainWindow : Window
             : ExportCodecs.Container(options.Format.Container).DisplayName;
         string name = $"{sequence.Name} · {formatLabel}";
         _exportQueue!.Enqueue(outputPath, options, sequenceId: sequence.Id, range: range, name: name);
-        SetStatus($"Queued export → {Path.GetFileName(outputPath)}");
+        SetStatus($"Exportação em fila → {Path.GetFileName(outputPath)}");
     }
 
     /// <summary>The queue window's "Start" action: quiesce every in-process decode pipeline (as the single export
@@ -5583,9 +5583,9 @@ public partial class MainWindow : Window
         int done = jobs.Count(j => j.Status == ExportJobStatus.Succeeded);
         int failed = jobs.Count(j => j.Status == ExportJobStatus.Failed);
         int cancelled = jobs.Count(j => j.Status == ExportJobStatus.Cancelled);
-        string summary = $"Export queue finished — {done} exported";
-        if (failed > 0) summary += $", {failed} failed";
-        if (cancelled > 0) summary += $", {cancelled} cancelled";
+        string summary = $"Fila de exportação terminada — {done} exportada{(done == 1 ? "" : "s")}";
+        if (failed > 0) summary += $", {failed} falhada{(failed == 1 ? "" : "s")}";
+        if (cancelled > 0) summary += $", {cancelled} cancelada{(cancelled == 1 ? "" : "s")}";
         SetStatus(summary);
     }
 
@@ -5603,8 +5603,8 @@ public partial class MainWindow : Window
             return;
         if (_project.Timeline.Duration.Ticks <= 0)
         {
-            await MessageDialog.Show(this, "Nothing to Export",
-                "The timeline is empty — add a clip before exporting an interchange file.");
+            await MessageDialog.Show(this, "Nada para exportar",
+                "A linha do tempo está vazia — adicione um clipe antes de exportar um ficheiro de intercâmbio.");
             return;
         }
 
@@ -5619,7 +5619,7 @@ public partial class MainWindow : Window
         string baseName = DocumentName;
         IStorageFile? target = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = $"Export {label}",
+            Title = $"Exportar {label}",
             SuggestedFileName = baseName + extension,
             DefaultExtension = extension.TrimStart('.'),
             FileTypeChoices = [fileType],
@@ -5633,16 +5633,16 @@ public partial class MainWindow : Window
                 ? EdlExporter.Save(_project, path)
                 : FinalCutXmlInterchange.Save(_project, path);
 
-            SetStatus($"Exported {label} → {path}");
+            SetStatus($"Exportado {label} → {path}");
             if (report.HasWarnings)
-                await MessageDialog.Show(this, $"{label} Exported — some details were not included",
-                    $"Exported to:\n{path}\n\n{label} cannot represent everything in this sequence:\n\n"
+                await MessageDialog.Show(this, $"{label} exportado — alguns detalhes não foram incluídos",
+                    $"Exportado para:\n{path}\n\nO formato {label} não consegue representar tudo nesta sequência:\n\n"
                     + string.Join("\n", report.Warnings.Select(w => "• " + w)));
         }
         catch (Exception ex)
         {
-            SetStatus($"{label} export failed: {ex.Message}");
-            await MessageDialog.Show(this, "Export Failed", $"The {label} export could not be completed:\n{ex.Message}");
+            SetStatus($"Falha na exportação de {label}: {ex.Message}");
+            await MessageDialog.Show(this, "Falha na exportação", $"Não foi possível concluir a exportação de {label}:\n{ex.Message}");
         }
     }
 
@@ -5661,14 +5661,14 @@ public partial class MainWindow : Window
         IReadOnlyList<OfflineMedia> offline = MediaRelink.FindOffline(_project);
         if (offline.Count == 0)
         {
-            await MessageDialog.Show(this, "No Offline Media",
-                "Every source in this project resolves to a file on disk — there is nothing to relink.");
+            await MessageDialog.Show(this, "Sem multimédia offline",
+                "Todas as fontes deste projeto resolvem para um ficheiro no disco — não há nada para religar.");
             return;
         }
 
         IReadOnlyList<IStorageFolder> folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
-            Title = $"Relink {offline.Count} offline media file{(offline.Count == 1 ? "" : "s")} — choose a folder to search",
+            Title = $"Religar {offline.Count} ficheiro{(offline.Count == 1 ? "" : "s")} de multimédia offline — escolha uma pasta para procurar",
             AllowMultiple = false,
         });
         if (folders.Count == 0 || folders[0].TryGetLocalPath() is not { } root)
@@ -5677,18 +5677,19 @@ public partial class MainWindow : Window
         RelinkPlan plan = await Task.Run(() => MediaRelink.Plan(_project, root));
         if (plan.Matches.Count == 0)
         {
-            await MessageDialog.Show(this, "No Matches Found",
-                $"No files under the chosen folder matched the {offline.Count} offline source"
-                + $"{(offline.Count == 1 ? "" : "s")} by name.");
+            await MessageDialog.Show(this, "Nenhuma correspondência encontrada",
+                $"Nenhum ficheiro na pasta escolhida correspondeu {(offline.Count == 1 ? "à" : "às")} {offline.Count} "
+                + $"fonte{(offline.Count == 1 ? "" : "s")} offline pelo nome.");
             return;
         }
 
-        string preview = "Found matches for " + plan.Matches.Count + " of " + offline.Count + " offline source(s):\n\n"
+        string preview = $"Encontradas correspondências para {plan.Matches.Count} de {offline.Count} "
+            + $"{(offline.Count == 1 ? "fonte" : "fontes")} offline:\n\n"
             + string.Join("\n", plan.Matches.Take(12).Select(m => $"• {Path.GetFileName(m.NewPath)}"))
-            + (plan.Matches.Count > 12 ? $"\n… (+{plan.Matches.Count - 12} more)" : "")
-            + (plan.Ambiguous.Count > 0 ? $"\n\n{plan.Ambiguous.Count} ambiguous (several candidates) — left offline." : "")
-            + (plan.Unmatched.Count > 0 ? $"\n{plan.Unmatched.Count} not found — left offline." : "");
-        if (!await ConfirmDialog.Show(this, "Relink Media", preview, "Relink", "Cancel"))
+            + (plan.Matches.Count > 12 ? $"\n… (+{plan.Matches.Count - 12} mais)" : "")
+            + (plan.Ambiguous.Count > 0 ? $"\n\n{plan.Ambiguous.Count} ambíguas (vários candidatos) — mantidas offline." : "")
+            + (plan.Unmatched.Count > 0 ? $"\n{plan.Unmatched.Count} não encontradas — mantidas offline." : "");
+        if (!await ConfirmDialog.Show(this, "Religar multimédia", preview, "Religar", "Cancelar"))
             return;
 
         int relinked = MediaRelink.Apply(_project, plan);
@@ -5697,12 +5698,12 @@ public partial class MainWindow : Window
         if (_currentProjectPath is not null)
         {
             try { MediaLinks.Write(_project, _currentProjectPath); }
-            catch (Exception ex) { SetStatus($"Relinked {relinked}, but the media-link sidecar could not be saved: {ex.Message}"); }
+            catch (Exception ex) { SetStatus($"Religados {relinked}, mas o ficheiro secundário de ligações de multimédia não pôde ser guardado: {ex.Message}"); }
         }
 
         _mediaBrowser?.Refresh();
-        SetStatus($"Relinked {relinked} media file{(relinked == 1 ? "" : "s")}"
-            + (_currentProjectPath is null ? " (save the project to keep the links)." : "."));
+        SetStatus($"Religado{(relinked == 1 ? "" : "s")} {relinked} ficheiro{(relinked == 1 ? "" : "s")} de multimédia"
+            + (_currentProjectPath is null ? " (guarde o projeto para manter as ligações)." : "."));
     }
 
     /// <summary>Opens the OS file manager with <paramref name="path"/> selected (Explorer/Finder), or its folder
@@ -5747,7 +5748,7 @@ public partial class MainWindow : Window
     {
         if (!_exporting)
             return false;
-        SetStatus("An export is in progress — cancel or wait for it to finish first.");
+        SetStatus("Está uma exportação em curso — cancele-a ou aguarde que termine primeiro.");
         return true;
     }
 

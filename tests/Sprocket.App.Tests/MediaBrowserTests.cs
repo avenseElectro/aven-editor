@@ -40,7 +40,7 @@ public class MediaBrowserTests
     [Theory]
     [InlineData("C:/clips/Ambient_Score.aif", "AIF")]
     [InlineData("song.wav", "WAV")]
-    [InlineData("noext", "AUDIO")]
+    [InlineData("noext", "ÁUDIO")]
     public void FormatTag_Uppercases_The_Extension(string path, string expected) =>
         Assert.Equal(expected, MediaBadges.FormatTag(path));
 
@@ -63,14 +63,14 @@ public class MediaBrowserTests
     {
         // UI.md §3.3: Logo_Anim.mov · 00:05 · Alpha (PLAN.md step 26).
         var badges = MediaBadges.Describe(Video(1920, 1080, 5, audio: false, alpha: true), "Logo_Anim.mov");
-        Assert.Equal(new[] { "0:05", "1080p", "Alpha" }, badges);
+        Assert.Equal(new[] { "0:05", "1080p", "Alfa" }, badges);
     }
 
     [Fact]
     public void Describe_OpaqueVideo_Has_No_Alpha_Badge()
     {
         var badges = MediaBadges.Describe(Video(1920, 1080, 5), "Interview_A.mp4");
-        Assert.DoesNotContain("Alpha", badges);
+        Assert.DoesNotContain("Alfa", badges);
     }
 
     // ── WaveformBuilder ───────────────────────────────────────────────────────────────────────────────

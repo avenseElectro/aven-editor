@@ -76,14 +76,14 @@ public sealed partial class SprocketTools
                 ?? throw new McpException($"track {trackId} not found — call get_project_state.");
             var commands = new List<IEditCommand>();
             if (targeted is { } t && t != track.Targeted)
-                commands.Add(SetPropertyCommand<bool>.Create("Toggle track targeting", () => track.Targeted, v => track.Targeted = v, t));
+                commands.Add(SetPropertyCommand<bool>.Create("Alternar pista de destino", () => track.Targeted, v => track.Targeted = v, t));
             if (syncLocked is { } s && s != track.SyncLocked)
-                commands.Add(SetPropertyCommand<bool>.Create("Toggle sync lock", () => track.SyncLocked, v => track.SyncLocked = v, s));
+                commands.Add(SetPropertyCommand<bool>.Create("Alternar bloqueio de sincronização", () => track.SyncLocked, v => track.SyncLocked = v, s));
             if (locked is { } l && l != track.Locked)
-                commands.Add(SetPropertyCommand<bool>.Create(l ? "Lock track" : "Unlock track", () => track.Locked, v => track.Locked = v, l));
+                commands.Add(SetPropertyCommand<bool>.Create(l ? "Bloquear pista" : "Desbloquear pista", () => track.Locked, v => track.Locked = v, l));
             if (commands.Count == 0)
                 return StateFormatter.HistoryState(api.History, $"track {track.Name} unchanged");
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Set track state", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Definir estado da pista", commands));
             api.RefreshPreview();
             return StateFormatter.HistoryState(api.History, $"updated track {track.Name}");
         });
@@ -213,7 +213,7 @@ public sealed partial class SprocketTools
                     "Marker comment", () => marker.Comment, v => marker.Comment = v, comment));
             if (commands.Count == 0)
                 throw new McpException("pass newTimeTicks, name, color, and/or comment.");
-            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Edit marker", commands));
+            api.History.Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Editar marcador", commands));
             return StateFormatter.HistoryState(api.History, "updated marker");
         });
 
@@ -266,7 +266,7 @@ public sealed partial class SprocketTools
                 {
                     // Stack on a fresh top track so the generator overlays (not displaces) existing content.
                     var newTrack = new VideoTrack { Name = $"V{videoTracks.Count + 1}" };
-                    api.History.Execute(new CompositeCommand("Add generator clip",
+                    api.History.Execute(new CompositeCommand("Adicionar clipe gerador",
                     [
                         new AddTrackCommand(timeline, newTrack),
                         new AddClipCommand(newTrack, clip),

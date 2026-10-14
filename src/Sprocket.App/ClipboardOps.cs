@@ -89,7 +89,7 @@ public static class ClipboardOps
             commands.Add(new AddClipCommand(isVideo ? videoTarget! : audioTarget!, copy));
             pasted.Add(copy);
         }
-        IEditCommand command = commands.Count == 1 ? commands[0] : new CompositeCommand("Paste clips", commands);
+        IEditCommand command = commands.Count == 1 ? commands[0] : new CompositeCommand("Colar clipes", commands);
         return new PasteResult(command, pasted[0], pasted);
     }
 

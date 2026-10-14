@@ -23,7 +23,7 @@ public class MarkerListFormatTests
     public void Describe_Falls_Back_To_A_Stable_Marker_Number_When_Unnamed()
     {
         var marker = new Marker(Timecode.FromSeconds(2));
-        Assert.Equal("0:02.00 · Marker 3", MarkerListFormat.Describe(marker, 2)); // index 2 → "Marker 3"
+        Assert.Equal("0:02.00 · Marcador 3", MarkerListFormat.Describe(marker, 2)); // index 2 → "Marcador 3"
     }
 
     [Fact]
@@ -37,6 +37,6 @@ public class MarkerListFormatTests
     public void Describe_Trims_Whitespace_Only_Names_To_The_Fallback()
     {
         var marker = new Marker(Timecode.Zero, "   ");
-        Assert.Equal("0:00.00 · Marker 1", MarkerListFormat.Describe(marker, 0));
+        Assert.Equal("0:00.00 · Marcador 1", MarkerListFormat.Describe(marker, 0));
     }
 }

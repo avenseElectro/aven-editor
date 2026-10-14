@@ -100,7 +100,7 @@ public static class ClipPlacement
 
         IEditCommand command = commands.Count == 1
             ? commands[0]
-            : new CompositeCommand("Place linked clips", commands);
+            : new CompositeCommand("Colocar clipes ligados", commands);
 
         Clip primary = (primaryIsVideo ? videoClip : audioClip) ?? videoClip ?? audioClip!;
         return new PlacementResult(command, primary);
