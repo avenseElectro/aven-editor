@@ -309,7 +309,7 @@ public sealed class InspectorPanel : UserControl
             Foreground = FaintText,
             TextWrapping = TextWrapping.Wrap,
         });
-        _body.Children.Add(Section(target.Title, info, expanded: true));
+        _body.Children.Add(Section(target.Title, info, expanded: false));
 
         var context = new ChainContext(
             target.Chain, target.StateKey, e => new RemoveChainEffectCommand(target.Chain, e), ClipScope: false);
@@ -450,7 +450,7 @@ public sealed class InspectorPanel : UserControl
         if (source is null)
         {
             content.Children.Add(new TextBlock { Text = "Fonte multicâmara em falta.", FontSize = Typography.Caption, Foreground = FaintText });
-            return Section("Multicâmara", content, expanded: true);
+            return Section("Multicâmara", content, expanded: false);
         }
 
         content.Children.Add(InfoRow("Origem", source.Name));
@@ -483,7 +483,7 @@ public sealed class InspectorPanel : UserControl
             angles.Children.Add(button);
         }
         content.Children.Add(angles);
-        return Section("Multicâmara", content, expanded: true);
+        return Section("Multicâmara", content, expanded: false);
     }
 
     // ── Title sections (PLAN.md step 40) ──────────────────────────────────────────────────────────────
@@ -809,7 +809,7 @@ public sealed class InspectorPanel : UserControl
                 (next, coalescing) => ExecuteGeneratorParam(gen, param.Name, next, coalescing)));
         }
 
-        return Section(descriptor.DisplayName, rows, expanded: true);
+        return Section(descriptor.DisplayName, rows, expanded: false);
     }
 
     /// <summary>An animatable numeric generator parameter row — the same slider/box/keyframe-lane UI effect
@@ -998,7 +998,7 @@ public sealed class InspectorPanel : UserControl
             Children = { center, fillHeight, reset },
         });
 
-        return Section("Enquadramento", rows, expanded: true);
+        return Section("Enquadramento", rows, expanded: false);
     }
 
     /// <summary>The pixel dimensions of the clip's presented content, or <see langword="null"/> when unknown
@@ -1346,7 +1346,7 @@ public sealed class InspectorPanel : UserControl
         // Header: an enable/disable status LED on the left of the title (green = active, grey = bypassed —
         // the audio-rack convention, replacing the earlier eye icon), the instance's reference tag chip
         // (EffectTags, e.g. RV-1 — how AI/MCP clients address this exact instance), and a remove (x) button.
-        bool expanded = !_effectExpanded.TryGetValue(effect, out bool stored) || stored;
+        bool expanded = _effectExpanded.TryGetValue(effect, out bool stored) && stored;
         var header = new DockPanel { Background = Brushes.Transparent }; // hit-testable for the reorder drag
         var led = new Border
         {

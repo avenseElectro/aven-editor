@@ -146,6 +146,7 @@ public partial class MainWindow : Window
     private long _prevDelivered, _prevStatsTs; // baseline for the live-fps delta (frames delivered, Stopwatch ticks)
     private MenuItem? _undoMenuItem, _redoMenuItem;
     private Button? _exportButton, _maxButton;
+    private Button? _undoButton, _redoButton; // toolbar Anular/Refazer (Aven Editor, Etapa B)
     private ShapesPath? _maxButtonIcon; // swapped between Icons.Maximize / Icons.Restore by OnPropertyChanged
     private Control? _root;
     private WindowState _lastNonMinimizedState = WindowState.Normal; // persisted on close (ignores Minimized/FullScreen)
@@ -174,13 +175,15 @@ public partial class MainWindow : Window
     private MenuItem? _nestMenuItem, _openSequenceMenuItem; // Sequence menu (PLAN.md step 23)
     private MenuItem? _snappingMenuItem, _guidesMenuItem, _showProjectMenuItem, _showInspectorMenuItem, _showStatsMenuItem,
         _showProxyStatusMenuItem;
+    // Aven Editor (Etapa B): os toggles saíram da barra de ferramentas para o menu Ver.
+    private MenuItem? _linkedMenuItem, _showSourceMonitorMenuItem, _showScopeSelectorMenuItem;
     private MenuItem? _fullScreenMenuItem; // View ▸ Full Screen (checked while fullscreen)
     // View ▸ Playback Auto-Scroll (radio group; the timeline's AutoScroll property is the source of truth)
     private MenuItem? _autoScrollNoneMenuItem, _autoScrollPageMenuItem, _autoScrollSmoothMenuItem;
     private PlaybackStatsOverlay? _statsOverlay; // floating playback-diagnostics window (View ▸ Playback Statistics)
     private ProxyStatusWindow? _proxyWindow; // proxy status + live control window (View ▸ Proxy, PLAN.md step 18)
     private MenuItem? _effectsMenu;
-    private ToggleButton? _snappingToggle, _guidesToggle;
+    private ToggleButton? _snappingToggle, _guidesToggle, _linkedToggle;
     private Grid? _workspaceGrid, _outerGrid;
     private Border? _projectPane, _inspectorPane;
     private GridSplitter? _projectSplitter, _inspectorSplitter;
@@ -283,6 +286,8 @@ public partial class MainWindow : Window
         _timelineHeader = this.FindControl<TextBlock>("TimelineHeader")!;
         _undoMenuItem = this.FindControl<MenuItem>("UndoMenuItem")!;
         _redoMenuItem = this.FindControl<MenuItem>("RedoMenuItem")!;
+        _undoButton = this.FindControl<Button>("UndoButton");
+        _redoButton = this.FindControl<Button>("RedoButton");
         _exportButton = this.FindControl<Button>("ExportButton")!;
         _maxButton = this.FindControl<Button>("MaxButton")!;
         _maxButtonIcon = this.FindControl<ShapesPath>("MaxButtonIcon")!;
@@ -659,6 +664,8 @@ public partial class MainWindow : Window
         // Edit
         _undoMenuItem!.Click += (_, _) => _history.Undo();
         _redoMenuItem!.Click += (_, _) => _history.Redo();
+        if (_undoButton is not null) _undoButton.Click += (_, _) => _history.Undo();
+        if (_redoButton is not null) _redoButton.Click += (_, _) => _history.Redo();
         this.FindControl<MenuItem>("PreferencesMenuItem")!.Click += (_, _) => _ = ShowPreferencesAsync();
         this.FindControl<MenuItem>("PluginsMenuItem")!.Click += (_, _) => _ = ShowPluginManagerAsync();
 
@@ -710,6 +717,7 @@ public partial class MainWindow : Window
         }
         if (this.FindControl<ToggleButton>("LinkedToggle") is { } linkedToggle)
         {
+            _linkedToggle = linkedToggle;
             linkedToggle.IsChecked = _userSettings.TimelineLinked;
             linkedToggle.IsCheckedChanged += (_, _) => PersistTimelineToggles();
         }
@@ -826,6 +834,25 @@ public partial class MainWindow : Window
         // Drive the toolbar toggle (the single source of truth) from the menu checkbox's new state.
         _snappingMenuItem.Click += (_, _) => { if (_snappingToggle is not null) _snappingToggle.IsChecked = _snappingMenuItem.IsChecked; };
         _guidesMenuItem.Click += (_, _) => { if (_guidesToggle is not null) _guidesToggle.IsChecked = _guidesMenuItem.IsChecked; };
+        // Aven Editor (Etapa B): Ligados saiu da barra — o toggle (oculto) continua a fonte de verdade.
+        _linkedMenuItem = this.FindControl<MenuItem>("LinkedMenuItem")!;
+        _linkedMenuItem.Click += (_, _) => { if (_linkedToggle is not null) _linkedToggle.IsChecked = _linkedMenuItem.IsChecked; };
+        // Aven Editor (Etapa B): Ver ▸ Ferramentas — cada opção marca o botão (visível ou oculto) da barra,
+        // cujo WireTool é o dono de timeline.ActiveTool; o menu só espelha (RefreshViewMenu sincroniza).
+        WireToolMenuItem("ToolSelectMenuItem", "SelectTool");
+        WireToolMenuItem("ToolBladeMenuItem", "BladeTool");
+        WireToolMenuItem("ToolRippleMenuItem", "RippleTool");
+        WireToolMenuItem("ToolRollMenuItem", "RollTool");
+        WireToolMenuItem("ToolSlipMenuItem", "SlipTool");
+        WireToolMenuItem("ToolSlideMenuItem", "SlideTool");
+        WireToolMenuItem("ToolHandMenuItem", "HandTool");
+        WireToolMenuItem("ToolZoomMenuItem", "ZoomTool");
+        // Aven Editor (Etapa B): monitor só Programa por omissão; estas opções reconstituem o resto.
+        _showSourceMonitorMenuItem = this.FindControl<MenuItem>("ShowSourceMonitorMenuItem")!;
+        _showSourceMonitorMenuItem.Click += (_, _) => SetSourceMonitorVisible(_showSourceMonitorMenuItem.IsChecked == true);
+        _showScopeSelectorMenuItem = this.FindControl<MenuItem>("ShowScopeSelectorMenuItem")!;
+        _showScopeSelectorMenuItem.Click += (_, _) =>
+            this.FindControl<ComboBox>("ScopeBox")!.IsVisible = _showScopeSelectorMenuItem.IsChecked == true;
         _showProjectMenuItem.Click += (_, _) => SetPanelVisible(project: true, _showProjectMenuItem.IsChecked == true);
         _showInspectorMenuItem.Click += (_, _) => SetPanelVisible(project: false, _showInspectorMenuItem.IsChecked == true);
         _autoScrollNoneMenuItem = this.FindControl<MenuItem>("AutoScrollNoneMenuItem")!;
@@ -2555,7 +2582,7 @@ public partial class MainWindow : Window
         var sourceTab = this.FindControl<RadioButton>("SourceTab")!;
         if (sourceTab.IsChecked == true)
             RefreshTransportForActive();              // IsCheckedChanged won't fire; re-point the transport ourselves
-        else
+        else if (sourceTab.IsVisible)                 // Aven Editor (Etapa B): só traz o separador se estiver visível
             sourceTab.IsChecked = true;               // fires WireMonitorTabs → Activate() → bind surface + transport
         // Hand focus to the monitor, as Premiere does on a bin double-click, so I / O mark the source right away
         // instead of the sequence (the bin would otherwise keep the active work area). Posted so it lands after the
@@ -3354,11 +3381,58 @@ public partial class MainWindow : Window
         if (_showStatsMenuItem is not null) _showStatsMenuItem.IsChecked = _statsOverlay is not null;
         if (_showProxyStatusMenuItem is not null) _showProxyStatusMenuItem.IsChecked = _proxyWindow is not null;
         if (_fullScreenMenuItem is not null) _fullScreenMenuItem.IsChecked = WindowState == WindowState.FullScreen;
+        // Aven Editor (Etapa B): os novos espelhos do menu Ver.
+        if (_linkedMenuItem is not null) _linkedMenuItem.IsChecked = _linkedToggle?.IsChecked == true;
+        if (_showSourceMonitorMenuItem is not null)
+            _showSourceMonitorMenuItem.IsChecked = this.FindControl<RadioButton>("SourceTab")?.IsVisible == true;
+        if (_showScopeSelectorMenuItem is not null)
+            _showScopeSelectorMenuItem.IsChecked = this.FindControl<ComboBox>("ScopeBox")?.IsVisible == true;
+        // Ferramentas: o botão da barra (visível ou oculto) é quem guarda a escolha; o menu espelha-o.
+        foreach ((string menuItemName, string buttonName) in ToolMenuPairs)
+        {
+            var item = this.FindControl<MenuItem>(menuItemName);
+            if (item is not null)
+                item.IsChecked = this.FindControl<RadioButton>(buttonName)?.IsChecked == true;
+        }
         // The timeline owns the mode; re-check the matching item rather than trusting the radio group's own state.
         TimelineAutoScroll autoScroll = _timeline?.AutoScroll ?? TimelineAutoScroll.Page;
         if (_autoScrollNoneMenuItem is not null) _autoScrollNoneMenuItem.IsChecked = autoScroll == TimelineAutoScroll.None;
         if (_autoScrollPageMenuItem is not null) _autoScrollPageMenuItem.IsChecked = autoScroll == TimelineAutoScroll.Page;
         if (_autoScrollSmoothMenuItem is not null) _autoScrollSmoothMenuItem.IsChecked = autoScroll == TimelineAutoScroll.Smooth;
+    }
+
+    /// <summary>Ver ▸ Ferramentas ↔ botões da barra de ferramentas (Aven Editor, Etapa B): as ferramentas
+    /// fora de Selecionar/Cortar estão ocultas na barra mas continuam ligadas; cada par liga a opção do
+    /// menu ao botão que lhe corresponde.</summary>
+    private static readonly (string MenuItem, string ToolButton)[] ToolMenuPairs =
+    {
+        ("ToolSelectMenuItem", "SelectTool"),
+        ("ToolBladeMenuItem", "BladeTool"),
+        ("ToolRippleMenuItem", "RippleTool"),
+        ("ToolRollMenuItem", "RollTool"),
+        ("ToolSlipMenuItem", "SlipTool"),
+        ("ToolSlideMenuItem", "SlideTool"),
+        ("ToolHandMenuItem", "HandTool"),
+        ("ToolZoomMenuItem", "ZoomTool"),
+    };
+
+    /// <summary>Ver ▸ Ferramentas: selecionar a opção marca o botão correspondente da barra — o processador
+    /// registado por WireTool reage ao IsCheckedChanged e aplica timeline.ActiveTool.</summary>
+    private void WireToolMenuItem(string menuItemName, string toolButtonName)
+    {
+        this.FindControl<MenuItem>(menuItemName)!.Click +=
+            (_, _) => this.FindControl<RadioButton>(toolButtonName)!.IsChecked = true;
+    }
+
+    /// <summary>Ver ▸ Monitor de origem (Aven Editor, Etapa B): mostra/esconde o separador Origem. Ao
+    /// ocultar com a Origem ativa, regressa primeiro ao Programa para o monitor não ficar sem superfície
+    /// ligada.</summary>
+    private void SetSourceMonitorVisible(bool visible)
+    {
+        var sourceTab = this.FindControl<RadioButton>("SourceTab")!;
+        if (!visible && sourceTab.IsChecked == true)
+            this.FindControl<RadioButton>("ProgramTab")!.IsChecked = true; // dispara WireMonitorTabs → Programa
+        sourceTab.IsVisible = visible;
     }
 
     /// <summary>
@@ -3629,6 +3703,8 @@ public partial class MainWindow : Window
         _redoMenuItem!.IsEnabled = _history.CanRedo;
         _undoMenuItem.Header = _history.CanUndo ? $"_Anular {_history.UndoLabel}" : "_Anular";
         _redoMenuItem.Header = _history.CanRedo ? $"_Refazer {_history.RedoLabel}" : "_Refazer";
+        if (_undoButton is not null) _undoButton.IsEnabled = _history.CanUndo;
+        if (_redoButton is not null) _redoButton.IsEnabled = _history.CanRedo;
 
         bool dirty = IsDirty;
         _saveStateText!.Text = dirty ? "• alterações não guardadas" : "• todas as alterações guardadas";

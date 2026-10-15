@@ -8,7 +8,7 @@
         Width="1280" Height="800"
         MinWidth="900" MinHeight="600"
         WindowStartupLocation="CenterScreen"
-        Title="Sprocket"
+        Title="Aven Editor"
         Icon="/Assets/sprocket.png"
         Background="{DynamicResource WindowBg}">
 
@@ -48,7 +48,7 @@
           <Image Source="/Assets/sprocket.png" Width="22" Height="22" Margin="0,0,8,0"
                  VerticalAlignment="Center" />
 
-          <TextBlock Text="Sprocket" Foreground="{DynamicResource Text}" FontWeight="SemiBold"
+          <TextBlock Text="Aven Editor" Foreground="{DynamicResource Text}" FontWeight="SemiBold"
                      FontSize="{x:Static local:Typography.Emphasis}" VerticalAlignment="Center" />
         </StackPanel>
 
@@ -73,10 +73,6 @@
             <MenuItem x:Name="RelinkMenuItem" Header="_Religar multimédia…" />
             <MenuItem x:Name="ExportMenuItem" Header="_Exportar…" InputGesture="Ctrl+E" />
             <MenuItem x:Name="ExportQueueMenuItem" Header="Fila de e_xportação…" InputGesture="Ctrl+Shift+E" />
-            <MenuItem Header="Exportar intercâmbio">
-              <MenuItem x:Name="ExportEdlMenuItem" Header="_EDL (CMX3600)…" />
-              <MenuItem x:Name="ExportFcpXmlMenuItem" Header="_Final Cut XML…" />
-            </MenuItem>
             <Separator />
             <MenuItem x:Name="ExitMenuItem" Header="Sai_r" InputGesture="Alt+F4" />
           </MenuItem>
@@ -102,7 +98,73 @@
                  over the managed host. DAW convention (Ableton's Plug-Ins preferences) puts it beside Preferences. -->
             <MenuItem x:Name="PluginsMenuItem" Header="_Plugins…" />
           </MenuItem>
-          <MenuItem x:Name="ClipMenu" Header="_Clipe">
+          <MenuItem x:Name="ViewMenu" Header="_Ver">
+            <!-- The bare =/- keys and Ctrl++/Ctrl+- are handled in OnKeyDown; we don't set InputGesture here
+                 because Avalonia's KeyGesture.ToString() uses the raw Key enum name, so even a bare
+                 KeyGesture.Parse("-") renders as "OemMinus". The clean shortcut text lives in the timeline zoom
+                 buttons' tooltips instead. Shift+Z renders cleanly so it keeps its gesture. -->
+            <MenuItem x:Name="ZoomInMenuItem" Header="_Ampliar" />
+            <MenuItem x:Name="ZoomOutMenuItem" Header="_Reduzir" />
+            <MenuItem x:Name="ZoomToFitMenuItem" Header="Zoom para ajustar" InputGesture="Shift+Z" />
+            <Separator />
+            <!-- Aven Editor (Etapa B): a barra de ferramentas ficou reduzida a Selecionar + Cortar; as
+                 restantes ferramentas continuam disponíveis aqui. Cada opção marca o botão (oculto) da
+                 barra, cujo WireTool é o dono de timeline.ActiveTool. -->
+            <MenuItem x:Name="ToolsMenu" Header="Ferramen_tas">
+              <MenuItem x:Name="ToolSelectMenuItem" Header="_Selecionar" ToggleType="Radio" GroupName="ViewTools" IsChecked="True" />
+              <MenuItem x:Name="ToolBladeMenuItem" Header="_Cortar" ToggleType="Radio" GroupName="ViewTools" />
+              <Separator />
+              <MenuItem x:Name="ToolRippleMenuItem" Header="Edição em _cadeia" ToggleType="Radio" GroupName="ViewTools" />
+              <MenuItem x:Name="ToolRollMenuItem" Header="_Rolar" ToggleType="Radio" GroupName="ViewTools" />
+              <MenuItem x:Name="ToolSlipMenuItem" Header="_Deslizar" ToggleType="Radio" GroupName="ViewTools" />
+              <MenuItem x:Name="ToolSlideMenuItem" Header="A_rrastar" ToggleType="Radio" GroupName="ViewTools" />
+              <Separator />
+              <MenuItem x:Name="ToolHandMenuItem" Header="_Mão" ToggleType="Radio" GroupName="ViewTools" />
+              <MenuItem x:Name="ToolZoomMenuItem" Header="_Zoom" ToggleType="Radio" GroupName="ViewTools" />
+            </MenuItem>
+            <MenuItem x:Name="SnappingMenuItem" Header="_Ajuste magnético" ToggleType="CheckBox" />
+            <MenuItem x:Name="LinkedMenuItem" Header="Clipes _ligados" ToggleType="CheckBox" IsChecked="True" />
+            <MenuItem x:Name="GuidesMenuItem" Header="_Guias" ToggleType="CheckBox" />
+            <!-- Playback auto-scroll: Premiere's three modes and its Page Scroll default (Preferences ▸ Timeline ▸
+                 Timeline Playback Auto-Scroll). No accelerator — the leading editors don't bind one either.
+                 RefreshViewMenu re-checks the active mode each time the View menu opens. -->
+            <MenuItem x:Name="AutoScrollMenuItem" Header="Deslocamento automático">
+              <MenuItem x:Name="AutoScrollNoneMenuItem" Header="_Sem deslocamento" ToggleType="Radio" GroupName="AutoScroll" />
+              <MenuItem x:Name="AutoScrollPageMenuItem" Header="Deslocamento por _página" ToggleType="Radio" GroupName="AutoScroll" />
+              <MenuItem x:Name="AutoScrollSmoothMenuItem" Header="Deslocamento suave" ToggleType="Radio" GroupName="AutoScroll" />
+            </MenuItem>
+            <Separator />
+            <!-- Aven Editor (Etapa B): o separador Origem e o seletor de âmbitos ficam ocultos por omissão
+                 (monitor só Programa); estas opções reconstituem-nos. -->
+            <MenuItem x:Name="ShowSourceMonitorMenuItem" Header="_Monitor de origem" ToggleType="CheckBox" />
+            <MenuItem x:Name="ShowScopeSelectorMenuItem" Header="Seletor de âm_bitos de vídeo" ToggleType="CheckBox" />
+            <Separator />
+            <MenuItem x:Name="ShowProjectMenuItem" Header="Painel _Projeto" ToggleType="CheckBox" IsChecked="True" />
+            <MenuItem x:Name="ShowInspectorMenuItem" Header="Painel I_nspetor" ToggleType="CheckBox" IsChecked="True" />
+            <Separator />
+            <MenuItem x:Name="ShowStatsMenuItem" Header="_Estatísticas de reprodução" ToggleType="CheckBox" />
+            <!-- Background Tasks (PLAN.md step 18 + stabilization phase 6), Final Cut Pro's Background Tasks window:
+                 live proxy pipeline control + stabilization analyses. Non-modal like Playback Statistics, so it can
+                 sit open while editing. -->
+            <MenuItem x:Name="ShowProxyStatusMenuItem" Header="Tarefas em _segundo plano" ToggleType="CheckBox" />
+            <Separator />
+            <!-- Fullscreen (user-requested; F11 is the Windows/Linux convention). On macOS the gestures are
+                 swapped in code to the native ⌃⌘F / ⌘F (WireCommandMenus) — Magic Keyboards treat F11 as a
+                 media key. Esc exits either mode; both accelerators are handled in OnKeyDown. -->
+            <MenuItem x:Name="FullScreenMenuItem" Header="Ecrã _inteiro" ToggleType="CheckBox" InputGesture="F11" />
+            <MenuItem x:Name="FullScreenPreviewMenuItem" Header="Pré-visualização em ecrã inteiro" InputGesture="Ctrl+F" />
+            <Separator />
+            <MenuItem x:Name="ResetLayoutMenuItem" Header="_Repor disposição" />
+          </MenuItem>
+          <!-- Aven Editor (Etapa B): os menus de edição avançada (Clipe, Sequência, Efeitos) e a exportação
+               de intercâmbio vivem agora sob Avançado — fora do caminho do dia a dia, mas intactos. -->
+          <MenuItem x:Name="AdvancedMenu" Header="A_vançado">
+            <MenuItem Header="Exportar intercâmbio">
+              <MenuItem x:Name="ExportEdlMenuItem" Header="_EDL (CMX3600)…" />
+              <MenuItem x:Name="ExportFcpXmlMenuItem" Header="_Final Cut XML…" />
+            </MenuItem>
+            <Separator />
+            <MenuItem x:Name="ClipMenu" Header="_Clipe">
             <!-- Insert generators / adjustment layer at the playhead (PLAN.md step 19); children added at runtime. -->
             <MenuItem x:Name="ClipInsertMenuItem" Header="_Inserir" />
             <Separator />
@@ -211,43 +273,6 @@
           </MenuItem>
           <!-- Effects menu is populated from EffectCatalog at runtime (WireCommandMenus). -->
           <MenuItem x:Name="EffectsMenu" Header="Efe_itos" />
-          <MenuItem x:Name="ViewMenu" Header="_Ver">
-            <!-- The bare =/- keys and Ctrl++/Ctrl+- are handled in OnKeyDown; we don't set InputGesture here
-                 because Avalonia's KeyGesture.ToString() uses the raw Key enum name, so even a bare
-                 KeyGesture.Parse("-") renders as "OemMinus". The clean shortcut text lives in the timeline zoom
-                 buttons' tooltips instead. Shift+Z renders cleanly so it keeps its gesture. -->
-            <MenuItem x:Name="ZoomInMenuItem" Header="_Ampliar" />
-            <MenuItem x:Name="ZoomOutMenuItem" Header="_Reduzir" />
-            <MenuItem x:Name="ZoomToFitMenuItem" Header="Zoom para ajustar" InputGesture="Shift+Z" />
-            <Separator />
-            <MenuItem x:Name="SnappingMenuItem" Header="_Ajuste magnético" ToggleType="CheckBox" />
-            <MenuItem x:Name="GuidesMenuItem" Header="_Guias" ToggleType="CheckBox" />
-            <!-- Playback auto-scroll: Premiere's three modes and its Page Scroll default (Preferences ▸ Timeline ▸
-                 Timeline Playback Auto-Scroll). No accelerator — the leading editors don't bind one either.
-                 RefreshViewMenu re-checks the active mode each time the View menu opens. -->
-            <MenuItem x:Name="AutoScrollMenuItem" Header="Deslocamento automático">
-              <MenuItem x:Name="AutoScrollNoneMenuItem" Header="_Sem deslocamento" ToggleType="Radio" GroupName="AutoScroll" />
-              <MenuItem x:Name="AutoScrollPageMenuItem" Header="Deslocamento por _página" ToggleType="Radio" GroupName="AutoScroll" />
-              <MenuItem x:Name="AutoScrollSmoothMenuItem" Header="Deslocamento suave" ToggleType="Radio" GroupName="AutoScroll" />
-            </MenuItem>
-            <Separator />
-            <MenuItem x:Name="ShowProjectMenuItem" Header="Painel _Projeto" ToggleType="CheckBox" IsChecked="True" />
-            <MenuItem x:Name="ShowInspectorMenuItem" Header="Painel I_nspetor" ToggleType="CheckBox" IsChecked="True" />
-            <Separator />
-            <MenuItem x:Name="ShowStatsMenuItem" Header="_Estatísticas de reprodução" ToggleType="CheckBox" />
-            <!-- Background Tasks (PLAN.md step 18 + stabilization phase 6), Final Cut Pro's Background Tasks window:
-                 live proxy pipeline control + stabilization analyses. Non-modal like Playback Statistics, so it can
-                 sit open while editing. -->
-            <MenuItem x:Name="ShowProxyStatusMenuItem" Header="Tarefas em _segundo plano" ToggleType="CheckBox" />
-            <Separator />
-            <!-- Fullscreen (user-requested; F11 is the Windows/Linux convention). On macOS the gestures are
-                 swapped in code to the native ⌃⌘F / ⌘F (WireCommandMenus) — Magic Keyboards treat F11 as a
-                 media key. Esc exits either mode; both accelerators are handled in OnKeyDown. -->
-            <MenuItem x:Name="FullScreenMenuItem" Header="Ecrã _inteiro" ToggleType="CheckBox" InputGesture="F11" />
-            <MenuItem x:Name="FullScreenPreviewMenuItem" Header="Pré-visualização em ecrã inteiro" InputGesture="Ctrl+F" />
-          </MenuItem>
-          <MenuItem x:Name="WindowMenu" Header="_Janela">
-            <MenuItem x:Name="ResetLayoutMenuItem" Header="_Repor disposição" />
           </MenuItem>
           <MenuItem x:Name="HelpMenu">
             <!-- Custom header keeps the Alt+H mnemonic (AccessText) while adding a discoverability dot
@@ -328,27 +353,34 @@
       <Grid ColumnDefinitions="Auto,*,Auto,Auto">
         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Spacing="2">
           <!-- Tool palette (radio group): Select/Blade edit, Ripple/Roll/Slip/Slide trim, Hand/Zoom view
-               (PLAN.md steps 13/22, UI.md §3.2). -->
+               (PLAN.md steps 13/22, UI.md §3.2). Aven Editor (Etapa B): só Selecionar + Cortar ficam
+               visíveis; as restantes ferramentas continuam ligadas e escolhem-se em Ver ▸ Ferramentas. -->
           <RadioButton x:Name="SelectTool" Classes="tool" GroupName="Tools" Content="Selecionar" IsChecked="True"
                        ToolTip.Tip="Selecionar, mover e aparar arestas de clipes" />
-          <RadioButton x:Name="BladeTool" Classes="tool" GroupName="Tools" Content="Lâmina"
-                       ToolTip.Tip="Lâmina: clique num clipe para o dividir no cursor" />
-          <RadioButton x:Name="RippleTool" Classes="tool" GroupName="Tools" Content="Onda"
+          <RadioButton x:Name="BladeTool" Classes="tool" GroupName="Tools" Content="Cortar"
+                       ToolTip.Tip="Cortar: clique num clipe para o dividir no cursor" />
+          <RadioButton x:Name="RippleTool" Classes="tool" GroupName="Tools" Content="Onda" IsVisible="False"
                        ToolTip.Tip="Edição em cadeia: apare a aresta do clipe e desloca o que se segue para fechar o espaço" />
-          <RadioButton x:Name="RollTool" Classes="tool" GroupName="Tools" Content="Rolar"
+          <RadioButton x:Name="RollTool" Classes="tool" GroupName="Tools" Content="Rolar" IsVisible="False"
                        ToolTip.Tip="Edição por rolagem: arraste o corte entre dois clipes adjacentes mantendo o comprimento total" />
-          <RadioButton x:Name="SlipTool" Classes="tool" GroupName="Tools" Content="Deslizar"
+          <RadioButton x:Name="SlipTool" Classes="tool" GroupName="Tools" Content="Deslizar" IsVisible="False"
                        ToolTip.Tip="Deslizar a origem (entrada/saída) do clipe sem o mover na linha do tempo" />
-          <RadioButton x:Name="SlideTool" Classes="tool" GroupName="Tools" Content="Arrastar"
+          <RadioButton x:Name="SlideTool" Classes="tool" GroupName="Tools" Content="Arrastar" IsVisible="False"
                        ToolTip.Tip="Arrastar um clipe ao longo da linha do tempo enquanto os vizinhos absorvem a alteração" />
-          <RadioButton x:Name="HandTool" Classes="tool" GroupName="Tools" Content="Mão"
+          <RadioButton x:Name="HandTool" Classes="tool" GroupName="Tools" Content="Mão" IsVisible="False"
                        ToolTip.Tip="Deslocar a vista da linha do tempo" />
-          <RadioButton x:Name="ZoomTool" Classes="tool" GroupName="Tools" Content="Zoom"
+          <RadioButton x:Name="ZoomTool" Classes="tool" GroupName="Tools" Content="Zoom" IsVisible="False"
                        ToolTip.Tip="Ampliar a vista da linha do tempo (clique para ampliar, Alt+clique para reduzir)" />
           <Border Width="1" Height="18" Background="{DynamicResource Edge}" Margin="8,0" />
-          <ToggleButton x:Name="SnappingToggle" Content="Ajuste magnético" IsChecked="True" FontSize="{x:Static local:Typography.Body}" Padding="7,2"
+          <Button x:Name="UndoButton" Content="Anular" FontSize="{x:Static local:Typography.Body}" Padding="9,2"
+                  IsEnabled="False" ToolTip.Tip="Anular a última edição (Ctrl+Z)" />
+          <Button x:Name="RedoButton" Content="Refazer" FontSize="{x:Static local:Typography.Body}" Padding="9,2" Margin="2,0,0,0"
+                  IsEnabled="False" ToolTip.Tip="Refazer a edição anulada (Ctrl+Shift+Z)" />
+          <!-- Aven Editor (Etapa B): Ajuste magnético / Ligados saíram da barra — vivem em Ver (o estado
+               destes toggles continua a ser a fonte de verdade; ficam apenas ocultos). -->
+          <ToggleButton x:Name="SnappingToggle" Content="Ajuste magnético" IsChecked="True" FontSize="{x:Static local:Typography.Body}" Padding="7,2" IsVisible="False"
                         ToolTip.Tip="Ajustar arestas de clipes e o indicador de reprodução a cortes e marcadores próximos durante o arrastamento" />
-          <ToggleButton x:Name="LinkedToggle" Content="Ligados" IsChecked="True" FontSize="{x:Static local:Typography.Body}" Padding="7,2" Margin="2,0,0,0"
+          <ToggleButton x:Name="LinkedToggle" Content="Ligados" IsChecked="True" FontSize="{x:Static local:Typography.Body}" Padding="7,2" Margin="2,0,0,0" IsVisible="False"
                         ToolTip.Tip="Mover clipes de áudio e vídeo ligados em grupo ao editar" />
         </StackPanel>
 
@@ -444,12 +476,13 @@
                 <!-- Dual-monitor tabs: Program (composited timeline) / Source (raw clip), UI.md §3.4. -->
                 <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                   <RadioButton x:Name="ProgramTab" Classes="tool" GroupName="Monitor" Content="Programa" IsChecked="True" />
-                  <RadioButton x:Name="SourceTab" Classes="tool" GroupName="Monitor" Content="Origem" />
+                  <!-- Aven Editor (Etapa B): separador Origem oculto por omissão (Ver ▸ Monitor de origem). -->
+                  <RadioButton x:Name="SourceTab" Classes="tool" GroupName="Monitor" Content="Origem" IsVisible="False" />
                 </StackPanel>
                 <!-- Grading scopes selector (PLAN.md step 34) + safe-area / framing-grid overlay toggle +
                      the Fit ▾ zoom level. -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                  <ComboBox x:Name="ScopeBox" MinWidth="112" MinHeight="0" FontSize="{x:Static local:Typography.Body}" Padding="7,2" Margin="0,1,0,0" SelectedIndex="0">
+                  <ComboBox x:Name="ScopeBox" MinWidth="112" MinHeight="0" FontSize="{x:Static local:Typography.Body}" Padding="7,2" Margin="0,1,0,0" SelectedIndex="0" IsVisible="False">
                     <ComboBoxItem>Sem âmbitos</ComboBoxItem>
                     <ComboBoxItem>Forma de onda</ComboBoxItem>
                     <ComboBoxItem>Desfile RGB</ComboBoxItem>
