@@ -87,6 +87,9 @@ public sealed class TimelineControl : Control
     private static readonly Pen TransitionBorderPen = new(new ImmutableSolidColorBrush(Palette.Accent, 0.8), 1);
     private static readonly IBrush VideoGhostFill = new ImmutableSolidColorBrush(((ISolidColorBrush)VideoFill).Color, 0.55);
     private static readonly IBrush AudioGhostFill = new ImmutableSolidColorBrush(((ISolidColorBrush)AudioFill).Color, 0.55);
+    // A refused (occupied-range) media drop: the ghost turns red so the refusal is visible before release.
+    private static readonly IBrush BlockedGhostFill = new ImmutableSolidColorBrush(Palette.Bad, 0.40);
+    private static readonly Pen BlockedGhostPen = new(new ImmutableSolidColorBrush(Palette.Bad, 0.9), 1.5);
 
     // Disabled-clip shade (PLAN.md step 53): drawn over a disabled clip's body so it reads dimmed at a glance,
     // cached like every draw-path brush so the render path never allocates.
@@ -1411,8 +1414,9 @@ public sealed class TimelineControl : Control
     }
 
     // A media drag's landing spot (PLAN.md step 61 phase 4): a translucent block per destination lane spanning the
-    // range the drop would overwrite — or, during a Ctrl / Cmd insert drag, a right-pointing ripple arrow on every lane
-    // the insert pushes (the destinations and the unlocked sync-locked tracks), like Premiere's insert cursor.
+    // range the drop would occupy — red when the plain drop is refused for landing on existing clips — or, during a
+    // Ctrl / Cmd insert drag, a right-pointing ripple arrow on every lane the insert pushes (the destinations and the
+    // unlocked sync-locked tracks), like Premiere's insert cursor.
     private void DrawDropGhost(DrawingContext ctx, Size size)
     {
         if (_dropGhost is not { } ghost)
@@ -1428,7 +1432,9 @@ public sealed class TimelineControl : Control
             if (destination)
             {
                 var rect = new Rect(x0, LaneTop(i) + 3, Math.Max(2, x1 - x0), TrackHeight - 6);
-                ctx.DrawRectangle(lanes[i].isVideo ? VideoGhostFill : AudioGhostFill, SelectPen, new RoundedRect(rect, 4));
+                ctx.DrawRectangle(
+                    ghost.Blocked ? BlockedGhostFill : lanes[i].isVideo ? VideoGhostFill : AudioGhostFill,
+                    ghost.Blocked ? BlockedGhostPen : SelectPen, new RoundedRect(rect, 4));
             }
             if (ghost.Insert && (destination || (track.SyncLocked && !track.Locked)))
             {
@@ -3381,7 +3387,7 @@ public sealed class TimelineControl : Control
             return;
         }
 
-        e.DragEffects = DragDropEffects.Copy;
+        e.DragEffects = plan is { Blocked: true } ? DragDropEffects.None : DragDropEffects.Copy;
         // Show a ghost of the clip(s) at the snapped drop start (media), the nearest cut (transition), or just the cursor.
         _dropGhost = plan;
         if (plan is { } ghost)
@@ -3500,17 +3506,25 @@ public sealed class TimelineControl : Control
         long start = ClipPlacement.SnapStart(
             dropTicks, (sourceOut - sourceIn).Ticks, DropSnapPoints(), Snapping, SnapTolerancePx, _pxPerSecond);
         bool insert = (modifiers & (KeyModifiers.Control | KeyModifiers.Meta)) != 0;
-        return new SourceDropPlan(media, sourceIn, sourceOut, video, audio, primaryIsVideo, start, insert);
+        // The Aven Editor drop guard: a plain drop may never overwrite existing content — flag the occupied
+        // range so the ghost turns red and the drop is refused with a hint (Ctrl/Cmd insert still pushes aside).
+        bool blocked = !insert && ClipPlacement.RangeOccupied(video, audio, start, (sourceOut - sourceIn).Ticks);
+        return new SourceDropPlan(media, sourceIn, sourceOut, video, audio, primaryIsVideo, start, insert, blocked);
     }
 
-    /// <summary>Drops a planned media drag (<see cref="PlanSourceDrop"/>): an Overwrite of the range at the drop point,
-    /// or an Insert that pushes the destination and sync-locked tracks right. It's the same <see cref="ThreePointEdits"/>
-    /// builder as the <c>.</c> / <c>,</c> keys, so a drop never stacks an overlap (Premiere's drag behavior); the
-    /// sequence marks aren't used or cleared, and the playhead stays put.</summary>
+    /// <summary>Drops a planned media drag (<see cref="PlanSourceDrop"/>): a plain drop places the range at the drop
+    /// point but is <em>refused</em> when it would land on existing clips (never a silent overwrite — the guard is
+    /// <see cref="ClipPlacement.RangeOccupied"/>); a Ctrl/Cmd Insert pushes the destination and sync-locked tracks
+    /// right. The sequence marks aren't used or cleared, and the playhead stays put.</summary>
     private void DropSource(SourceDropPlan? plan)
     {
         if (plan is not { } drop)
             return;
+        if (drop.Blocked)
+        {
+            Status?.Invoke("Espaço ocupado — largue em espaço livre, ou prima Ctrl ao largar para inserir (empurra o que segue).");
+            return;
+        }
         var range = new ThreePointRange(drop.SourceIn, drop.SourceOut, new Timecode(drop.Start), []);
         ThreePointEditResult result = ThreePointEdits.Build(
             drop.Insert ? ThreePointEditKind.Insert : ThreePointEditKind.Overwrite, _project!.ActiveSequence,
@@ -3532,10 +3546,10 @@ public sealed class TimelineControl : Control
     }
 
     /// <summary>A planned media drop: the source range, the destination track per stream, the snapped start (ticks),
-    /// and Insert vs Overwrite.</summary>
+    /// Insert vs plain placement, and whether the plain drop is refused for landing on existing clips.</summary>
     private readonly record struct SourceDropPlan(
         MediaRef Media, Timecode SourceIn, Timecode SourceOut, VideoTrack? Video, AudioTrack? Audio,
-        bool PrimaryIsVideo, long Start, bool Insert)
+        bool PrimaryIsVideo, long Start, bool Insert, bool Blocked)
     {
         public long Duration => (SourceOut - SourceIn).Ticks;
     }

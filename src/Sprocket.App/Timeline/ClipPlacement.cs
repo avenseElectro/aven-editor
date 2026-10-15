@@ -48,6 +48,26 @@ public static class ClipPlacement
     }
 
     /// <summary>
+    /// Whether the range [<paramref name="startTicks"/>, startTicks + duration) would land on any existing clip of
+    /// either destination track — the Aven Editor drop guard: a plain (non-insert) drop is refused on an occupied
+    /// range, so dragging media in never silently overwrites existing content (a Ctrl/Cmd insert still pushes it
+    /// aside). Touching edges — the new clip butting exactly against a neighbour — is not occupancy.
+    /// </summary>
+    public static bool RangeOccupied(VideoTrack? video, AudioTrack? audio, long startTicks, long durationTicks)
+    {
+        long end = startTicks + durationTicks;
+        if (video is not null)
+            foreach (Clip clip in video.Clips)
+                if (clip.TimelineStart.Ticks < end && clip.TimelineEnd.Ticks > startTicks)
+                    return true;
+        if (audio is not null)
+            foreach (Clip clip in audio.Clips)
+                if (clip.TimelineStart.Ticks < end && clip.TimelineEnd.Ticks > startTicks)
+                    return true;
+        return false;
+    }
+
+    /// <summary>
     /// The source range a placement of <paramref name="media"/> uses (PLAN.md step 61 phase 2): its Source-monitor
     /// marks, each missing mark falling back to that end of the media — as Premiere does when a master clip with
     /// marks is dragged from the bin. A range that isn't positive (a stale mark past a relinked, shorter source)

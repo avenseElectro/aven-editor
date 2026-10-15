@@ -231,6 +231,40 @@ public class ClipPlacementTests
 
     // ── Timeline drops (PLAN.md step 61 phase 4) ─────────────────────────────────────────────────
 
+    private static Clip ClipAt(double startSeconds, double durationSeconds)
+    {
+        var media = Media(video: true, audio: false, durationSeconds: durationSeconds);
+        return new Clip(media.Id, Timecode.Zero, Timecode.FromSeconds(durationSeconds), Timecode.FromSeconds(startSeconds));
+    }
+
+    [Fact]
+    public void RangeOccupied_Detects_An_Overlap_On_Either_Stream()
+    {
+        var v = new VideoTrack();
+        v.Clips.Add(ClipAt(2, 3)); // ocupa 2s→5s
+        var a = new AudioTrack();
+
+        Assert.True(ClipPlacement.RangeOccupied(v, a, Timecode.FromSeconds(3).Ticks, Timecode.FromSeconds(1).Ticks));   // dentro
+        Assert.True(ClipPlacement.RangeOccupied(v, a, Timecode.FromSeconds(1).Ticks, Timecode.FromSeconds(2).Ticks));   // cruza o início
+        Assert.True(ClipPlacement.RangeOccupied(v, a, Timecode.FromSeconds(4).Ticks, Timecode.FromSeconds(2).Ticks));   // cruza o fim
+
+        a.Clips.Add(ClipAt(0, 1));
+        Assert.True(ClipPlacement.RangeOccupied(null, a, Timecode.FromSeconds(0).Ticks, Timecode.FromSeconds(1).Ticks)); // só a pista de áudio
+    }
+
+    [Fact]
+    public void RangeOccupied_Allows_Free_Space_And_Butting_Edges()
+    {
+        var v = new VideoTrack();
+        v.Clips.Add(ClipAt(2, 3)); // ocupa 2s→5s
+        var a = new AudioTrack();
+
+        Assert.False(ClipPlacement.RangeOccupied(v, a, Timecode.FromSeconds(0).Ticks, Timecode.FromSeconds(2).Ticks)); // antes, encosta no início
+        Assert.False(ClipPlacement.RangeOccupied(v, a, Timecode.FromSeconds(5).Ticks, Timecode.FromSeconds(2).Ticks)); // depois, encosta no fim
+        Assert.False(ClipPlacement.RangeOccupied(null, null, 0, 1_000_000));                                          // sem pistas
+    }
+
+
     private static (Sequence Seq, VideoTrack V1, VideoTrack V2, AudioTrack A1, AudioTrack A2) Sequence4()
     {
         var timeline = new Sprocket.Core.Model.Timeline(new Rational(30, 1), new Resolution(1920, 1080), 48000);
