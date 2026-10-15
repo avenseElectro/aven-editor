@@ -42,7 +42,7 @@ internal static class MediaBootstrap
     {
         string? path = mediaPath is not null && File.Exists(mediaPath) ? mediaPath : null;
         if (path is null)
-            return CreateEmpty(attemptedPath: null, error: null);
+            return CreateEmpty(attemptedPath: null, error: null, audioDevice);
         try
         {
             Project project = BuildProjectFromMedia(path);
@@ -50,7 +50,7 @@ internal static class MediaBootstrap
         }
         catch (Exception ex)
         {
-            return CreateEmpty(path, ex.Message);
+            return CreateEmpty(path, ex.Message, audioDevice);
         }
     }
 
@@ -138,14 +138,20 @@ internal static class MediaBootstrap
     /// normal launch state (no command-line file), and also the fallback when a command-line file could not be
     /// opened (the reason is then shown in the status line).
     /// </summary>
-    private static Result CreateEmpty(string? attemptedPath, string? error)
+    private static Result CreateEmpty(string? attemptedPath, string? error, string audioDevice = "")
     {
         var project = new Project(); // default 1080p / 30 fps / 48 kHz timeline
         project.Timeline.Tracks.Add(new VideoTrack { Name = "V1" });
         project.Timeline.Tracks.Add(new AudioTrack { Name = "A1" });
 
+        // Aven Editor (correção de áudio): wire the audio master clock over the empty project too. The
+        // mixer resolves PCM readers from the live project on demand, so media imported and placed after
+        // launch becomes audible right away. Before, the empty launch session kept a software clock
+        // forever — imported audio stayed silent until the project was saved and reopened.
+        (AudioEngine? clock, _) = TryCreateAudioClockForProject(project, audioDevice, requireAudioClips: false);
+
         var proxy = new ProxyService(project.Settings.UseProxies, project.Settings.ProxyTier);
-        var engine = new PlaybackEngine(project, (id, reverse) => OpenVideoFeed(project, id, proxy, reverse), (IMasterClock?)null)
+        var engine = new PlaybackEngine(project, (id, reverse) => OpenVideoFeed(project, id, proxy, reverse), clock)
         {
             AllowPlayheadPastEnd = true, // sequence timelines are open-ended past the last clip
         };
@@ -155,7 +161,7 @@ internal static class MediaBootstrap
         string status = attemptedPath is not null
             ? $"Não foi possível abrir {Path.GetFileName(attemptedPath)}: {error}  ·  abriu-se um projeto vazio — use Ficheiro ▸ Importar para adicionar multimédia"
             : "Novo projeto — use Ficheiro ▸ Importar para adicionar multimédia, ou Ficheiro ▸ Abrir Projeto de Exemplo para um clipe de demonstração";
-        return new Result(engine, project, status, proxy, Stab: new StabilizationService());
+        return new Result(engine, project, status, proxy, clock, new StabilizationService());
     }
 
     /// <summary>
@@ -196,15 +202,19 @@ internal static class MediaBootstrap
     /// reader per source on demand, so it already mixes N audio tracks; offline sources mix as silence (§15). Also
     /// builds the Source monitor's own clock over its one-clip project (PLAN.md step 61 phase 5).
     /// </summary>
-    internal static (AudioEngine? clock, bool audioWired) TryCreateAudioClockForProject(Project project, string audioDevice)
+    internal static (AudioEngine? clock, bool audioWired) TryCreateAudioClockForProject(
+        Project project, string audioDevice, bool requireAudioClips = true)
     {
         int sampleRate = project.Timeline.SampleRate > 0 ? project.Timeline.SampleRate : 48000;
         const int channels = 2; // stereo output; sources are up/downmixed at decode
 
-        bool hasAudio = project.Timeline.AudioTracks.Any(
-            t => t.Clips.Any(c => project.MediaPool.Get(c.MediaRefId) is { Info.HasAudio: true }));
-        if (!hasAudio)
-            return (null, false);
+        if (requireAudioClips)
+        {
+            bool hasAudio = project.Timeline.AudioTracks.Any(
+                t => t.Clips.Any(c => project.MediaPool.Get(c.MediaRefId) is { Info.HasAudio: true }));
+            if (!hasAudio)
+                return (null, false);
+        }
 
         OpenAlAudioOutput? output = null;
         try
@@ -216,10 +226,14 @@ internal static class MediaBootstrap
             output.Configure(sampleRate, channels, audioDevice);
             var engine = new AudioEngine(output, mixer, project); // the engine takes ownership
             engine.FeedError += ex => CrashLog.Write("Audio feeder error", ex); // don't let audio faults vanish
+            engine.OutputStatusChanged += status => CrashLog.Write($"Audio output status: {status}", null);
             return (engine, true);
         }
-        catch
+        catch (Exception ex)
         {
+            // Não deixar a causa morrer em silêncio: sem isto, o desaparecimento do áudio na reprodução
+            // é indistinguível de um mute (o vídeo continua com o relógio de software).
+            CrashLog.Write("Audio device init failed — falling back to silent software clock", ex);
             output?.Dispose();
             return (null, false); // degrade to the software clock; video still plays
         }
@@ -295,8 +309,9 @@ internal static class MediaBootstrap
         {
             return AudioSource.Open(media.AbsolutePath, sampleRate, channels);
         }
-        catch
+        catch (Exception ex)
         {
+            CrashLog.Write($"PCM reader open failed (mixed as silence): {media.AbsolutePath}", ex);
             return null;
         }
     }
