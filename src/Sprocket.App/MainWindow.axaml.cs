@@ -3137,6 +3137,10 @@ public partial class MainWindow : Window
 
         if (isVideoLane)
         {
+            // The Aven Editor per-segment framing/movement editor (approved spec): everything is staged in a
+            // throwaway preview inside the window; only «Aplicar» runs the returned command through history.
+            items.Add(Item("Editar recorte e movimento…", () => _ = ShowSegmentEditDialogAsync(clip),
+                _project is not null && _project.MediaPool.Get(clip.MediaRefId) is { Info.HasVideo: true }));
             items.Add(Item("Interpretar metragem…", InterpretSelectedClipFootage, SelectedClipVideoMedia() is not null));
 
             // Multicam (PLAN.md step 24): Create mirrors the Clip menu; on a multicam clip the angles are listed
@@ -3179,6 +3183,24 @@ public partial class MainWindow : Window
         menu.Closed += (_, _) => { if (ReferenceEquals(_clipContextMenu, menu)) _clipContextMenu = null; };
         _clipContextMenu = menu;
         menu.Open(timeline);
+    }
+
+    /// <summary>
+    /// Opens the «Editar recorte e movimento» window over one video clip. The window stages everything against
+    /// its own preview and returns the composite command only on «Aplicar» — this is the single place the real
+    /// project changes, as one undoable history entry; cancel paths never reach here.
+    /// </summary>
+    private async Task ShowSegmentEditDialogAsync(Clip clip)
+    {
+        if (_project is not { } project)
+            return;
+        IEditCommand? command = await SegmentEditWindow.Show(this, project, clip);
+        if (command is null)
+            return;
+        _history.Execute(command);
+        // A paused program monitor holds its last composite — re-seek so the applied framing shows immediately.
+        if (_program is { State: not PlaybackState.Playing } monitor)
+            monitor.SeekTo(monitor.Position);
     }
 
     /// <summary>
