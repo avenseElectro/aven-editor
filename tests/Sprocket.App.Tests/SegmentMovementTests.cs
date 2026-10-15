@@ -1,5 +1,6 @@
 using System.Linq;
 using Sprocket.App;
+using Sprocket.Core.Commands;
 using Sprocket.Core.Model;
 using Sprocket.Core.Timing;
 using Xunit;
@@ -169,5 +170,67 @@ public class SegmentMovementTests
                 new Keyframe(new Timecode(Second), 1.0),
             ]));
         Assert.False(SegmentMovement.IsIdentity(animated));
+    }
+
+    // ── Comando «Aplicar» (§9: vizinhos intactos, edição independente, Anular exato) ───────────
+
+    private static Clip ClipAt(double startSeconds, double durationSeconds)
+    {
+        var media = new MediaRef(MediaRefId.New(), "/tmp/clip.mp4",
+            new ProbedMediaInfo(Timecode.FromSeconds(8), true, new Rational(30, 1), 1920, 1080, false, 0, 0));
+        return new Clip(media.Id, Timecode.Zero, Timecode.FromSeconds(durationSeconds), Timecode.FromSeconds(startSeconds));
+    }
+
+    [Fact]
+    public void Apply_Touches_Only_The_Selected_Segment_And_Anular_Restores_Exactly()
+    {
+        Clip first = ClipAt(0, 4);
+        Clip second = ClipAt(4, 4);
+        var committed = new EffectInstance(EffectTypeIds.Transform).Set(EffectParamNames.Scale, 1.2);
+        first.Effects.Add(committed);
+
+        // o comando que a janela constrói em «Aplicar»: troca o Transform do segmento selecionado
+        long dur = 4 * Second;
+        EffectInstance staged = new EffectInstance(EffectTypeIds.Transform).Set(EffectParamNames.Scale,
+            SegmentMovement.Parameter(1.0, 1 / SegmentMovement.ZoomAmplitude(0.5), null, 0, dur, Second, 0, Interpolation.EaseInOut));
+        var history = new EditHistory();
+        history.Execute(new CompositeCommand("Editar recorte e movimento",
+            [new RemoveEffectCommand(first, committed), new AddEffectCommand(first, staged)]));
+
+        Assert.Same(staged, first.Effects.Single());
+        Assert.Equal(4 * Second, first.TimelineEnd.Ticks - first.TimelineStart.Ticks); // duração intacta
+        Assert.Empty(second.Effects);                                                 // vizinho intocado
+        Assert.Equal(4 * Second, second.TimelineStart.Ticks);
+
+        history.Undo(); // Anular restaura exatamente o estado anterior
+        Assert.Same(committed, first.Effects.Single());
+        Assert.Equal(1.2, committed.Parameters[EffectParamNames.Scale].Evaluate(Timecode.Zero));
+        Assert.Empty(second.Effects);
+    }
+
+    [Fact]
+    public void Consecutive_Segments_Carry_Independent_Movements()
+    {
+        Clip first = ClipAt(0, 4);
+        Clip second = ClipAt(4, 4);
+
+        // zoom in de entrada no primeiro, deslize para a direita no segundo — escalas de tempo absolutas distintas
+        EffectInstance a = new EffectInstance(EffectTypeIds.Transform).Set(EffectParamNames.Scale,
+            SegmentMovement.Parameter(1.0, 0.8, null, 0, 4 * Second, Second, 0, Interpolation.EaseInOut));
+        EffectInstance b = new EffectInstance(EffectTypeIds.Transform).Set(EffectParamNames.PositionX,
+            SegmentMovement.Parameter(0, null, SegmentMovement.PanAmplitude(0.5), 4 * Second, 4 * Second, 0, Second, Interpolation.EaseInOut));
+        var history = new EditHistory();
+        history.Execute(new CompositeCommand("Editar recorte e movimento", [new AddEffectCommand(first, a)]));
+        history.Execute(new CompositeCommand("Editar recorte e movimento", [new AddEffectCommand(second, b)]));
+
+        // cada segmento reproduz o seu próprio movimento nos seus próprios tempos
+        Assert.Equal(0.8, a.Parameters[EffectParamNames.Scale].Evaluate(new Timecode(0)));
+        Assert.Equal(1.0, a.Parameters[EffectParamNames.Scale].Evaluate(new Timecode(3 * Second)));
+        Assert.Equal(0.0, b.Parameters[EffectParamNames.PositionX].Evaluate(new Timecode(5 * Second)));
+        Assert.Equal(SegmentMovement.PanAmplitude(0.5), b.Parameters[EffectParamNames.PositionX].Evaluate(new Timecode(8 * Second)), 5);
+
+        history.Undo(); // desfaz o segundo; o primeiro mantém-se
+        Assert.Single(first.Effects);
+        Assert.Empty(second.Effects);
     }
 }
