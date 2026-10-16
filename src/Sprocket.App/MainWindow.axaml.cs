@@ -3110,6 +3110,8 @@ public partial class MainWindow : Window
             Item("_Velocidade / duração…", () => _ = ShowSpeedDialogAsync()),
             Item(timeline.SelectedClipReverse ? "Reproduzir para a frente" : "Inverter velocidade", timeline.ToggleSelectedReverse,
                 timeline.SelectedCanReverse),
+            new Separator(),
+            Item("Aplicar transições aleatórias…", () => _ = ShowRandomTransitionsDialogAsync(), _project is not null),
         };
 
         if (isVideoLane)
@@ -3199,6 +3201,31 @@ public partial class MainWindow : Window
             return;
         _history.Execute(command);
         // A paused program monitor holds its last composite — re-seek so the applied framing shows immediately.
+        if (_program is { State: not PlaybackState.Playing } monitor)
+            monitor.SeekTo(monitor.Position);
+    }
+
+    /// <summary>
+    /// Opens the «Aplicar transições aleatórias» options window (Etapa C): duration, allowed types and seed,
+    /// staged with a live assignment preview. «Aplicar» executes the whole plan as ONE composite — a single
+    /// Anular removes every transition it added; cuts that already carried a transition were never touched.
+    /// </summary>
+    private async Task ShowRandomTransitionsDialogAsync()
+    {
+        if (_project is not { } project)
+            return;
+        Rational fps = project.Timeline.FrameRate;
+        if (fps.Num <= 0)
+            return;
+        long frameTicks = Timecode.FromFrames(1, fps).Ticks;
+        IReadOnlyList<RandomTransitionAssignment>? assignments =
+            await RandomTransitionsDialog.Show(this, project.Timeline, frameTicks);
+        if (assignments is not { Count: > 0 })
+            return;
+
+        var commands = assignments.Select(a => new AddTransitionCommand(a.Track, a.ToTransition())).ToList();
+        _history.Execute(new CompositeCommand("Aplicar transições aleatórias", commands));
+        SetStatus($"{commands.Count} transições aleatórias aplicadas — um único Anular remove todas.");
         if (_program is { State: not PlaybackState.Playing } monitor)
             monitor.SeekTo(monitor.Position);
     }

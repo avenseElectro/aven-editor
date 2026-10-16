@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -15,6 +16,7 @@ using Avalonia.Platform;
 using Sprocket.Core.Model;
 using Sprocket.Core.Timing;
 using Sprocket.Export;
+using Sprocket.Render;
 
 namespace Sprocket.App;
 
@@ -714,6 +716,225 @@ internal static class SpeedDialog
 
         return dialog.ShowDialog<SpeedDialogResult?>(owner);
     }
+}
+
+/// <summary>
+/// The «Aplicar transições aleatórias» options window (Etapa C): the transition duration, which types may be
+/// drawn (a toggle per catalog entry — the emoji types included), and the RNG seed with a «Gerar de novo»
+/// re-roll, over a live preview listing the planned cut → transition assignment. The planning itself is
+/// <see cref="RandomTransitions"/>, recomputed on every option change; the window closes with the final
+/// assignment list (null on cancel), which the caller applies as one composite command.
+/// </summary>
+internal static class RandomTransitionsDialog
+{
+    public static Task<IReadOnlyList<RandomTransitionAssignment>?> Show(Window owner, Timeline timeline, long frameTicks)
+    {
+        var durationBox = new TextBox
+        {
+            Text = "0.5",
+            Width = 70,
+            Foreground = Palette.TextBrush,
+            Background = Palette.PanelBgBrush,
+        };
+        var seedBox = new TextBox
+        {
+            Width = 130,
+            Foreground = Palette.TextBrush,
+            Background = Palette.PanelBgBrush,
+        };
+        var reroll = new Button
+        {
+            Content = "Gerar de novo",
+            Padding = new Thickness(10, 4),
+            Foreground = Palette.TextBrush,
+            Background = Palette.PanelBgBrush,
+            CornerRadius = new CornerRadius(4),
+        };
+
+        // One toggle per catalog type, all on by default; Avalonia 12 ToggleButtons expose state via Click + IsChecked.
+        var toggles = new List<(ToggleButton Button, string Id)>();
+        var typeRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+        foreach (TransitionDescriptor descriptor in TransitionCatalog.BuiltIns)
+        {
+            var toggle = new ToggleButton
+            {
+                Content = descriptor.DisplayName,
+                IsChecked = true,
+                Padding = new Thickness(10, 4),
+                Foreground = Palette.TextBrush,
+                Background = Palette.PanelBgBrush,
+                CornerRadius = new CornerRadius(4),
+            };
+            toggles.Add((toggle, descriptor.Id));
+            typeRow.Children.Add(toggle);
+        }
+
+        var summary = new TextBlock { Foreground = Palette.MutedTextBrush, FontSize = Typography.Caption, TextWrapping = TextWrapping.Wrap };
+        var previewList = new StackPanel { Spacing = 2 };
+        var ok = new Button
+        {
+            Content = "Aplicar",
+            Padding = new Thickness(16, 5),
+            Foreground = Brushes.White,
+            Background = Palette.AccentBrush,
+            CornerRadius = new CornerRadius(5),
+        };
+        var cancel = new Button
+        {
+            Content = "Cancelar",
+            Padding = new Thickness(16, 5),
+            Foreground = Palette.TextBrush,
+            Background = Palette.PanelBgBrush,
+            CornerRadius = new CornerRadius(5),
+        };
+
+        var dialog = new Window
+        {
+            Title = "Aplicar transições aleatórias",
+            Icon = AppIcon.Window,
+            Width = 480,
+            Height = 540,
+            CanResize = false,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Background = Palette.WindowBgBrush,
+            Content = new DockPanel
+            {
+                Margin = new Thickness(22),
+                Children =
+                {
+                    new StackPanel
+                    {
+                        [DockPanel.DockProperty] = Dock.Bottom,
+                        Orientation = Orientation.Horizontal,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        Spacing = 8,
+                        Margin = new Thickness(0, 16, 0, 0),
+                        Children = { cancel, ok },
+                    },
+                    new StackPanel
+                    {
+                        Spacing = 6,
+                        Children =
+                        {
+                            new TextBlock { Text = "Duração de cada transição", Foreground = Palette.MutedTextBrush, FontSize = Typography.Body },
+                            new StackPanel
+                            {
+                                Orientation = Orientation.Horizontal,
+                                Spacing = 6,
+                                Children =
+                                {
+                                    durationBox,
+                                    new TextBlock { Text = "segundos", Foreground = Palette.TextBrush, VerticalAlignment = VerticalAlignment.Center },
+                                },
+                            },
+                            new TextBlock
+                            {
+                                Text = "Tipos a sortear",
+                                Foreground = Palette.MutedTextBrush,
+                                FontSize = Typography.Body,
+                                Margin = new Thickness(0, 8, 0, 0),
+                            },
+                            typeRow,
+                            new TextBlock
+                            {
+                                Text = "Semente",
+                                Foreground = Palette.MutedTextBrush,
+                                FontSize = Typography.Body,
+                                Margin = new Thickness(0, 8, 0, 0),
+                            },
+                            new StackPanel
+                            {
+                                Orientation = Orientation.Horizontal,
+                                Spacing = 6,
+                                Children = { seedBox, reroll },
+                            },
+                            new TextBlock
+                            {
+                                Text = "Pré-visualização",
+                                Foreground = Palette.MutedTextBrush,
+                                FontSize = Typography.Body,
+                                Margin = new Thickness(0, 8, 0, 0),
+                            },
+                            summary,
+                            new ScrollViewer { MaxHeight = 210, Content = previewList },
+                        },
+                    },
+                },
+            },
+        };
+
+        ulong seed = (ulong)Random.Shared.NextInt64();
+        IReadOnlyList<RandomTransitionAssignment> current = [];
+
+        void Refresh(bool rewriteSeed)
+        {
+            if (rewriteSeed)
+                seedBox.Text = seed.ToString(CultureInfo.InvariantCulture);
+            previewList.Children.Clear();
+            if (!double.TryParse(durationBox.Text.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out double seconds)
+                || seconds <= 0)
+            {
+                summary.Text = "Duração inválida — introduza os segundos (ex.: 0.5).";
+                ok.IsEnabled = false;
+                return;
+            }
+            List<string> allowed = toggles.Where(t => t.Button.IsChecked == true).Select(t => t.Id).ToList();
+            if (allowed.Count == 0)
+            {
+                summary.Text = "Escolha pelo menos um tipo de transição.";
+                ok.IsEnabled = false;
+                return;
+            }
+
+            current = RandomTransitions.Build(
+                timeline, Timecode.FromSeconds(seconds), allowed, seed, frameTicks, EmojiAssets.Bundled);
+            summary.Text = current.Count == 0
+                ? "Sem cortes elegíveis — só cortes entre clips adjacentes e ainda sem transição recebem uma."
+                : $"{current.Count} transições a aplicar:";
+            foreach (RandomTransitionAssignment a in current)
+            {
+                string track = string.IsNullOrEmpty(a.Track.Name) ? "pista" : a.Track.Name;
+                previewList.Children.Add(new TextBlock
+                {
+                    Text = $"{FormatCut(a.CutPoint)} · {track} — {TransitionCatalog.DisplayName(a.TransitionTypeId)}"
+                        + (a.Emoji is null ? "" : $" {a.Emoji}"),
+                    Foreground = Palette.TextBrush,
+                    FontSize = Typography.Body,
+                });
+            }
+            ok.IsEnabled = current.Count > 0;
+        }
+
+        reroll.Click += (_, _) => { seed = (ulong)Random.Shared.NextInt64(); Refresh(rewriteSeed: true); };
+        foreach ((ToggleButton button, _) in toggles)
+            button.Click += (_, _) => Refresh(rewriteSeed: false);
+        durationBox.TextChanged += (_, _) => Refresh(rewriteSeed: false);
+        // Typing a seed re-plans with it (reproducing a liked draw); an unparseable seed just disables Aplicar.
+        seedBox.TextChanged += (_, _) =>
+        {
+            if (ulong.TryParse(seedBox.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out ulong typed))
+            {
+                seed = typed;
+                Refresh(rewriteSeed: false);
+            }
+            else
+            {
+                previewList.Children.Clear();
+                summary.Text = "Semente inválida.";
+                ok.IsEnabled = false;
+            }
+        };
+
+        ok.Click += (_, _) => dialog.Close(current);
+        cancel.Click += (_, _) => dialog.Close(null);
+
+        Refresh(rewriteSeed: true);
+        return dialog.ShowDialog<IReadOnlyList<RandomTransitionAssignment>?>(owner);
+    }
+
+    private static string FormatCut(Timecode t) =>
+        TimeSpan.FromTicks((long)(t.Ticks * 1e7 / Timecode.TicksPerSecond))
+            .ToString("m\\:ss\\.f", CultureInfo.InvariantCulture);
 }
 
 /// <summary>
