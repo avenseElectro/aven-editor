@@ -46,7 +46,7 @@ public sealed class McpServerHost : IAsyncDisposable
         _bearerToken = string.IsNullOrEmpty(bearerToken) ? null : bearerToken;
         _session = session;
         // One tool set for the host's lifetime, bound to the live session through a swap-safe proxy.
-        _tools = new SprocketTools(new CurrentSession(session)).BuildTools();
+        _tools = new SprocketTools(new ResolvingSession(session)).BuildTools();
     }
 
     /// <summary>The endpoint URL clients connect to.</summary>
@@ -234,15 +234,5 @@ public sealed class McpServerHost : IAsyncDisposable
             await loop.ConfigureAwait(false);
         _listener?.Close();
         _shutdown.Dispose();
-    }
-
-    /// <summary>Delegates to whichever editor session is currently attached, so File ▸ New/Open (which
-    /// rebuilds the window and its session) never invalidates the host or its tool collection.</summary>
-    private sealed class CurrentSession(Func<IEditorSession?> resolve) : IEditorSession
-    {
-        public Task<T> OnModelThreadAsync<T>(Func<IEditorApi, T> fn) =>
-            resolve() is { } session
-                ? session.OnModelThreadAsync(fn)
-                : throw new McpException("no project session is available — retry shortly.");
     }
 }
