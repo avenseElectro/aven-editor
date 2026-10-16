@@ -180,13 +180,16 @@ internal sealed record TrackDto(
     bool? Locked = null);
 
 /// <summary>A transition on a cut (PLAN.md step 25): its type id, the cut it sits on, its length, alignment, and
-/// any type parameters (null when there are none — the v1 built-ins).</summary>
+/// any type parameters (null when there are none — the v1 built-ins). String attributes (e.g. an emoji
+/// transition's glyph) are additive + nullable: a transition without them serializes byte-identically and
+/// pre-emoji files load with none.</summary>
 internal sealed record TransitionDto(
     string TransitionTypeId,
     long CutPointTicks,
     long DurationTicks,
     TransitionAlignment Alignment,
-    Dictionary<string, AnimatableValueDto>? Parameters = null);
+    Dictionary<string, AnimatableValueDto>? Parameters = null,
+    Dictionary<string, string>? Strings = null);
 
 internal enum TrackKind
 {

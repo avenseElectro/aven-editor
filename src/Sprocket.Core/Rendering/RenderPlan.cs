@@ -183,17 +183,25 @@ public sealed record VideoLayer(
 /// <param name="Parameters">Type parameters, evaluated at the frame's time (empty for the v1 built-ins).</param>
 /// <param name="From">The outgoing clip's resolved layer (shown at progress 0).</param>
 /// <param name="To">The incoming clip's resolved layer (shown at progress 1).</param>
+/// <param name="Strings">The transition's string attributes, passed through unevaluated (null when it has none).</param>
 public sealed record ResolvedTransition(
     string TransitionTypeId,
     double Progress,
     IReadOnlyDictionary<string, double> Parameters,
     VideoLayer From,
-    VideoLayer To)
+    VideoLayer To,
+    IReadOnlyDictionary<string, string>? Strings = null)
 {
+    private static readonly IReadOnlyDictionary<string, string> NoStrings = new Dictionary<string, string>();
+
     /// <summary>Gets a parameter value, or <paramref name="fallback"/> if it is not set or not finite (see
     /// <see cref="ResolvedEffect.Get"/>).</summary>
     public double Get(string name, double fallback = 0) =>
         Parameters.TryGetValue(name, out double value) && double.IsFinite(value) ? value : fallback;
+
+    /// <summary>Gets a string attribute, or <paramref name="fallback"/> if it is not set or empty.</summary>
+    public string GetString(string name, string fallback = "") =>
+        (Strings ?? NoStrings).TryGetValue(name, out string? value) && !string.IsNullOrEmpty(value) ? value : fallback;
 }
 
 /// <summary>

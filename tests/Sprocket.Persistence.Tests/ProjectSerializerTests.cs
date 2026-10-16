@@ -245,6 +245,30 @@ public class ProjectSerializerTests
     }
 
     [Fact]
+    public void Round_Trips_Transition_String_Attributes()
+    {
+        var timeline = new Timeline(new Rational(30, 1), new Resolution(1920, 1080), 48000);
+        var project = new Project(timeline);
+        var track = new VideoTrack { Name = "V1" };
+        var spec = new GeneratorSpec(GeneratorTypeIds.SolidColor);
+        track.Clips.Add(Clip.CreateGenerator(spec, Timecode.FromSeconds(2), Timecode.Zero));
+        track.Clips.Add(Clip.CreateGenerator(spec, Timecode.FromSeconds(2), Timecode.FromSeconds(2)));
+
+        // com atributos de texto (a transição emoji guarda o glifo aqui) — sobrevivem à viagem
+        track.Transitions.Add(new Transition(TransitionTypeIds.CrossDissolve, Timecode.FromSeconds(2), Timecode.FromSeconds(1))
+            .SetString("emoji", "🔥"));
+        // sem atributos: serializa o campo nulo — a forma exata que os ficheiros pré-emoji têm
+        track.Transitions.Add(new Transition(TransitionTypeIds.Wipe, Timecode.FromSeconds(2), Timecode.FromSeconds(1)));
+        timeline.Tracks.Add(track);
+
+        List<Transition> loaded = RoundTrip(project).Timeline.VideoTracks.First().Transitions;
+        Assert.Equal(2, loaded.Count);
+        Assert.Equal("🔥", loaded[0].GetString("emoji"));
+        Assert.Equal("", loaded[0].GetString("inexistente"));
+        Assert.Empty(loaded[1].Strings); // ficheiros antigos carregam com as strings vazias
+    }
+
+    [Fact]
     public void Round_Trips_Custom_Bezier_Handles()
     {
         // The step-16d custom velocity handles serialize as nullable additive fields (no schema bump).

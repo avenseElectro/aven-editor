@@ -324,7 +324,8 @@ public static class ProjectSerializer
         var list = new List<TransitionDto>(transitions.Count);
         foreach (Transition t in transitions)
             list.Add(new TransitionDto(
-                t.TransitionTypeId, t.CutPoint.Ticks, t.Duration.Ticks, t.Alignment, ToParameterDict(t.Parameters)));
+                t.TransitionTypeId, t.CutPoint.Ticks, t.Duration.Ticks, t.Alignment, ToParameterDict(t.Parameters),
+                t.Strings.Count == 0 ? null : new Dictionary<string, string>(t.Strings)));
         return list;
     }
 
@@ -579,6 +580,9 @@ public static class ProjectSerializer
         if (t.Parameters is { } parameters)
             foreach ((string name, AnimatableValueDto value) in parameters)
                 transition.Set(name, FromDto(value));
+        if (t.Strings is { } strings)
+            foreach ((string name, string value) in strings)
+                transition.SetString(name, value);
         return transition;
     }
 

@@ -88,6 +88,11 @@ public sealed class Transition
     /// the v1 built-ins.</summary>
     public Dictionary<string, AnimatableValue> Parameters { get; } = new();
 
+    /// <summary>String attributes by name (e.g. an emoji transition's glyph) — the same shape
+    /// <see cref="GeneratorSpec"/> strings use, for parameterised types that need non-numeric data. Not
+    /// time-evaluated, so the render graph passes them through as-is.</summary>
+    public Dictionary<string, string> Strings { get; } = new();
+
     /// <summary>The inclusive timeline time the transition begins (where it shows the full outgoing clip).</summary>
     public Timecode Start => Alignment switch
     {
@@ -127,6 +132,17 @@ public sealed class Transition
     public Transition Set(string name, AnimatableValue value)
     {
         Parameters[name] = value;
+        return this;
+    }
+
+    /// <summary>Gets a string attribute, or <paramref name="fallback"/> when it is not set or empty.</summary>
+    public string GetString(string name, string fallback = "") =>
+        Strings.TryGetValue(name, out string? value) && !string.IsNullOrEmpty(value) ? value : fallback;
+
+    /// <summary>Sets a string attribute (fluent).</summary>
+    public Transition SetString(string name, string value)
+    {
+        Strings[name] = value;
         return this;
     }
 }

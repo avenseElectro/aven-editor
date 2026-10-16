@@ -259,7 +259,8 @@ public static class RenderGraph
             return null; // a side resolved to nothing — render normally rather than blending against emptiness
 
         IReadOnlyDictionary<string, double> values = ResolveTransitionParams(transition, t);
-        var resolved = new ResolvedTransition(transition.TransitionTypeId, transition.ProgressAt(t), values, from, to);
+        IReadOnlyDictionary<string, string>? strings = transition.Strings.Count == 0 ? null : transition.Strings;
+        var resolved = new ResolvedTransition(transition.TransitionTypeId, transition.ProgressAt(t), values, from, to, strings);
         return new VideoLayer(default, default, [], track.Opacity, track.BlendMode, LayerKind.Transition, Transition: resolved);
     }
 

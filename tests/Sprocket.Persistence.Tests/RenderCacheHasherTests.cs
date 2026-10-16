@@ -53,6 +53,30 @@ public class RenderCacheHasherTests
         Assert.Equal(before, VideoHash(p));
     }
 
+    /// <summary>Dois clips adjacentes com uma transição no corte aos 2 s (janela [1.5 s, 2.5 s), dentro do alcance).</summary>
+    private static Project BuildTransitionProject()
+    {
+        Project p = BuildProject();
+        VideoTrack video = p.Timeline.VideoTracks.First();
+        var spec = new GeneratorSpec(GeneratorTypeIds.SolidColor).SetString(GeneratorParamNames.Color, "#FF203040");
+        video.Clips[0] = Clip.CreateGenerator(spec, Timecode.FromSeconds(2), Timecode.Zero);
+        video.Clips.Insert(1, Clip.CreateGenerator(spec, Timecode.FromSeconds(2), Timecode.FromSeconds(2)));
+        video.Transitions.Add(new Transition(TransitionTypeIds.CrossDissolve, Timecode.FromSeconds(2), Timecode.FromSeconds(1)));
+        return p;
+    }
+
+    [Fact]
+    public void Transition_String_Attributes_Change_The_Video_Hash()
+    {
+        // o glifo de uma transição emoji muda o renderizado → tem de mudar o hash da cache
+        Project p = BuildTransitionProject();
+        string before = VideoHash(p);
+        p.Timeline.VideoTracks.First().Transitions[0].SetString("emoji", "🔥");
+        string after = VideoHash(p);
+        Assert.NotEqual(before, after);
+        Assert.Equal(after, VideoHash(p)); // e continua estável para o mesmo modelo
+    }
+
     [Fact]
     public void Track_Editing_State_Does_Not_Change_The_Hash()
     {
