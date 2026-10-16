@@ -79,7 +79,8 @@ frames never touch the managed heap per frame.
 - **Generators, titles, adjustment layers & transitions** — title/text generator clips (including
   scrolling titles), procedural atmospherics (smoke, fog, dust, embers, sparks, light leaks),
   adjustment layers whose effect stacks apply to everything beneath, and a transition library with
-  overlapping-clip resolution.
+  overlapping-clip resolution — including emoji transitions (zoom cover / silhouette reveal) and an
+  apply-random-transitions pass over every cut, plus emoji stickers as still overlays.
 - **Audio** — sample-accurate mixer with per-clip gain envelopes, per-track gain/pan/mute/solo,
   built-in audio effects on insert chains at clip / track / bus / master scope, loudness metering &
   normalization, and a master limiter. **Audio is the master clock** for A/V sync.
