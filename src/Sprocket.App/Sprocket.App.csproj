@@ -65,6 +65,7 @@
     <PackageReference Include="Avalonia" Version="12.1.1" />
     <PackageReference Include="Avalonia.Desktop" Version="12.1.1" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.13" />
 
     <!-- Installer + auto-update runtime (PLAN.md step 36). Keep in lock-step with the `vpk` CLI version
          pinned in scripts/release.ps1 ($VpkVersion) and installed by .github/workflows/release.yml —
