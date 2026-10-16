@@ -83,6 +83,28 @@ public sealed class LooksTests
     }
 
     [Fact]
+    public void BlackWhite_And_Sepia_Are_The_Simple_Monochrome_Presets()
+    {
+        // Etapa C: os dois presets simples do grupo «Limpo» — dessaturação pura, e dessaturação aquecida.
+        Look bw = LooksCatalog.Find("builtin.look.black-white")!;
+        Look sepia = LooksCatalog.Find("builtin.look.sepia")!;
+        Assert.NotNull(bw);
+        Assert.NotNull(sepia);
+        Assert.Equal("Limpo", bw.Group);
+        Assert.Equal("Limpo", sepia.Group);
+
+        LookEntry bwColor = Assert.Single(bw.Entries);
+        Assert.Equal(EffectTypeIds.Color, bwColor.EffectTypeId);
+        Assert.Equal(0.0, bwColor.Values[EffectParamNames.Saturation]);
+
+        Assert.Equal([EffectTypeIds.Color, EffectTypeIds.WhiteBalance, EffectTypeIds.ColorWheels],
+            sepia.Entries.Select(e => e.EffectTypeId));
+        Assert.Equal(0.0, sepia.Entries[0].Values[EffectParamNames.Saturation]);
+        Assert.Equal(25, sepia.Entries[1].Values[EffectParamNames.Temperature]);
+        Assert.Equal(0.06, sepia.Entries[2].Values[EffectParamNames.GainR]);
+    }
+
+    [Fact]
     public void CreativeLut_Is_A_Color_Effect_With_A_Cube_Asset_And_Intensity()
     {
         EffectDescriptor d = EffectCatalog.Find(EffectTypeIds.CreativeLut)!;

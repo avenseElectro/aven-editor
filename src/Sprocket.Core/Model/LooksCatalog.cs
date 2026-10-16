@@ -113,6 +113,14 @@ public static class LooksCatalog
             Wheels(gammaG: 0.05)),
 
         // ── Clean ──
+        Make("black-white", "Preto e branco", "Limpo",
+            "Monocromático puro: toda a cor retirada e um leve acréscimo de contraste.",
+            Color(saturation: 0, contrast: 1.05)),
+        Make("sepia", "Sépia", "Limpo",
+            "O tom quente das fotografias antigas: monocromático sobre uma base amarelada.",
+            Color(saturation: 0),
+            WhiteBalance(temperature: 25),
+            Wheels(gainR: 0.06, gainG: 0.02, gainB: -0.08)),
         Make("natural-punch", "Força Natural", "Limpo",
             "Um ligeiro realce para imagens planas: um toque de contraste e vividez, nada estilizado.",
             Color(contrast: 1.1, vibrance: 0.25),
