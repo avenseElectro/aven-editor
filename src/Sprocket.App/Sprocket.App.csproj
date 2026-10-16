@@ -48,6 +48,9 @@
     <Content Include="Samples\sample.mp4" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Samples\runner.mp3" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Samples\sample.sprocket.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Emoji sticker PNGs (same Twemoji-derived assets the Render project embeds): loose files so a click in
+         the «Autocolantes» tab imports them as ordinary Still media by filesystem path. -->
+    <Content Include="Samples\Stickers\*.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- The third-party notices doc (PLAN.md step 36a), copied next to the exe so it ships in every release

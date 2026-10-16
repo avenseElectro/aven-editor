@@ -63,6 +63,7 @@ created for this project and carries no third-party license.
 |---|---|---|
 | **DJI D-Log / D-Log M → Rec.709 LUTs** | © DJI, distributed free of charge by DJI for grading DJI footage | Downloaded from DJI's Download Center for the input color-transform effect (PLAN.md step 37). Details: [`src/Sprocket.Render/Luts/NOTICE.md`](src/Sprocket.Render/Luts/NOTICE.md). |
 | **Sample clip** (`src/Sprocket.App/Samples/sample.mp4`, used by File ▸ Open Sample Project) | [Pixabay Content License](https://pixabay.com/service/license-summary/) | "Rain, Heavy Rain, Crowd, People" — <https://pixabay.com/videos/rain-heavy-rain-crowd-people-339586/>. Free to use per Pixabay's license; credited here as good practice. |
+| **Emoji glyph PNGs** (`src/Sprocket.Render/Assets/Emoji/`, `src/Sprocket.App/Samples/Stickers/`) | [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 512×512 transparent PNGs rasterised once from the [Twemoji](https://github.com/jdecked/twemoji) SVG set (the maintained `jdecked/twemoji` fork) for the emoji transitions and the «Autocolantes» sticker tab. © Twitter/X and other Twemoji contributors, graphics licensed CC-BY 4.0. |
 
 ## User-installed plugins
 

@@ -35,6 +35,11 @@
          .cube files (see Luts/NOTICE.md), decoded once into packed GPU textures by ColorLuts for the
          builtin.colortransform input transform — the same embed-for-determinism rationale as the fonts. -->
     <EmbeddedResource Include="Luts\*.cube" />
+    <!-- Bundled emoji glyphs (Etapa C): 512×512 transparent PNGs rasterised once from the Twemoji
+         SVG set (CC-BY 4.0, see THIRD-PARTY-NOTICES.md) so the emoji transitions/stickers render
+         byte-identically across OSes — no system emoji font is ever consulted. EmojiAssets decodes
+         them once into cached SKImages. -->
+    <EmbeddedResource Include="Assets\Emoji\*.png" />
   </ItemGroup>
 
   <ItemGroup>
