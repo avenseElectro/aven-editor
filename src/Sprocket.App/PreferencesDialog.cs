@@ -154,6 +154,66 @@ internal static class PreferencesDialog
         mcpEnabled.IsCheckedChanged += (_, _) => RefreshMcpControls();
         RefreshMcpControls();
 
+        // ── AI assistant (Etapa D) ───────────────────────────────────────────────────────────────
+        // The API key never flows through UserSettings: "Guardar/Remover chave" act immediately on the
+        // DPAPI-encrypted store (the same act-now contract as the cache buttons), so Cancel cannot leave
+        // a half-saved key and OK only ever persists provider + models.
+        var providerLabels = new List<string> { "Desativado", "Google Gemini (AI Studio)", "GLM (Z.ai)" };
+        var providerIds = new List<string> { "none", Ai.SecretStore.Gemini, Ai.SecretStore.Glm };
+        var providerBox = new ComboBox
+        {
+            ItemsSource = providerLabels,
+            SelectedIndex = Math.Max(0, providerIds.IndexOf(current.AiProvider)),
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            Foreground = Palette.TextBrush,
+            Background = Palette.PanelBgBrush,
+            FontSize = Typography.Body,
+        };
+        TextBox geminiModel = MakeText(current.AiGeminiModel);
+        TextBox glmModel = MakeText(current.AiGlmModel);
+        TextBox keyBox = MakeText("");
+        keyBox.PasswordChar = '•';
+        keyBox.PlaceholderText = "Cole aqui a chave API";
+        Button saveKey = SmallButton("Guardar chave");
+        Button removeKey = SmallButton("Remover chave");
+        StackPanel geminiModelRow = Labeled("Modelo do Gemini", geminiModel);
+        StackPanel glmModelRow = Labeled("Modelo do GLM", glmModel);
+        var keyButtons = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            Children = { saveKey, removeKey },
+        };
+        TextBlock keyState = Hint("");
+        TextBlock keyWhere = Hint(
+            "Onde obter a chave: Gemini em aistudio.google.com/app/apikey (subscrição Google AI Pro); " +
+            "GLM em z.ai, secção de chaves de API (plano GLM Coding Plan). A chave é guardada encriptada " +
+            "neste computador (DPAPI do Windows) e nunca em texto simples.");
+        var keyArea = new StackPanel
+        {
+            Spacing = 8,
+            Children = { Labeled("Chave API", keyBox), keyButtons, keyState, keyWhere },
+        };
+
+        string CurrentProvider() => providerIds[providerBox.SelectedIndex > 0 ? providerBox.SelectedIndex : 0];
+
+        void RefreshAiControls()
+        {
+            string provider = CurrentProvider();
+            bool persisted = OperatingSystem.IsWindows();
+            geminiModelRow.IsVisible = provider == Ai.SecretStore.Gemini;
+            glmModelRow.IsVisible = provider == Ai.SecretStore.Glm;
+            keyArea.IsVisible = provider != "none";
+            saveKey.IsEnabled = persisted;
+            removeKey.IsEnabled = persisted;
+            keyState.Text = !persisted
+                ? "Guardar chaves não é suportado neste sistema — o assistente não as pode memorizar."
+                : Ai.SecretStore.HasKey(provider) ? "Chave guardada." : "Sem chave guardada.";
+        }
+
+        providerBox.SelectionChanged += (_, _) => RefreshAiControls();
+        RefreshAiControls();
+
         // ── Buttons ─────────────────────────────────────────────────────────────────────────────
         var ok = new Button
         {
@@ -177,7 +237,7 @@ internal static class PreferencesDialog
             Title = "Preferências",
             Icon = AppIcon.Window,
             Width = 474,
-            Height = 640,
+            Height = 700,
             CanResize = false,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             Background = Palette.WindowBgBrush,
@@ -241,6 +301,14 @@ internal static class PreferencesDialog
                                 tokenText,
                                 copySetup,
                                 mcpWarning,
+
+                                Section("Assistente de IA"),
+                                Labeled("Fornecedor", providerBox),
+                                Hint("O assistente propõe um plano de edição a partir de um pedido em palavras; " +
+                                    "nada é executado sem a sua aprovação e um Ctrl+Z anula tudo."),
+                                geminiModelRow,
+                                glmModelRow,
+                                keyArea,
                             },
                         },
                     },
@@ -295,6 +363,31 @@ internal static class PreferencesDialog
                 await clipboard.SetValueAsync(DataFormat.Text, command);
         };
 
+        saveKey.Click += (_, _) =>
+        {
+            string provider = CurrentProvider();
+            if (provider == "none" || !OperatingSystem.IsWindows())
+                return;
+            string key = keyBox.Text?.Trim() ?? "";
+            if (key.Length == 0)
+            {
+                keyState.Text = "Cole a chave na caixa antes de guardar.";
+                return;
+            }
+            Ai.SecretStore.Set(provider, key);
+            keyBox.Text = "";
+            RefreshAiControls();
+        };
+
+        removeKey.Click += (_, _) =>
+        {
+            string provider = CurrentProvider();
+            if (provider == "none" || !OperatingSystem.IsWindows())
+                return;
+            Ai.SecretStore.Remove(provider);
+            RefreshAiControls();
+        };
+
         ok.Click += (_, _) => dialog.Close(UserSettingsStore.Clamp(current with
         {
             ExportTitle = title.Text ?? "",
@@ -311,6 +404,9 @@ internal static class PreferencesDialog
             McpPort = PreferencesFormat.ParsePort(port.Text) ?? current.McpPort,
             McpRequireToken = requireToken.IsChecked == true,
             McpToken = token,
+            AiProvider = CurrentProvider(),
+            AiGeminiModel = geminiModel.Text ?? "",
+            AiGlmModel = glmModel.Text ?? "",
             UpdateCheckEnabled = updatesEnabled.IsChecked == true,
             AudioOutputDevice = deviceSpecs[audioDevice.SelectedIndex >= 0 ? audioDevice.SelectedIndex : 0],
         }));

@@ -285,4 +285,55 @@ public class UserSettingsStoreTests
         Assert.Equal(43, a.Length); // 32 bytes → 43 base64url chars, unpadded
         Assert.Matches("^[A-Za-z0-9_-]+$", a);
     }
+
+    [Fact]
+    public void Ai_Assistant_Fields_Round_Trip()
+    {
+        var settings = new UserSettings(
+            AiProvider: "gemini", AiGeminiModel: "gemini-2.5-pro", AiGlmModel: "glm-4.7", AiMaxPlanSteps: 7);
+        Assert.Equal(settings, UserSettingsStore.Deserialize(UserSettingsStore.Serialize(settings)));
+    }
+
+    [Fact]
+    public void Ai_Assistant_Fields_Default_Off_With_Stock_Models()
+    {
+        // Fresh install and an old settings file written before the fields existed both mean "off".
+        Assert.Equal("none", new UserSettings().AiProvider);
+        Assert.Equal("gemini-2.5-flash", new UserSettings().AiGeminiModel);
+        Assert.Equal("glm-4.6", new UserSettings().AiGlmModel);
+        Assert.Equal(20, new UserSettings().AiMaxPlanSteps);
+        UserSettings old = UserSettingsStore.Deserialize("""{"McpEnabled": true}""");
+        Assert.Equal("none", old.AiProvider);
+        Assert.Equal(20, old.AiMaxPlanSteps);
+    }
+
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(-3, 1)]
+    [InlineData(999, 50)]
+    [InlineData(12, 12)]
+    public void Clamp_Bounds_The_Plan_Step_Limit(int stored, int expected) =>
+        Assert.Equal(expected, UserSettingsStore.Clamp(new UserSettings(AiMaxPlanSteps: stored)).AiMaxPlanSteps);
+
+    [Fact]
+    public void Clamp_Normalizes_Blank_Model_Names_To_The_Stock_Models()
+    {
+        UserSettings s = UserSettingsStore.Clamp(new UserSettings(AiGeminiModel: "  ", AiGlmModel: null!));
+        Assert.Equal("gemini-2.5-flash", s.AiGeminiModel);
+        Assert.Equal("glm-4.6", s.AiGlmModel);
+    }
+
+    [Theory]
+    [InlineData("gemini", "gemini")]
+    [InlineData("glm", "glm")]
+    [InlineData("GEMINI", "none")] // exact ids only — hand-edited variants degrade to off, never crash
+    [InlineData("openai", "none")]
+    [InlineData("", "none")]
+    [InlineData(null, "none")]
+    public void ParseAiProvider_Maps_Ids_And_Falls_Back_To_None(string? stored, string expected) =>
+        Assert.Equal(expected, UserSettingsStore.ParseAiProvider(stored));
+
+    [Fact]
+    public void Clamp_Normalizes_An_Unknown_Provider_To_None() =>
+        Assert.Equal("none", UserSettingsStore.Clamp(new UserSettings(AiProvider: "skynet")).AiProvider);
 }

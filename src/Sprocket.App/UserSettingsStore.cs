@@ -54,6 +54,12 @@ namespace Sprocket.App;
 /// habit carried across every project (as Premiere's snap toggle is), never stored in a project file.</param>
 /// <param name="TimelineLinked">The timeline toolbar's Linked (linked selection) toggle, persisted the same way
 /// as <paramref name="TimelineSnapping"/>.</param>
+/// <param name="AiProvider">The in-app assistant's provider (Etapa D): "none" (off) or a
+/// <see cref="Sprocket.App.Ai.SecretStore"/> provider id ("gemini" / "glm"). The API key itself never lives
+/// here — it goes to the DPAPI-encrypted <see cref="Sprocket.App.Ai.SecretStore"/>.</param>
+/// <param name="AiGeminiModel">The Gemini model id the assistant uses (Google AI Pro's included quota).</param>
+/// <param name="AiGlmModel">The GLM model id the assistant uses (Z.ai GLM Coding Plan).</param>
+/// <param name="AiMaxPlanSteps">Upper bound on steps per assistant plan; bigger asks must be simplified.</param>
 public sealed record UserSettings(
     string ExportTitle = "{project}",
     string ExportAuthor = "{username}",
@@ -74,7 +80,11 @@ public sealed record UserSettings(
     bool LinuxDesktopIntegrationPrompted = false,
     string AudioOutputDevice = "",
     bool TimelineSnapping = true,
-    bool TimelineLinked = true)
+    bool TimelineLinked = true,
+    string AiProvider = "none",
+    string AiGeminiModel = "gemini-2.5-flash",
+    string AiGlmModel = "glm-4.6",
+    int AiMaxPlanSteps = 20)
 {
     /// <summary>
     /// The plugin assemblies the user has disabled in the Plugin Manager (PLAN.md step 58), by full assembly
@@ -126,6 +136,12 @@ public static class UserSettingsStore
     /// <inheritdoc cref="MinPort"/>
     public const int MaxPort = 65535;
 
+    /// <summary>Assistant plan-length bounds (steps per approved plan).</summary>
+    public const int MinAiPlanSteps = 1;
+
+    /// <inheritdoc cref="MinAiPlanSteps"/>
+    public const int MaxAiPlanSteps = 50;
+
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     /// <summary>Serializes settings to indented JSON.</summary>
@@ -167,6 +183,10 @@ public static class UserSettingsStore
         StillImageDefaultSeconds = Math.Clamp(settings.StillImageDefaultSeconds, MinStillSeconds, MaxStillSeconds),
         TimelineAutoScroll = ParseAutoScroll(settings.TimelineAutoScroll).ToString(),
         AudioOutputDevice = settings.AudioOutputDevice ?? "",
+        AiProvider = ParseAiProvider(settings.AiProvider),
+        AiGeminiModel = string.IsNullOrWhiteSpace(settings.AiGeminiModel) ? "gemini-2.5-flash" : settings.AiGeminiModel.Trim(),
+        AiGlmModel = string.IsNullOrWhiteSpace(settings.AiGlmModel) ? "glm-4.6" : settings.AiGlmModel.Trim(),
+        AiMaxPlanSteps = Math.Clamp(settings.AiMaxPlanSteps, MinAiPlanSteps, MaxAiPlanSteps),
         // Normalize null / empty to the canonical empty array (Array.Empty): the record's auto-equality compares
         // this list by reference, so collapsing every empty form to one shared instance keeps two settings that
         // differ only in "no plugins disabled" comparing equal (and a round-tripped default stays a default).
@@ -221,6 +241,13 @@ public static class UserSettingsStore
         Enum.TryParse(name, ignoreCase: true, out TimelineAutoScroll mode) && Enum.IsDefined(mode)
             ? mode
             : TimelineAutoScroll.Page;
+
+    /// <summary>
+    /// Parses a persisted <see cref="UserSettings.AiProvider"/> id, falling back to "none" for anything
+    /// missing or unrecognized (the same degrade-safely contract as <see cref="ParseAutoScroll"/>).
+    /// </summary>
+    public static string ParseAiProvider(string? name) =>
+        name is Ai.SecretStore.Gemini or Ai.SecretStore.Glm ? name : "none";
 
     /// <summary>Generates a fresh MCP bearer token: 32 random bytes, base64url (no padding, URL/header safe).</summary>
     public static string NewToken()
