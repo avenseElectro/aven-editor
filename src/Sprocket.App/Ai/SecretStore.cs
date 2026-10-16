@@ -1,4 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -39,10 +41,11 @@ internal static class SecretStore
         return Path.Combine(baseDir, "Sprocket", "ai-keys.bin");
     }
 
-    /// <summary>The stored key for <paramref name="provider"/>, or <see langword="null"/> when absent.</summary>
+    /// <summary>The stored key for <paramref name="provider"/>, or <see langword="null"/> when absent
+    /// (including on non-Windows systems, where keys cannot be persisted).</summary>
     public static string? Get(string provider, string? filePath = null)
     {
-        if (!IsSupported)
+        if (!OperatingSystem.IsWindows())
             return null;
         try
         {
@@ -59,6 +62,7 @@ internal static class SecretStore
 
     /// <summary>Stores (or replaces) the key for <paramref name="provider"/>, keeping the other providers'
     /// keys. Windows-only; throws <see cref="PlatformNotSupportedException"/> elsewhere.</summary>
+    [SupportedOSPlatform("windows")]
     public static void Set(string provider, string key, string? filePath = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(provider);
@@ -68,7 +72,9 @@ internal static class SecretStore
         WriteMap(map, filePath);
     }
 
-    /// <summary>Removes the key for <paramref name="provider"/>; deleting the last key removes the file.</summary>
+    /// <summary>Removes the key for <paramref name="provider"/>; deleting the last key removes the file.
+    /// Windows-only.</summary>
+    [SupportedOSPlatform("windows")]
     public static void Remove(string provider, string? filePath = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(provider);
@@ -88,10 +94,9 @@ internal static class SecretStore
         }
     }
 
+    [SupportedOSPlatform("windows")]
     private static Dictionary<string, string> LoadMap(string? filePath)
     {
-        if (!IsSupported)
-            throw new PlatformNotSupportedException("DPAPI is only available on Windows.");
         try
         {
             string path = filePath ?? DefaultFilePath();
@@ -112,6 +117,7 @@ internal static class SecretStore
         }
     }
 
+    [SupportedOSPlatform("windows")]
     private static void WriteMap(Dictionary<string, string> map, string? filePath)
     {
         string path = filePath ?? DefaultFilePath();
