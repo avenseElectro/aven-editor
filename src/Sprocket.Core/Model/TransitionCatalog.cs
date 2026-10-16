@@ -12,15 +12,19 @@ namespace Sprocket.Core.Model;
 /// <param name="DisplayName">Human-readable name for the browser.</param>
 /// <param name="Description">A one-line summary shown under the name.</param>
 /// <param name="Parameters">The transition's editable parameters, in display order (empty for the v1 built-ins).</param>
+/// <param name="DefaultStrings">Default string attributes (e.g. an emoji transition's glyph) that
+/// <see cref="CreateInstance"/> seeds onto new instances; <see langword="null"/> when the type has none.</param>
 public sealed record TransitionDescriptor(
     string Id,
     string DisplayName,
     string Description,
-    IReadOnlyList<EffectParameterDescriptor> Parameters)
+    IReadOnlyList<EffectParameterDescriptor> Parameters,
+    IReadOnlyDictionary<string, string>? DefaultStrings = null)
 {
     /// <summary>
     /// Builds a fresh <see cref="Transition"/> of this type at <paramref name="cutPoint"/> spanning
-    /// <paramref name="duration"/>, with every parameter set to its <see cref="EffectParameterDescriptor.Default"/>.
+    /// <paramref name="duration"/>, with every parameter set to its <see cref="EffectParameterDescriptor.Default"/>
+    /// and every default string attribute seeded.
     /// </summary>
     public Transition CreateInstance(
         Timecode cutPoint, Timecode duration, TransitionAlignment alignment = TransitionAlignment.CenterOnCut)
@@ -28,6 +32,11 @@ public sealed record TransitionDescriptor(
         var transition = new Transition(Id, cutPoint, duration, alignment);
         foreach (EffectParameterDescriptor p in Parameters)
             transition.Set(p.Name, p.Default);
+        if (DefaultStrings is not null)
+        {
+            foreach (KeyValuePair<string, string> s in DefaultStrings)
+                transition.SetString(s.Key, s.Value);
+        }
         return transition;
     }
 }
@@ -46,6 +55,10 @@ public static class TransitionCatalog
 
     /// <summary>The transition applied by the default "Apply Transition" gesture (cross dissolve, the NLE default).</summary>
     public static string DefaultTransitionId => TransitionTypeIds.CrossDissolve;
+
+    /// <summary>The glyph an emoji transition (zoom / mask) uses when its "emoji" string attribute is unset.
+    /// The Render layer falls back to this same value, so a transition created without the attribute still renders.</summary>
+    public const string DefaultEmoji = "🔥";
 
     /// <summary>All registered transition descriptors, in display order.</summary>
     public static IReadOnlyList<TransitionDescriptor> BuiltIns { get; } =
@@ -73,6 +86,20 @@ public static class TransitionCatalog
             "Varrimento",
             "Varre o clipe de entrada sobre o de saída, da esquerda para a direita.",
             []),
+
+        new TransitionDescriptor(
+            TransitionTypeIds.EmojiZoom,
+            "Emoji (zoom)",
+            "Um emoji cresce até cobrir o ecrã no corte e encolhe revelando o clipe de entrada.",
+            [],
+            new Dictionary<string, string> { ["emoji"] = DefaultEmoji }),
+
+        new TransitionDescriptor(
+            TransitionTypeIds.EmojiMask,
+            "Emoji (revelação)",
+            "O clipe de entrada é revelado através da silhueta crescente de um emoji.",
+            [],
+            new Dictionary<string, string> { ["emoji"] = DefaultEmoji }),
     ];
 
     /// <summary>Looks up a descriptor by transition type id, or returns <see langword="null"/> if it is not registered.</summary>

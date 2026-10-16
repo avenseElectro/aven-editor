@@ -281,6 +281,58 @@ half4 main(float2 coord) {
     return mix(to.eval(coord), from.eval(coord), w);
 }";
 
+    // Emoji transitions (Etapa C): both sample a third child — `emoji`, the bundled 512×512 glyph as a plain Decal
+    // texture at identity mapping, so glyph texel p is addressed directly in the 512-space. The glyph is drawn as
+    // a square of `side` canvas pixels centred on the frame: a canvas point `d` pixels from the frame centre maps
+    // to texel 256 + d·(512/side), so at side = frame size the glyph exactly fills the frame, and outside the
+    // square the Decal read is transparent. `from`/`to`/glyph are all premultiplied (EmojiAssets converts the PNG
+    // once, at cache time).
+
+    // Emoji zoom — a triangle envelope drives the glyph's size: tiny at the window's start, covering the frame at
+    // the midpoint (the cut), tiny again at the end. The first half composites it over `from`, the second over
+    // `to` (premultiplied over-composite), so the covering glyph hands the frame from one clip to the other. The
+    // sides are relative to the frame so the envelope is resolution-independent; 1.2·max(w,h) guarantees the
+    // (axis-aligned) glyph square covers every corner at the midpoint, and side grows quadratically (tri·tri) so
+    // the zoom reads as accelerating in and decelerating out.
+    private const string EmojiZoomSksl = @"
+uniform shader from;
+uniform shader to;
+uniform shader emoji;
+uniform float progress;
+uniform float4 bounds;
+half4 main(float2 coord) {
+    float m = max(bounds.z, bounds.w);
+    float2 center = bounds.xy + bounds.zw * 0.5;
+    float tri = 1.0 - abs(progress * 2.0 - 1.0);
+    float side = mix(0.06 * m, 1.2 * m, tri * tri);
+    float2 p = float2(256.0) + (coord - center) * (512.0 / side);
+    half4 e = emoji.eval(p);
+    half4 under = progress < 0.5 ? from.eval(coord) : to.eval(coord);
+    return under * (1.0 - e.a) + e;
+}";
+
+    // Emoji mask — `to` is revealed through the glyph's alpha silhouette, which grows from a dot to covering the
+    // frame (side eased quadratically). Where the glyph is opaque the frame is `to`, outside it `from`; smoothstep
+    // on the alpha antialiases the silhouette edge. Near the end a progress-driven ramp takes over the last
+    // glyph-transparent slivers so the final frames are fully `to` (the artwork's transparent padding would
+    // otherwise pin them to `from` right up to the window's exclusive end).
+    private const string EmojiMaskSksl = @"
+uniform shader from;
+uniform shader to;
+uniform shader emoji;
+uniform float progress;
+uniform float4 bounds;
+half4 main(float2 coord) {
+    float m = max(bounds.z, bounds.w);
+    float2 center = bounds.xy + bounds.zw * 0.5;
+    float side = mix(0.04 * m, 1.2 * m, progress * progress);
+    float2 p = float2(256.0) + (coord - center) * (512.0 / side);
+    float a = emoji.eval(p).a;
+    float reveal = smoothstep(0.25, 0.75, a);
+    reveal = max(reveal, smoothstep(0.85, 1.0, progress));
+    return mix(from.eval(coord), to.eval(coord), reveal);
+}";
+
     private static readonly SKSamplingOptions Sampling = new(SKFilterMode.Linear);
 
     // ── Registered shader effects (PLAN.md step 33, ARCHITECTURE.md §13) ─────────────────────────────
@@ -419,6 +471,8 @@ half4 main(float2 coord) {
     private readonly SKRuntimeEffect _dipToBlack;
     private readonly SKRuntimeEffect _dipToWhite;
     private readonly SKRuntimeEffect _wipe;
+    private readonly SKRuntimeEffect _emojiZoom;
+    private readonly SKRuntimeEffect _emojiMask;
     private readonly SKPaint _paint = new();
     private readonly List<SKShader> _scratch = new(); // shaders built for the current draw, disposed after it
     private readonly List<SKImage> _scratchImages = new(); // CPU-stage outputs wrapped for the current draw
@@ -485,6 +539,10 @@ half4 main(float2 coord) {
             ?? throw new InvalidOperationException($"Dip-to-white SkSL failed to compile: {dipWhiteErr}");
         _wipe = SKRuntimeEffect.CreateShader(WipeSksl, out string wipeErr)
             ?? throw new InvalidOperationException($"Wipe SkSL failed to compile: {wipeErr}");
+        _emojiZoom = SKRuntimeEffect.CreateShader(EmojiZoomSksl, out string emojiZoomErr)
+            ?? throw new InvalidOperationException($"Emoji-zoom SkSL failed to compile: {emojiZoomErr}");
+        _emojiMask = SKRuntimeEffect.CreateShader(EmojiMaskSksl, out string emojiMaskErr)
+            ?? throw new InvalidOperationException($"Emoji-mask SkSL failed to compile: {emojiMaskErr}");
     }
 
     /// <summary>
@@ -817,11 +875,48 @@ half4 main(float2 coord) {
                     },
                     new SKRuntimeEffectChildren(_wipe) { ["from"] = from, ["to"] = to });
 
+            case TransitionTypeIds.EmojiZoom:
+                if (EmojiShader(transition) is { } zoomGlyph)
+                    return _emojiZoom.ToShader(
+                        new SKRuntimeEffectUniforms(_emojiZoom)
+                        {
+                            ["progress"] = progress,
+                            ["bounds"] = new[] { bounds.Left, bounds.Top, bounds.Width, bounds.Height },
+                        },
+                        new SKRuntimeEffectChildren(_emojiZoom) { ["from"] = from, ["to"] = to, ["emoji"] = zoomGlyph });
+                goto default; // no bundled glyph for this emoji: degrade to the dissolve
+
+            case TransitionTypeIds.EmojiMask:
+                if (EmojiShader(transition) is { } maskGlyph)
+                    return _emojiMask.ToShader(
+                        new SKRuntimeEffectUniforms(_emojiMask)
+                        {
+                            ["progress"] = progress,
+                            ["bounds"] = new[] { bounds.Left, bounds.Top, bounds.Width, bounds.Height },
+                        },
+                        new SKRuntimeEffectChildren(_emojiMask) { ["from"] = from, ["to"] = to, ["emoji"] = maskGlyph });
+                goto default; // no bundled glyph for this emoji: degrade to the dissolve
+
             default: // cross dissolve — and unknown (plugin) ids degrade to it rather than dropping the layer
                 return _crossDissolve.ToShader(
                     new SKRuntimeEffectUniforms(_crossDissolve) { ["progress"] = progress },
                     new SKRuntimeEffectChildren(_crossDissolve) { ["from"] = from, ["to"] = to });
         }
+    }
+
+    /// <summary>The transition's bundled emoji glyph as a Decal child shader (identity mapping — the SkSL
+    /// addresses glyph texels in the 512×512 space directly), appended to the per-draw scratch list. Returns
+    /// <see langword="null"/> when the glyph has no bundled PNG, so the caller degrades to a cross dissolve —
+    /// mirroring the unknown-type-id rule. The underlying <see cref="SKImage"/> is the shared
+    /// <see cref="EmojiAssets"/> cache entry and is never disposed here.</summary>
+    private SKShader? EmojiShader(ResolvedTransition transition)
+    {
+        SKImage? glyph = EmojiAssets.Get(transition.GetString("emoji", TransitionCatalog.DefaultEmoji));
+        if (glyph is null)
+            return null;
+        SKShader shader = glyph.ToShader(SKShaderTileMode.Decal, SKShaderTileMode.Decal, Sampling);
+        _scratch.Add(shader);
+        return shader;
     }
 
     /// <summary>Disposes and clears the per-draw scratch shaders (intermediate children are not auto-disposed by

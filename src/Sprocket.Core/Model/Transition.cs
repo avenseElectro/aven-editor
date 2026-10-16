@@ -19,6 +19,14 @@ public static class TransitionTypeIds
 
     /// <summary>A linear left-to-right wipe revealing the incoming clip over the outgoing one.</summary>
     public const string Wipe = "builtin.wipe";
+
+    /// <summary>An emoji glyph zooms up until it covers the frame at the middle of the cut, then shrinks
+    /// away revealing the incoming clip. The glyph is the transition's "emoji" string attribute.</summary>
+    public const string EmojiZoom = "builtin.emoji.zoom";
+
+    /// <summary>The incoming clip is revealed through the growing alpha silhouette of an emoji glyph
+    /// (the transition's "emoji" string attribute).</summary>
+    public const string EmojiMask = "builtin.emoji.mask";
 }
 
 /// <summary>

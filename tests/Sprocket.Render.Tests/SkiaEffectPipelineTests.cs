@@ -319,10 +319,83 @@ public sealed class SkiaEffectPipelineTests
         Assert.InRange(c.Blue, 127 - 4, 127 + 4);
     }
 
+    // ── Etapa C: emoji transitions (zoom / mask) ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void EmojiZoom_AtQuarter_ShowsGlyphAtCentre_OutgoingAtCorners()
+    {
+        // First half: the glyph dot grows over the outgoing (Red) clip — centre is opaque glyph colour
+        // (warm, i.e. carries green), the frame's corner is still the untouched outgoing clip.
+        SKColor centre = RenderTransitionPixel(TransitionTypeIds.EmojiZoom, 0.25, Size / 2, Size / 2);
+        SKColor corner = RenderTransitionPixel(TransitionTypeIds.EmojiZoom, 0.25, 0, 0);
+        Assert.True(centre.Alpha >= 250, $"Glyph centre should be opaque, was {centre}.");
+        Assert.True(centre.Green > 40, $"Glyph centre should be a warm fire colour, was {centre}.");
+        Assert.True(corner.Red > 240 && corner.Green < 15 && corner.Blue < 15, $"Corner should be the outgoing clip, was {corner}.");
+    }
+
+    [Fact]
+    public void EmojiZoom_AtThreeQuarters_ShowsGlyphAtCentre_IncomingAtCorners()
+    {
+        // Second half mirrors the first over the incoming (Blue) clip: the glyph shrinks, corners go blue.
+        SKColor centre = RenderTransitionPixel(TransitionTypeIds.EmojiZoom, 0.75, Size / 2, Size / 2);
+        SKColor corner = RenderTransitionPixel(TransitionTypeIds.EmojiZoom, 0.75, 0, 0);
+        Assert.True(centre.Alpha >= 250, $"Glyph centre should be opaque, was {centre}.");
+        Assert.True(centre.Green > 40, $"Glyph centre should be a warm fire colour, was {centre}.");
+        Assert.True(corner.Blue > 240 && corner.Red < 15, $"Corner should be the incoming clip, was {corner}.");
+    }
+
+    [Fact]
+    public void EmojiZoom_AtMidpoint_TheGlyphCoversTheFrame()
+    {
+        // At the cut the glyph square (1.2× the frame) covers every corner, so no pixel is the pure outgoing red.
+        SKColor corner = RenderTransitionPixel(TransitionTypeIds.EmojiZoom, 0.5, 0, 0);
+        Assert.False(corner.Red > 240 && corner.Green < 15 && corner.Blue < 15,
+            $"Covered corner must not be the outgoing clip, was {corner}.");
+    }
+
+    [Fact]
+    public void EmojiMask_AtHalf_RevealsIncomingThroughTheSilhouette()
+    {
+        // The glyph's opaque centre reveals the incoming (Blue) clip; outside the silhouette it stays outgoing (Red).
+        SKColor centre = RenderTransitionPixel(TransitionTypeIds.EmojiMask, 0.5, Size / 2, Size / 2);
+        SKColor corner = RenderTransitionPixel(TransitionTypeIds.EmojiMask, 0.5, 0, 0);
+        Assert.True(centre.Blue > 200 && centre.Red < 60, $"Silhouette centre should be the incoming clip, was {centre}.");
+        Assert.True(corner.Red > 240 && corner.Blue < 15, $"Outside the silhouette should be the outgoing clip, was {corner}.");
+    }
+
+    [Fact]
+    public void EmojiMask_NearTheEnd_IsFullyIncomingClip()
+    {
+        // The end ramp hands the glyph-transparent padding over to the incoming clip, so the last frames are pure To.
+        SKColor corner = RenderTransitionPixel(TransitionTypeIds.EmojiMask, 0.99, 0, 0);
+        Assert.True(corner.Blue > 240 && corner.Red < 15, $"Corner should have been taken over by the incoming clip, was {corner}.");
+    }
+
+    [Fact]
+    public void EmojiZoom_GlyphFollowsTheStringAttribute()
+    {
+        // The "emoji" string attribute selects the glyph: 💀's pale centre (#ccd6dd-ish) and 😎's yellow face
+        // (#ffcc4d-ish) must render visibly different colours at the same midpoint frame.
+        SKColor skull = RenderTransitionPixel(TransitionTypeIds.EmojiZoom, 0.5, Size / 2, Size / 2, "💀");
+        SKColor shades = RenderTransitionPixel(TransitionTypeIds.EmojiZoom, 0.5, Size / 2, Size / 2, "😎");
+        int delta = Math.Abs(skull.Red - shades.Red) + Math.Abs(skull.Green - shades.Green)
+            + Math.Abs(skull.Blue - shades.Blue);
+        Assert.True(delta > 120, $"Different glyphs should render differently: 💀 {skull} vs 😎 {shades} (Δ{delta}).");
+    }
+
+    [Fact]
+    public void EmojiTransition_WithUnbundledEmoji_DegradesToCrossDissolve()
+    {
+        // An emoji with no bundled PNG degrades to the dissolve, mirroring the unknown-type-id rule.
+        SKColor c = RenderTransitionPixel(TransitionTypeIds.EmojiZoom, 0.5, Size / 2, Size / 2, "🫠");
+        Assert.InRange(c.Red, 127 - 8, 127 + 8);
+        Assert.InRange(c.Blue, 127 - 8, 127 + 8);
+    }
+
     private static SKColor RenderTransitionCenter(string typeId, double progress) =>
         RenderTransitionPixel(typeId, progress, Size / 2, Size / 2);
 
-    private static SKColor RenderTransitionPixel(string typeId, double progress, int px, int py)
+    private static SKColor RenderTransitionPixel(string typeId, double progress, int px, int py, string? emoji = null)
     {
         using var pipeline = new SkiaEffectPipeline();
         using SKBitmap fromBmp = SolidBitmap(Red);
@@ -331,7 +404,8 @@ public sealed class SkiaEffectPipelineTests
         using SKImage toImg = SKImage.FromBitmap(toBmp);
 
         var dummy = new VideoLayer(default, default, [], 1.0, BlendMode.Normal);
-        var transition = new ResolvedTransition(typeId, progress, new Dictionary<string, double>(), dummy, dummy);
+        var transition = new ResolvedTransition(typeId, progress, new Dictionary<string, double>(), dummy, dummy,
+            emoji is null ? null : new Dictionary<string, string> { ["emoji"] = emoji });
 
         using SKSurface surface = SKSurface.Create(new SKImageInfo(Size, Size, SKColorType.Rgba8888, SKAlphaType.Premul));
         surface.Canvas.Clear(SKColors.Black);
