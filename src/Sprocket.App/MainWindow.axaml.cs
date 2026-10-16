@@ -2016,6 +2016,7 @@ public partial class MainWindow : Window
         // the effect is applied. Standard (non-detailed) analysis over the full source duration.
         browser.AnalyzeForStabilizationRequested += media => _stab?.Analyze(media, Timecode.Zero, media.Info.Duration, detailed: false);
         browser.MediaActivated += ShowInSourceMonitor; // double-click a bin item → Source monitor
+        browser.StickerActivated += PlaceSticker; // one click in «Autocolantes» → Still clip at the playhead (Etapa C)
         browser.Attach(_project, _history, _thumbnails);
 
         // The Looks tab (plan/features/looks-browser.md): built-ins + the user's saved looks. Save Look… samples
@@ -3228,6 +3229,30 @@ public partial class MainWindow : Window
         SetStatus($"{commands.Count} transições aleatórias aplicadas — um único Anular remove todas.");
         if (_program is { State: not PlaybackState.Playing } monitor)
             monitor.SeekTo(monitor.Position);
+    }
+
+    /// <summary>
+    /// Places a sticker clicked in the «Autocolantes» tab (Etapa C): imports the bundled PNG as Still media
+    /// (deduplicated by path, so repeated clicks reuse one <see cref="MediaRef"/>) and inserts its clip at the
+    /// playhead through the timeline's stacking rule, seeded with a small Transform scale — then editable like
+    /// any clip («Editar recorte e movimento»). The placement is one undo entry; a first-time import is a second.
+    /// </summary>
+    private void PlaceSticker(string pngPath)
+    {
+        if (_project is null || _timeline is null)
+            return;
+        Timecode stillDuration = Timecode.FromSeconds(_userSettings.StillImageDefaultSeconds);
+        MediaImport.Result result = MediaImport.TryImport(_project, _history, pngPath, stillDuration);
+        if (!result.Succeeded || result.Media is not { } media)
+        {
+            SetStatus($"Não foi possível importar o autocolante: {result.Error ?? "não foi possível abrir"}");
+            return;
+        }
+        if (_timeline.InsertSticker(media))
+        {
+            _mediaBrowser?.Refresh();
+            SetStatus("Autocolante colocado no indicador de reprodução — use «Editar recorte e movimento» para o enquadrar.");
+        }
     }
 
     /// <summary>

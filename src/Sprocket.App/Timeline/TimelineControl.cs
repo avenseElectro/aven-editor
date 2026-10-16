@@ -1133,6 +1133,52 @@ public sealed class TimelineControl : Control
         // Fully qualified: a Control already has a `Clip` property (Geometry), which would shadow the model type here.
         InsertSyntheticVideoClip(t => Sprocket.Core.Model.Clip.CreateAdjustment(GeneratorCatalog.DefaultDuration, t), "Insert adjustment layer");
 
+    /// <summary>The Transform scale a freshly placed sticker starts at — ~15% of the frame height, a small overlay
+    /// the user then frames in «Editar recorte e movimento» (Etapa C).</summary>
+    private const double StickerInitialScale = 0.15;
+
+    /// <summary>
+    /// Places a sticker (Etapa C): <paramref name="media"/>'s still clip lands at the playhead on the topmost
+    /// video track when that track is unlocked and free over its span, else on a fresh top track — the synthetic
+    /// stacking rule, so the sticker overlays content instead of displacing it. The clip and its seeding Transform
+    /// scale apply as ONE undoable entry (the media import itself is the caller's separate entry). The new clip
+    /// becomes the selection.
+    /// </summary>
+    public bool InsertSticker(MediaRef media)
+    {
+        ArgumentNullException.ThrowIfNull(media);
+        if (_history is null || _project is null)
+            return false;
+
+        // Fully qualified: a Control already has a `Clip` property (Geometry), which would shadow the model type.
+        var clip = new Sprocket.Core.Model.Clip(media.Id, Timecode.Zero, media.Info.Duration, _playhead);
+        EffectInstance? transform = EffectCatalog.Find(EffectTypeIds.Transform)?.CreateInstance();
+        if (transform is not null)
+            transform.Set(EffectParamNames.Scale, StickerInitialScale);
+
+        var commands = new List<IEditCommand>();
+        VideoTrack? top = _project.Timeline.VideoTracks.LastOrDefault();
+        Track target;
+        if (top is not null && !top.Locked
+            && top.ResolveActiveClip(_playhead) is null && top.ResolveActiveClip(clip.TimelineEnd - new Timecode(1)) is null)
+        {
+            target = top;
+        }
+        else
+        {
+            target = new VideoTrack { Name = $"V{_project.Timeline.VideoTracks.Count() + 1}" };
+            commands.Add(new AddTrackCommand(_project.Timeline, target));
+        }
+        commands.Add(new AddClipCommand(target, clip));
+        if (transform is not null)
+            commands.Add(new AddEffectCommand(clip, transform));
+
+        Execute(commands.Count == 1 ? commands[0] : new CompositeCommand("Adicionar autocolante", commands));
+        Select(clip);
+        ClipPlaced?.Invoke();
+        return true;
+    }
+
     /// <summary>
     /// Nests the current selection — and, while <see cref="Linked"/>, its linked companion clips — into a new
     /// child sequence (PLAN.md step 23, the "Nest" / "compound clip" gesture found in leading editors): the selected

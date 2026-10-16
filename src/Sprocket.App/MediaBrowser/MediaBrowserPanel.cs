@@ -66,8 +66,9 @@ public sealed class MediaBrowserPanel : UserControl
     private readonly StackPanel _effectsList;
     private readonly StackPanel _transitionsList;
     private readonly StackPanel _looksList;
+    private readonly WrapPanel _stickersGrid;
     private readonly Decorator _content;            // hosts the active tab's body
-    private readonly ScrollViewer _mediaView, _audioView, _effectsView, _transitionsView, _looksView;
+    private readonly ScrollViewer _mediaView, _audioView, _effectsView, _transitionsView, _looksView, _stickersView;
     private readonly Dictionary<Tab, Button> _tabButtons = new();
 
     /// <summary>Raised with a short message for the status strip (effect applied / select-a-clip hint).</summary>
@@ -99,7 +100,11 @@ public sealed class MediaBrowserPanel : UserControl
     /// Source monitor. Fires for tiles in both the Media and Audio tabs.</summary>
     public event Action<MediaRef>? MediaActivated;
 
-    private enum Tab { Media, Effects, Looks, Transitions, Audio }
+    /// <summary>Raised when a sticker is clicked in the <b>Autocolantes</b> tab (Etapa C), with the bundled PNG's
+    /// filesystem path; the shell imports it as Still media and places its clip at the playhead.</summary>
+    public event Action<string>? StickerActivated;
+
+    private enum Tab { Media, Effects, Looks, Transitions, Stickers, Audio }
 
     // The visible PT label for a tab (the enum names stay as internal identifiers).
     private static string TabLabel(Tab tab) => tab switch
@@ -108,6 +113,7 @@ public sealed class MediaBrowserPanel : UserControl
         Tab.Effects => "Efeitos",
         Tab.Looks => "Estilos",
         Tab.Transitions => "Transições",
+        Tab.Stickers => "Autocolantes",
         Tab.Audio => "Áudio",
         _ => tab.ToString(),
     };
@@ -144,12 +150,15 @@ public sealed class MediaBrowserPanel : UserControl
         _effectsList = new StackPanel { Margin = new Avalonia.Thickness(8), Spacing = 6 };
         _transitionsList = new StackPanel { Margin = new Avalonia.Thickness(8), Spacing = 6 };
         _looksList = new StackPanel { Margin = new Avalonia.Thickness(8), Spacing = 6 };
+        _stickersGrid = new WrapPanel { Margin = new Avalonia.Thickness(6) };
 
         _mediaView = Scroll(_mediaGrid);
         _audioView = Scroll(_audioGrid);
         _effectsView = Scroll(_effectsList);
         _transitionsView = Scroll(_transitionsList);
         _looksView = Scroll(_looksList);
+        _stickersView = Scroll(_stickersGrid);
+        BuildStickers(); // the bundled set is fixed — no project needed, so build once here
 
         _content = new Decorator();
 
@@ -275,6 +284,7 @@ public sealed class MediaBrowserPanel : UserControl
             Tab.Effects => _effectsView,
             Tab.Looks => _looksView,
             Tab.Transitions => _transitionsView,
+            Tab.Stickers => _stickersView,
             Tab.Audio => (Control?)_mixer ?? _audioView,
             _ => _mediaView,
         };
@@ -1015,6 +1025,81 @@ public sealed class MediaBrowserPanel : UserControl
         // Drag the transition onto a timeline cut to apply it (PLAN.md step 25), complementing double-click.
         EnableDrag(row, DragFormats.TransitionId, () => transition.Id);
         return row;
+    }
+
+    // ── Stickers browser (Etapa C) ─────────────────────────────────────────────────────────────────────
+
+    // The PT tile names, parallel to EmojiAssets.Bundled's palette order.
+    private static readonly string[] StickerNames =
+    [
+        "Fogo", "Coração", "Riso", "Surpresa", "Festa", "Polegar", "Óculos", "Susto",
+        "Brilho", "Choro", "Bocejo", "Caveira", "Olhos", "Encanto", "Sono", "Clapeta",
+    ];
+
+    /// <summary>Builds the <b>Autocolantes</b> tiles once: the bundled Twemoji PNGs (the same glyphs the emoji
+    /// transitions render, copied next to the exe under <c>Samples/Stickers/</c>) — a single click places the
+    /// sticker at the playhead. No project needed, so this runs from the constructor.</summary>
+    private void BuildStickers()
+    {
+        _stickersGrid.Children.Clear();
+        string dir = Path.Combine(AppContext.BaseDirectory, "Samples", "Stickers");
+        IReadOnlyList<string> bundled = EmojiAssets.Bundled;
+        int placed = 0;
+        for (int i = 0; i < bundled.Count && i < StickerNames.Length; i++)
+        {
+            string path = Path.Combine(dir, $"{EmojiAssets.AssetName(bundled[i])}.png");
+            if (!File.Exists(path))
+                continue;
+            _stickersGrid.Children.Add(StickerTile(path, StickerNames[i]));
+            placed++;
+        }
+        if (placed == 0)
+            _stickersGrid.Children.Add(EmptyNote("Autocolantes indisponíveis — reinstale a aplicação."));
+    }
+
+    /// <summary>One sticker tile: the glyph PNG over its PT name. A single left click (no double-click — the
+    /// palette gesture is one-tap-one-sticker) raises <see cref="StickerActivated"/> with the PNG path.</summary>
+    private Control StickerTile(string pngPath, string name)
+    {
+        Bitmap image;
+        try
+        {
+            image = new Bitmap(pngPath);
+        }
+        catch (Exception)
+        {
+            return EmptyNote($"Não foi possível ler {name}.");
+        }
+
+        var tile = new Border
+        {
+            Background = RaisedBg,
+            CornerRadius = new Avalonia.CornerRadius(5),
+            Padding = new Avalonia.Thickness(8, 6),
+            Margin = new Avalonia.Thickness(0, 0, 6, 6),
+            Child = new StackPanel
+            {
+                Children =
+                {
+                    new Image { Source = image, Width = 56, Height = 56, HorizontalAlignment = HorizontalAlignment.Center },
+                    new TextBlock
+                    {
+                        Text = name,
+                        FontSize = Typography.Caption,
+                        Foreground = MutedText,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Avalonia.Thickness(0, 3, 0, 0),
+                    },
+                },
+            },
+        };
+        tile.PointerReleased += (_, e) =>
+        {
+            if (e.InitialPressMouseButton == MouseButton.Left)
+                StickerActivated?.Invoke(pngPath);
+        };
+        ToolTip.SetTip(tile, "Clique para colocar o autocolante no indicador de reprodução, sobre o vídeo.");
+        return tile;
     }
 
     // ── Drag source ─────────────────────────────────────────────────────────────────────────────────
