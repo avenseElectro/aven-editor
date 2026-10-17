@@ -110,14 +110,12 @@ in terms an app-side committer can check against their diff.
 | Window-state persistence (reopens maximized/centered; size, position and maximized/full-screen state also survive opening a project) | Sprocket.App/WindowStateStore.cs (`WindowStateStore`, `WindowPlacement`) | — | ➖ (invisible; mention only if asked) |
 | Project name + saved/unsaved indicator in title bar | MainWindow.axaml.cs:1609 | get-started/getting-started.md#11-save-your-project | ✅ |
 | Status bar (engine state, messages, live fps/size/duration) | UI.md §3.7; MainWindow.axaml.cs `RenderTelemetry` | get-started/getting-started.md#a-quick-tour-of-the-main-screen | ✅ |
-| Help ▸ About (version, open logs folder) | Sprocket.App/Dialogs.cs `AboutDialog` | get-started/updates-and-help.md#see-your-version-and-find-the-log-files | ✅ |
+| Help ▸ About (Aven Editor version, project GitHub link, open logs folder) | Sprocket.App/Dialogs.cs `AboutDialog` | get-started/updates-and-help.md#see-your-version-and-find-the-log-files | ✅ |
 | Help ▸ Third-Party Notices (bundled library/font/media licenses) | Sprocket.App/Dialogs.cs `ThirdPartyNoticesDialog`; THIRD-PARTY-NOTICES.md | get-started/updates-and-help.md#third-party-notices | ✅ |
 | Auto-update (Help ▸ Check for Updates; status-bar badge with Help-menu discoverability dot + age-based colour escalation; one-time first-run toast per version; installed builds download + Install & Restart in-app with an inline "what's new" changelog for the offered version and a "Full Release Notes" link to that release's GitHub page; portable builds link to the releases page) | Sprocket.App/UpdateService.cs; UpdateDialogs.cs; UpdateEscalation.cs; scripts/release.ps1 `Get-FeedReleaseNotes`; PLAN.md steps 36 + 45 | get-started/updates-and-help.md#how-youll-know-an-update-is-ready | ✅ |
 | Add to applications menu (Linux AppImage only: first-run offer + Help ▸ Add/Remove from Applications Menu; writes a per-user launcher + icon so the AppImage appears in the menu) | Sprocket.App/LinuxDesktopIntegration.cs; MainWindow.axaml.cs `MaybeOfferLinuxDesktopIntegrationAsync` | get-started/updates-and-help.md#add-sprocket-to-the-linux-applications-menu | ✅ |
-| Help ▸ Sprocket Website (opens sprocketvideo.org; also linked in About) | MainWindow.axaml.cs `OpenWebsiteAsync`; Dialogs.cs `AboutDialog.WebsiteUrl` | — | ➖ (trivial; mention only if asked) |
-| Help ▸ Documentation (opens sprocketvideo.org/docs/) | MainWindow.axaml.cs `OpenUriAsync`; Dialogs.cs `AboutDialog.DocsUrl` | — | ➖ (trivial; mention only if asked) |
-| Help ▸ Report an Issue (opens the GitHub new-issue chooser) | MainWindow.axaml.cs `OpenUriAsync`; Dialogs.cs `AboutDialog.ReportIssueUrl`; .github/ISSUE_TEMPLATE/ | — | ➖ (trivial; mention only if asked) |
-| Help ▸ Support Sprocket ♥ (opens the GitHub Sponsors funding page) | MainWindow.axaml.cs `OpenUriAsync`; Dialogs.cs `AboutDialog.SupportUrl`; .github/FUNDING.yml | — | ➖ (trivial; mention only if asked) |
+| Help ▸ Documentação (in-app user docs, PT-PT: Docs/AJUDA.md shipped beside the exe and rendered by the same MarkdownView as the notices) | Sprocket.App/Dialogs.cs `HelpDialog`; src/Sprocket.App/Docs/AJUDA.md | — | ❌ (new in-app doc; row added with the Aven Editor re-point) |
+| Help ▸ GitHub (opens the project GitHub, also linked in About) | MainWindow.axaml.cs `OpenUriAsync`; Dialogs.cs `AboutDialog.GitHubUrl` | — | ➖ (trivial; mention only if asked) |
 
 ### Projects & saving
 

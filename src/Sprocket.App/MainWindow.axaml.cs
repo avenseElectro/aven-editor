@@ -674,10 +674,8 @@ public partial class MainWindow : Window
 
         // Help
         this.FindControl<MenuItem>("CheckUpdatesMenuItem")!.Click += (_, _) => _ = CheckForUpdatesAsync();
-        this.FindControl<MenuItem>("DocsMenuItem")!.Click += (_, _) => _ = OpenUriAsync(AboutDialog.DocsUrl);
-        this.FindControl<MenuItem>("WebsiteMenuItem")!.Click += (_, _) => _ = OpenWebsiteAsync();
-        this.FindControl<MenuItem>("ReportIssueMenuItem")!.Click += (_, _) => _ = OpenUriAsync(AboutDialog.ReportIssueUrl);
-        this.FindControl<MenuItem>("SupportMenuItem")!.Click += (_, _) => _ = OpenUriAsync(AboutDialog.SupportUrl);
+        this.FindControl<MenuItem>("DocsMenuItem")!.Click += (_, _) => _ = HelpDialog.Show(this);
+        this.FindControl<MenuItem>("GitHubMenuItem")!.Click += (_, _) => _ = OpenUriAsync(AboutDialog.GitHubUrl);
         this.FindControl<MenuItem>("ThirdPartyNoticesMenuItem")!.Click += (_, _) => _ = ThirdPartyNoticesDialog.Show(this);
         this.FindControl<MenuItem>("AboutMenuItem")!.Click += (_, _) => _ = AboutDialog.Show(this);
 
@@ -1686,9 +1684,6 @@ public partial class MainWindow : Window
                 break;
         }
     }
-
-    /// <summary>Help ▸ Sprocket Website: opens the public site in the default browser.</summary>
-    private Task OpenWebsiteAsync() => OpenUriAsync(AboutDialog.WebsiteUrl);
 
     /// <summary>Opens <paramref name="uri"/> in the default browser (best-effort, like About's
     /// Open Logs Folder — a missing launcher must not crash).</summary>

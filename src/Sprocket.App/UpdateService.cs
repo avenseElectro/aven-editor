@@ -18,8 +18,9 @@ namespace Sprocket.App;
 internal sealed class UpdateService
 {
     /// <summary>Where releases are published — also the feed <see cref="Velopack.Sources.GithubSource"/>
-    /// reads (the per-channel <c>releases.&lt;rid&gt;.json</c> assets uploaded by the release workflow).</summary>
-    public const string RepoUrl = "https://github.com/SprocketVideo/Sprocket";
+    /// reads (the per-channel <c>releases.&lt;rid&gt;.json</c> assets uploaded by the release workflow).
+    /// Must stay in sync with <c>$VpkRepoUrl</c> in scripts/release.ps1 (the feed baked into installs).</summary>
+    public const string RepoUrl = "https://github.com/avenseElectro/aven-editor";
 
     /// <summary>The human releases page, for portable/dev builds that can't self-update.</summary>
     public const string ReleasesPageUrl = RepoUrl + "/releases";

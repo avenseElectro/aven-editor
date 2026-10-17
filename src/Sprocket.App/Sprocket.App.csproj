@@ -59,6 +59,9 @@
        of truth lives at the repo root so it stays next to LICENSE/README for anyone browsing the source. -->
   <ItemGroup>
     <Content Include="..\..\THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The in-app user documentation (Help ▸ Documentação), rendered by MarkdownView the same way as the
+         third-party notices. Kept inside the project so it versions with the UI it documents. -->
+    <Content Include="Docs\AJUDA.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

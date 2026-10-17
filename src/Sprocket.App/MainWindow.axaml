@@ -303,12 +303,10 @@
             <MenuItem x:Name="RemoveFromApplicationsMenuMenuItem" Header="Remover do menu de aplicações" IsVisible="False" />
             <Separator />
             <MenuItem x:Name="DocsMenuItem" Header="_Documentação" />
-            <MenuItem x:Name="WebsiteMenuItem" Header="_Site do Sprocket" />
-            <MenuItem x:Name="ReportIssueMenuItem" Header="_Comunicar um problema…" />
-            <MenuItem x:Name="SupportMenuItem" Header="_Apoiar o Sprocket ♥" />
+            <MenuItem x:Name="GitHubMenuItem" Header="_GitHub" />
             <MenuItem x:Name="ThirdPartyNoticesMenuItem" Header="Avisos de _terceiros" />
             <Separator />
-            <MenuItem x:Name="AboutMenuItem" Header="_Acerca do Sprocket" />
+            <MenuItem x:Name="AboutMenuItem" Header="_Acerca do Aven Editor" />
           </MenuItem>
         </Menu>
 

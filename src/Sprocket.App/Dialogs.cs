@@ -36,25 +36,15 @@ internal static class AppIcon
     public static WindowIcon Window => new(Bitmap);
 }
 
-/// <summary>The "About Sprocket" box. Deliberately carries no framework / runtime text (UI.md §3.7) — just the
-/// product name, the app's own version, and a one-line description.</summary>
+/// <summary>The "Acerca do Aven Editor" box. Deliberately carries no framework / runtime text (UI.md §3.7) —
+/// just the product name, the app's own version, and a one-line description.</summary>
 internal static class AboutDialog
 {
-    /// <summary>The public project site, shown in the About box and opened by Help ▸ Sprocket Website.</summary>
-    public const string WebsiteUrl = "https://sprocketvideo.org";
-
-    /// <summary>The user documentation site, opened by Help ▸ Documentation.</summary>
-    public const string DocsUrl = "https://sprocketvideo.org/docs/";
-
-    /// <summary>The GitHub new-issue chooser, opened by Help ▸ Report an Issue.</summary>
-    public const string ReportIssueUrl = "https://github.com/SprocketVideo/Sprocket/issues/new/choose";
-
-    /// <summary>The funding page, opened by Help ▸ Support Sprocket. The sponsor profile also links
-    /// the secondary Ko-fi channel, so the app carries a single canonical URL.</summary>
-    public const string SupportUrl = "https://github.com/sponsors/drittich";
+    /// <summary>The project's GitHub, shown in the About box and opened by Help ▸ GitHub.</summary>
+    public const string GitHubUrl = "https://github.com/avenseElectro";
 
     /// <summary>Documented exception to the <see cref="Typography"/> scale (STYLE_GUIDE.md): the About
-    /// box's "Sprocket" wordmark is brand presentation, not UI chrome, so it sits above the token scale
+    /// box's "Aven Editor" wordmark is brand presentation, not UI chrome, so it sits above the token scale
     /// — the same carve-out the style guide gives component-local colors.</summary>
     private const double AboutWordmarkSize = 20;
 
@@ -94,10 +84,10 @@ internal static class AboutDialog
             CornerRadius = new CornerRadius(5),
         };
 
-        // The public site, as a link-styled line (opened via the TopLevel launcher, like Open Logs Folder).
+        // The project GitHub, as a link-styled line (opened via the TopLevel launcher, like Open Logs Folder).
         var website = new TextBlock
         {
-            Text = "sprocketvideo.org",
+            Text = "github.com/avenseElectro",
             FontSize = Typography.Body,
             Foreground = Palette.AccentBrush,
             TextDecorations = TextDecorations.Underline,
@@ -107,7 +97,7 @@ internal static class AboutDialog
 
         var dialog = new Window
         {
-            Title = "Acerca do Sprocket",
+            Title = "Acerca do Aven Editor",
             Icon = AppIcon.Window,
             Width = 420,
             Height = 380,
@@ -122,7 +112,7 @@ internal static class AboutDialog
                 Children =
                 {
                     logo,
-                    Centered("Sprocket", AboutWordmarkSize, FontWeight.SemiBold, Palette.TextBrush),
+                    Centered("Aven Editor", AboutWordmarkSize, FontWeight.SemiBold, Palette.TextBrush),
                     Centered($"Versão {Program.AppVersion}", Typography.Body, FontWeight.Normal, Palette.MutedTextBrush),
                     Centered($"Motor de multimédia: {ffmpeg}", Typography.Body, FontWeight.Normal, Palette.MutedTextBrush),
                     Centered("Um editor de vídeo multiplataforma e não destrutivo. Gratuito e de código aberto.", Typography.Body, FontWeight.Normal, Palette.MutedTextBrush),
@@ -142,7 +132,7 @@ internal static class AboutDialog
             try
             {
                 if (TopLevel.GetTopLevel(dialog)?.Launcher is { } launcher)
-                    await launcher.LaunchUriAsync(new Uri(WebsiteUrl));
+                    await launcher.LaunchUriAsync(new Uri(GitHubUrl));
             }
             catch
             {
@@ -230,6 +220,77 @@ internal static class ThirdPartyNoticesDialog
         var dialog = new Window
         {
             Title = "Avisos de terceiros",
+            Icon = AppIcon.Window,
+            Width = 760,
+            Height = 600,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Background = Palette.WindowBgBrush,
+            Content = new DockPanel
+            {
+                Margin = new Thickness(22),
+                Children =
+                {
+                    new StackPanel
+                    {
+                        [DockPanel.DockProperty] = Dock.Bottom,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        Margin = new Thickness(0, 14, 0, 0),
+                        Children = { close },
+                    },
+                    new ScrollViewer
+                    {
+                        HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
+                        Content = body,
+                    },
+                },
+            },
+        };
+
+        close.Click += (_, _) => dialog.Close();
+        return dialog.ShowDialog(owner);
+    }
+}
+
+/// <summary>Help ▸ Documentação: the app's own user documentation, shipped as <c>Docs/AJUDA.md</c> next to the
+/// exe (Sprocket.App.csproj Content item) and rendered in-app by <see cref="MarkdownView"/> — the same
+/// no-WebView pattern as <see cref="ThirdPartyNoticesDialog"/>. The doc lives in the project so it versions
+/// with the UI it describes; external sites are reachable via Help ▸ GitHub. Degrades to an explanatory
+/// message rather than failing if the file is ever missing.</summary>
+internal static class HelpDialog
+{
+    public static Task Show(Window owner)
+    {
+        Control body;
+        try
+        {
+            string text = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Docs", "AJUDA.md"));
+            body = MarkdownView.Build(text, AppContext.BaseDirectory);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            body = new SelectableTextBlock
+            {
+                Text = "O Docs/AJUDA.md não foi encontrado junto do executável.",
+                FontSize = Typography.Emphasis,
+                Foreground = Palette.TextBrush,
+                TextWrapping = TextWrapping.Wrap,
+            };
+        }
+        body.Margin = new Thickness(0, 0, 12, 0);
+
+        var close = new Button
+        {
+            Content = "Fechar",
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Padding = new Thickness(18, 5),
+            Foreground = Brushes.White,
+            Background = Palette.AccentBrush,
+            CornerRadius = new CornerRadius(5),
+        };
+
+        var dialog = new Window
+        {
+            Title = "Documentação",
             Icon = AppIcon.Window,
             Width = 760,
             Height = 600,

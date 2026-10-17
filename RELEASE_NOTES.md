@@ -30,12 +30,12 @@ testing. Expect rough edges.
 - **What's new in this release** is listed under **"What's changed"** on this page, generated from the
   commits since the previous release.
 - **The full roadmap and current status** live in
-  [`PLAN.md`](https://github.com/SprocketVideo/Sprocket/blob/main/PLAN.md).
-- **Project website:** <https://sprocketvideo.org>
+  [`PLAN.md`](https://github.com/avenseElectro/aven-editor/blob/main/PLAN.md).
+- **Project GitHub:** <https://github.com/avenseElectro>
 
 ## 🐞 Found a bug? Tell us — it's quick
 
-**[→ Click here to file an issue](https://github.com/SprocketVideo/Sprocket/issues/new)** (a free GitHub
+**[→ Click here to file an issue](https://github.com/avenseElectro/aven-editor/issues/new)** (a free GitHub
 account is all you need). Or from the repo, go to the **Issues** tab → **New issue**.
 
 To help us reproduce it fast, please include what you can:

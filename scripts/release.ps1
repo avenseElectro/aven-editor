@@ -140,7 +140,7 @@ $VpkVersion = '1.2.0'
 # the repo URL is baked into installed apps as the update feed (UpdateService.RepoUrl).
 $VpkPackId = 'Sprocket'
 $VpkBundleId = 'org.sprocketvideo.sprocket'
-$VpkRepoUrl = 'https://github.com/SprocketVideo/Sprocket'
+$VpkRepoUrl = 'https://github.com/avenseElectro/aven-editor'
 # The FFmpeg download cache must live OUTSIDE $distRoot, which is wiped on every run; keeping it here is
 # what makes it persist between releases.
 $ffCache = if ($FFmpegCacheDir) { $FFmpegCacheDir } else { Join-Path $repoRoot '.ffmpeg-cache' }
