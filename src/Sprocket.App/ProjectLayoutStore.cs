@@ -16,9 +16,12 @@ namespace Sprocket.App;
 /// </summary>
 /// <param name="ProjectWidth">Width (px) of the Project (bin) column — its last visible width while hidden.</param>
 /// <param name="InspectorWidth">Width (px) of the Inspector column — its last visible width while hidden.</param>
+/// <param name="AssistantWidth">Width (px) of the AI assistant column (Etapa D) — its last visible width while hidden.</param>
 /// <param name="TimelineHeight">Height (px) of the timeline row.</param>
 /// <param name="ProjectVisible">View ▸ Show Project.</param>
 /// <param name="InspectorVisible">View ▸ Show Inspector.</param>
+/// <param name="AssistantVisible">View ▸ Show AI Assistant. Off by default (a fresh install and any layout
+/// written before the field existed both keep the pane out of the way until the user turns it on).</param>
 /// <param name="TimelinePxPerSecond">Timeline zoom, in pixels per second of timeline.</param>
 /// <param name="SourceMonitorActive">Whether the Source tab (rather than Program) was showing.</param>
 /// <param name="SourceMediaPath">The absolute path of the media loaded in the Source monitor, if any; restored
@@ -27,9 +30,11 @@ namespace Sprocket.App;
 internal sealed record ProjectLayout(
     double ProjectWidth = ProjectLayoutStore.DefaultProjectWidth,
     double InspectorWidth = ProjectLayoutStore.DefaultInspectorWidth,
+    double AssistantWidth = ProjectLayoutStore.DefaultAssistantWidth,
     double TimelineHeight = ProjectLayoutStore.DefaultTimelineHeight,
     bool ProjectVisible = true,
     bool InspectorVisible = true,
+    bool AssistantVisible = false,
     double TimelinePxPerSecond = ProjectLayoutStore.DefaultPxPerSecond,
     bool SourceMonitorActive = false,
     string? SourceMediaPath = null,
@@ -44,6 +49,7 @@ internal static class ProjectLayoutStore
 {
     public const double DefaultProjectWidth = 240;
     public const double DefaultInspectorWidth = 300;
+    public const double DefaultAssistantWidth = 320;
     public const double DefaultTimelineHeight = 240;
     public const double DefaultPxPerSecond = TimelineControl.DefaultPxPerSecond;
 
@@ -56,6 +62,9 @@ internal static class ProjectLayoutStore
 
     /// <summary>The Inspector column's XAML <c>MinWidth</c>.</summary>
     public const double MinInspectorWidth = 192;
+
+    /// <summary>The AI assistant column's XAML <c>MinWidth</c> (Etapa D).</summary>
+    public const double MinAssistantWidth = 192;
 
     /// <summary>How many layout files are kept; the least recently written beyond this are pruned on save.</summary>
     public const int MaxLayouts = 100;
@@ -111,6 +120,7 @@ internal static class ProjectLayoutStore
     {
         ProjectWidth = ClampOr(layout.ProjectWidth, MinPaneSize, MaxPaneSize, DefaultProjectWidth),
         InspectorWidth = ClampOr(layout.InspectorWidth, MinInspectorWidth, MaxPaneSize, DefaultInspectorWidth),
+        AssistantWidth = ClampOr(layout.AssistantWidth, MinAssistantWidth, MaxPaneSize, DefaultAssistantWidth),
         TimelineHeight = ClampOr(layout.TimelineHeight, MinPaneSize, MaxPaneSize, DefaultTimelineHeight),
         TimelinePxPerSecond = ClampOr(layout.TimelinePxPerSecond,
             TimelineControl.MinPxPerSecond, TimelineControl.MaxPxPerSecond, DefaultPxPerSecond),

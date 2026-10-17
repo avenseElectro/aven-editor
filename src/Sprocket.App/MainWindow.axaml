@@ -3,6 +3,7 @@
         xmlns:local="clr-namespace:Sprocket.App"
         xmlns:mb="clr-namespace:Sprocket.App.MediaBrowser"
         xmlns:insp="clr-namespace:Sprocket.App.Inspector"
+        xmlns:ai="clr-namespace:Sprocket.App.Ai"
         xmlns:chrome="clr-namespace:Avalonia.Controls.Chrome;assembly=Avalonia.Controls"
         x:Class="Sprocket.App.MainWindow"
         Width="1280" Height="800"
@@ -141,6 +142,7 @@
             <Separator />
             <MenuItem x:Name="ShowProjectMenuItem" Header="Painel _Projeto" ToggleType="CheckBox" IsChecked="True" />
             <MenuItem x:Name="ShowInspectorMenuItem" Header="Painel I_nspetor" ToggleType="CheckBox" IsChecked="True" />
+            <MenuItem x:Name="ShowAssistantMenuItem" Header="Painel _Assistente IA" ToggleType="CheckBox" />
             <Separator />
             <MenuItem x:Name="ShowStatsMenuItem" Header="_Estatísticas de reprodução" ToggleType="CheckBox" />
             <!-- Background Tasks (PLAN.md step 18 + stabilization phase 6), Final Cut Pro's Background Tasks window:
@@ -445,6 +447,10 @@
           <!-- MinWidth keeps the splitter from crushing the Inspector unusably narrow; SetPanelVisible drops
                it to 0 while the pane is hidden so the column can still collapse. -->
           <ColumnDefinition Width="300" MinWidth="192" />
+          <!-- AI assistant column (Etapa D): default hidden — the widths start collapsed so the first frame
+               never flashes it; SetAssistantPaneVisible restores/lifts like the Inspector's. -->
+          <ColumnDefinition Width="0" />
+          <ColumnDefinition Width="0" />
         </Grid.ColumnDefinitions>
 
         <!-- Project panel: tabbed media bin / effects / transitions / audio browser (PLAN.md step 15).
@@ -681,6 +687,21 @@
               </Grid>
             </Border>
             <insp:InspectorPanel x:Name="Inspector" />
+          </DockPanel>
+        </Border>
+
+        <GridSplitter x:Name="AssistantSplitter" Grid.Column="5" Width="6" Background="Transparent" ResizeDirection="Columns"
+                      HorizontalAlignment="Stretch" IsVisible="False" />
+
+        <!-- AI assistant (Etapa D): pedido → plano → aprovação → execução, a fixed column right of the
+             Inspector. Hidden by default — Ver ▸ Painel Assistente IA. -->
+        <Border x:Name="AssistantPane" Grid.Column="6" Classes="pane" AutomationProperties.Name="Assistente IA"
+                IsVisible="False">
+          <DockPanel>
+            <Border DockPanel.Dock="Top" Classes="paneHeader">
+              <TextBlock Classes="title" Text="Assistente IA" />
+            </Border>
+            <ai:AssistantPanel x:Name="Assistant" />
           </DockPanel>
         </Border>
       </Grid>

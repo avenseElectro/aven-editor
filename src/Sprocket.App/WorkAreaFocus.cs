@@ -22,6 +22,10 @@ public enum WorkArea
 
     /// <summary>The Inspector.</summary>
     Inspector,
+
+    /// <summary>The AI assistant panel (Etapa D), right of the Inspector. On the Tab ring but with no direct
+    /// digit chord — <c>Shift+5</c> stays with the multicam angle switcher.</summary>
+    Assistant,
 }
 
 /// <summary>
@@ -31,8 +35,9 @@ public enum WorkArea
 /// <para>
 /// This is the convention in leading NLEs (Premiere's "activate panel by number" is <c>Shift+1</c>…, and
 /// its panels are activated deliberately rather than reached by tabbing through toolbars). The deliberate
-/// departure: Sprocket has four work areas rather than a dozen dockable panels, so the digits are
-/// <c>Shift+1</c>–<c>4</c> only and the ring is short enough to be predictable.
+/// departure: Sprocket has a handful of work areas rather than a dozen dockable panels, so the digits are
+/// <c>Shift+1</c>–<c>4</c> only (the assistant joins the Tab ring but keeps no digit — <c>Shift+5</c>
+/// belongs to the multicam angle switcher) and the ring is short enough to be predictable.
 /// </para>
 /// <para>
 /// Kept free of any UI state so it is directly testable; <c>MainWindow</c> owns the focus targets, the
@@ -51,9 +56,10 @@ public static class WorkAreaFocus
     /// <summary>Style class applied to the pane <c>Border</c> of the currently active work area.</summary>
     public const string ActiveAreaClass = "activeArea";
 
-    // Left-to-right, then down to the timeline: the reading order of the shell (UI.md §3).
+    // Left-to-right, then down to the timeline: the reading order of the shell (UI.md §3). The assistant
+    // column sits right of the Inspector, so it closes the ring.
     private static readonly WorkArea[] RingOrder =
-        [WorkArea.Project, WorkArea.Monitor, WorkArea.Timeline, WorkArea.Inspector];
+        [WorkArea.Project, WorkArea.Monitor, WorkArea.Timeline, WorkArea.Inspector, WorkArea.Assistant];
 
     /// <summary>The focus ring, in Tab order.</summary>
     public static IReadOnlyList<WorkArea> Ring => RingOrder;

@@ -23,7 +23,7 @@ public class WorkAreaFocusTests
     public void RingIsTheShellsReadingOrder()
     {
         Assert.Equal(
-            new[] { WorkArea.Project, WorkArea.Monitor, WorkArea.Timeline, WorkArea.Inspector },
+            new[] { WorkArea.Project, WorkArea.Monitor, WorkArea.Timeline, WorkArea.Inspector, WorkArea.Assistant },
             WorkAreaFocus.Ring);
     }
 
@@ -33,11 +33,13 @@ public class WorkAreaFocusTests
         Assert.Equal(WorkArea.Monitor, WorkAreaFocus.Advance(WorkArea.Project, forward: true, All));
         Assert.Equal(WorkArea.Timeline, WorkAreaFocus.Advance(WorkArea.Monitor, forward: true, All));
         Assert.Equal(WorkArea.Inspector, WorkAreaFocus.Advance(WorkArea.Timeline, forward: true, All));
+        Assert.Equal(WorkArea.Assistant, WorkAreaFocus.Advance(WorkArea.Inspector, forward: true, All));
     }
 
     [Fact]
     public void ShiftTabReversesIt()
     {
+        Assert.Equal(WorkArea.Inspector, WorkAreaFocus.Advance(WorkArea.Assistant, forward: false, All));
         Assert.Equal(WorkArea.Timeline, WorkAreaFocus.Advance(WorkArea.Inspector, forward: false, All));
         Assert.Equal(WorkArea.Monitor, WorkAreaFocus.Advance(WorkArea.Timeline, forward: false, All));
         Assert.Equal(WorkArea.Project, WorkAreaFocus.Advance(WorkArea.Monitor, forward: false, All));
@@ -46,8 +48,9 @@ public class WorkAreaFocusTests
     [Fact]
     public void TheRingWrapsInBothDirections()
     {
-        Assert.Equal(WorkArea.Project, WorkAreaFocus.Advance(WorkArea.Inspector, forward: true, All));
-        Assert.Equal(WorkArea.Inspector, WorkAreaFocus.Advance(WorkArea.Project, forward: false, All));
+        Assert.Equal(WorkArea.Project, WorkAreaFocus.Advance(WorkArea.Assistant, forward: true, All));
+        Assert.Equal(WorkArea.Assistant, WorkAreaFocus.Advance(WorkArea.Inspector, forward: true, All));
+        Assert.Equal(WorkArea.Assistant, WorkAreaFocus.Advance(WorkArea.Project, forward: false, All));
     }
 
     /// <summary>View ▸ Show Project / Show Inspector hide a pane; the ring must step straight over it.</summary>
@@ -60,6 +63,16 @@ public class WorkAreaFocusTests
         Func<WorkArea, bool> noProject = Only(WorkArea.Monitor, WorkArea.Timeline, WorkArea.Inspector);
         Assert.Equal(WorkArea.Monitor, WorkAreaFocus.Advance(WorkArea.Inspector, forward: true, noProject));
         Assert.Equal(WorkArea.Inspector, WorkAreaFocus.Advance(WorkArea.Monitor, forward: false, noProject));
+    }
+
+    /// <summary>The assistant pane is hidden by default; with it off, the ring behaves exactly as it did before
+    /// the pane existed — Inspector wraps straight back to Project.</summary>
+    [Fact]
+    public void HiddenAssistantIsSkipped()
+    {
+        Func<WorkArea, bool> noAssistant = Only(WorkArea.Project, WorkArea.Monitor, WorkArea.Timeline, WorkArea.Inspector);
+        Assert.Equal(WorkArea.Project, WorkAreaFocus.Advance(WorkArea.Inspector, forward: true, noAssistant));
+        Assert.Equal(WorkArea.Inspector, WorkAreaFocus.Advance(WorkArea.Project, forward: false, noAssistant));
     }
 
     /// <summary>Both side panes hidden leaves a two-area ring that still alternates.</summary>

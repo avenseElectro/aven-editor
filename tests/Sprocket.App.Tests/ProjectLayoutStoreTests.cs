@@ -15,7 +15,8 @@ public class ProjectLayoutStoreTests
     public void Round_Trips_All_Fields()
     {
         var layout = new ProjectLayout(
-            ProjectWidth: 310, InspectorWidth: 420, TimelineHeight: 380, ProjectVisible: false, InspectorVisible: true,
+            ProjectWidth: 310, InspectorWidth: 420, AssistantWidth: 500, TimelineHeight: 380,
+            ProjectVisible: false, InspectorVisible: true, AssistantVisible: true,
             TimelinePxPerSecond: 155.5, SourceMonitorActive: true, SourceMediaPath: @"C:\media\a.mp4",
             ProjectPath: @"C:\projects\p.sprocket.json");
         Assert.Equal(layout, ProjectLayoutStore.Deserialize(ProjectLayoutStore.Serialize(layout)));
@@ -34,10 +35,12 @@ public class ProjectLayoutStoreTests
         ProjectLayout layout = ProjectLayoutStore.Deserialize("""{"ProjectWidth": 333}""")!;
         Assert.Equal(333, layout.ProjectWidth);
         Assert.Equal(ProjectLayoutStore.DefaultInspectorWidth, layout.InspectorWidth);
+        Assert.Equal(ProjectLayoutStore.DefaultAssistantWidth, layout.AssistantWidth);
         Assert.Equal(ProjectLayoutStore.DefaultTimelineHeight, layout.TimelineHeight);
         Assert.Equal(ProjectLayoutStore.DefaultPxPerSecond, layout.TimelinePxPerSecond);
         Assert.True(layout.ProjectVisible);
         Assert.True(layout.InspectorVisible);
+        Assert.False(layout.AssistantVisible); // the pane is hidden until the user turns it on
         Assert.False(layout.SourceMonitorActive);
         Assert.Null(layout.SourceMediaPath);
     }
@@ -46,16 +49,18 @@ public class ProjectLayoutStoreTests
     public void Clamp_Bounds_Sizes_And_Zoom()
     {
         ProjectLayout low = ProjectLayoutStore.Clamp(new ProjectLayout(
-            ProjectWidth: 1, InspectorWidth: 1, TimelineHeight: -5, TimelinePxPerSecond: 0.01));
+            ProjectWidth: 1, InspectorWidth: 1, AssistantWidth: 1, TimelineHeight: -5, TimelinePxPerSecond: 0.01));
         Assert.Equal(ProjectLayoutStore.MinPaneSize, low.ProjectWidth);
         Assert.Equal(ProjectLayoutStore.MinInspectorWidth, low.InspectorWidth);
+        Assert.Equal(ProjectLayoutStore.MinAssistantWidth, low.AssistantWidth);
         Assert.Equal(ProjectLayoutStore.MinPaneSize, low.TimelineHeight);
         Assert.Equal(TimelineControl.MinPxPerSecond, low.TimelinePxPerSecond);
 
         ProjectLayout high = ProjectLayoutStore.Clamp(new ProjectLayout(
-            ProjectWidth: 1e6, InspectorWidth: 1e6, TimelineHeight: 1e6, TimelinePxPerSecond: 1e6));
+            ProjectWidth: 1e6, InspectorWidth: 1e6, AssistantWidth: 1e6, TimelineHeight: 1e6, TimelinePxPerSecond: 1e6));
         Assert.Equal(ProjectLayoutStore.MaxPaneSize, high.ProjectWidth);
         Assert.Equal(ProjectLayoutStore.MaxPaneSize, high.InspectorWidth);
+        Assert.Equal(ProjectLayoutStore.MaxPaneSize, high.AssistantWidth);
         Assert.Equal(ProjectLayoutStore.MaxPaneSize, high.TimelineHeight);
         Assert.Equal(TimelineControl.MaxPxPerSecond, high.TimelinePxPerSecond);
     }

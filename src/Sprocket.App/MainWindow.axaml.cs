@@ -18,6 +18,7 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Sprocket.App.Ai;
 using Sprocket.App.Inspector;
 using Sprocket.App.MediaBrowser;
 using Sprocket.App.Stabilization;
@@ -173,7 +174,7 @@ public partial class MainWindow : Window
     private MenuItem? _clipFrameHoldOptionsMenuItem, _clipAddFrameHoldMenuItem, _clipInsertFrameHoldSegmentMenuItem;
     private MenuItem? _clipDuplicateFrameMenuItem, _clipRemoveFrameMenuItem;
     private MenuItem? _nestMenuItem, _openSequenceMenuItem; // Sequence menu (PLAN.md step 23)
-    private MenuItem? _snappingMenuItem, _guidesMenuItem, _showProjectMenuItem, _showInspectorMenuItem, _showStatsMenuItem,
+    private MenuItem? _snappingMenuItem, _guidesMenuItem, _showProjectMenuItem, _showInspectorMenuItem, _showAssistantMenuItem, _showStatsMenuItem,
         _showProxyStatusMenuItem;
     // Aven Editor (Etapa B): os toggles saíram da barra de ferramentas para o menu Ver.
     private MenuItem? _linkedMenuItem, _showSourceMonitorMenuItem, _showScopeSelectorMenuItem;
@@ -185,12 +186,14 @@ public partial class MainWindow : Window
     private MenuItem? _effectsMenu;
     private ToggleButton? _snappingToggle, _guidesToggle, _linkedToggle;
     private Grid? _workspaceGrid, _outerGrid;
-    private Border? _projectPane, _inspectorPane;
-    private GridSplitter? _projectSplitter, _inspectorSplitter;
+    private Border? _projectPane, _inspectorPane, _assistantPane;
+    private GridSplitter? _projectSplitter, _inspectorSplitter, _assistantSplitter;
+    private Ai.AssistantPanel? _assistantPanel; // the assistant pane's content (Etapa D); the panel owns its flow
     // Each side pane's last visible width, so hiding and re-showing it (and a layout saved while it is hidden)
     // keeps the user's splitter position instead of snapping back to the XAML default.
     private double _projectPaneWidth = ProjectLayoutStore.DefaultProjectWidth;
     private double _inspectorPaneWidth = ProjectLayoutStore.DefaultInspectorWidth;
+    private double _assistantPaneWidth = ProjectLayoutStore.DefaultAssistantWidth;
     // The per-user layout this project opened with (ProjectLayoutStore); also supplies the values a session
     // without an engine (no timeline / monitors) never shows, so saving it doesn't clobber them.
     private ProjectLayout _layout = new();
@@ -201,7 +204,7 @@ public partial class MainWindow : Window
     // real focus by OnShellGotFocus.
     private Panel? _shellRoot;
     private Border? _monitorPane, _timelinePane;
-    private Control? _projectAreaTarget, _monitorAreaTarget, _timelineAreaTarget, _inspectorAreaTarget;
+    private Control? _projectAreaTarget, _monitorAreaTarget, _timelineAreaTarget, _inspectorAreaTarget, _assistantAreaTarget;
     private WorkArea _activeArea = WorkArea.Timeline;
 
     /// <summary>The Sprocket project file type (a JSON sidecar) for the open / save-as pickers.</summary>
@@ -729,6 +732,22 @@ public partial class MainWindow : Window
         _projectSplitter = this.FindControl<GridSplitter>("ProjectSplitter");
         _inspectorPane = this.FindControl<Border>("InspectorPane");
         _inspectorSplitter = this.FindControl<GridSplitter>("InspectorSplitter");
+        _assistantPane = this.FindControl<Border>("AssistantPane");
+        _assistantSplitter = this.FindControl<GridSplitter>("AssistantSplitter");
+
+        // AI assistant (Etapa D): the panel owns the pedido → plano → aprovação → execução flow over the
+        // app-scoped in-process tool host (which may still be starting — the panel re-resolves it per ask).
+        // The blocked gate is this window's export/render gate, so a plan never edits mid-export.
+        if (this.FindControl<Ai.AssistantPanel>("Assistant") is { } assistantPanel)
+        {
+            _assistantPanel = assistantPanel;
+            assistantPanel.Initialize(
+                controller: () => (Application.Current as App)?.AssistantHost is { } host
+                    ? new AssistantController(host, CreateMcpSession, _userSettings.AiMaxPlanSteps, BlockedByExport)
+                    : null,
+                settings: () => _userSettings,
+                openPreferences: () => _ = ShowPreferencesAsync());
+        }
 
         // Inspector pane-header expand/collapse-all — sections are per-clip, so this acts on whatever the
         // panel currently shows.
@@ -855,6 +874,8 @@ public partial class MainWindow : Window
             this.FindControl<ComboBox>("ScopeBox")!.IsVisible = _showScopeSelectorMenuItem.IsChecked == true;
         _showProjectMenuItem.Click += (_, _) => SetPanelVisible(project: true, _showProjectMenuItem.IsChecked == true);
         _showInspectorMenuItem.Click += (_, _) => SetPanelVisible(project: false, _showInspectorMenuItem.IsChecked == true);
+        _showAssistantMenuItem = this.FindControl<MenuItem>("ShowAssistantMenuItem")!;
+        _showAssistantMenuItem.Click += (_, _) => SetAssistantPaneVisible(_showAssistantMenuItem.IsChecked == true);
         _autoScrollNoneMenuItem = this.FindControl<MenuItem>("AutoScrollNoneMenuItem")!;
         _autoScrollPageMenuItem = this.FindControl<MenuItem>("AutoScrollPageMenuItem")!;
         _autoScrollSmoothMenuItem = this.FindControl<MenuItem>("AutoScrollSmoothMenuItem")!;
@@ -1206,6 +1227,10 @@ public partial class MainWindow : Window
                 await MessageDialog.Show(this, "Servidor MCP",
                     mcpService.LastError ?? "O servidor MCP não arrancou.");
         }
+
+        // The assistant reads its provider/model/key fresh per ask, but the unconfigured hint only re-renders
+        // when told — the key lives in the DPAPI store, not in settings, so nothing else notifies the panel.
+        _assistantPanel?.Refresh();
     }
 
     /// <summary>
@@ -1264,7 +1289,8 @@ public partial class MainWindow : Window
         _monitorAreaTarget = this.FindControl<PreviewSurface>("Preview");
         _timelineAreaTarget = this.FindControl<TimelineControl>("Timeline");
         _inspectorAreaTarget = this.FindControl<InspectorPanel>("Inspector");
-        foreach (Control? target in new[] { _projectAreaTarget, _monitorAreaTarget, _timelineAreaTarget, _inspectorAreaTarget })
+        _assistantAreaTarget = this.FindControl<Ai.AssistantPanel>("Assistant");
+        foreach (Control? target in new[] { _projectAreaTarget, _monitorAreaTarget, _timelineAreaTarget, _inspectorAreaTarget, _assistantAreaTarget })
         {
             if (target is null)
                 continue;
@@ -1386,6 +1412,7 @@ public partial class MainWindow : Window
             WorkArea.Monitor => _monitorAreaTarget is not null,
             WorkArea.Timeline => _timelineAreaTarget is not null,
             WorkArea.Inspector => _inspectorAreaTarget is not null && _inspectorPane?.IsVisible != false,
+            WorkArea.Assistant => _assistantAreaTarget is not null && _assistantPane?.IsVisible == true,
             _ => false,
         };
     }
@@ -1396,6 +1423,7 @@ public partial class MainWindow : Window
         WorkArea.Monitor => _monitorAreaTarget,
         WorkArea.Timeline => _timelineAreaTarget,
         WorkArea.Inspector => _inspectorAreaTarget,
+        WorkArea.Assistant => _assistantAreaTarget,
         _ => null,
     };
 
@@ -1405,6 +1433,7 @@ public partial class MainWindow : Window
         WorkArea.Monitor => _monitorPane,
         WorkArea.Timeline => _timelinePane,
         WorkArea.Inspector => _inspectorPane,
+        WorkArea.Assistant => _assistantPane,
         _ => null,
     };
 
@@ -3452,6 +3481,7 @@ public partial class MainWindow : Window
         if (_guidesMenuItem is not null) _guidesMenuItem.IsChecked = _guidesToggle?.IsChecked == true;
         if (_showProjectMenuItem is not null) _showProjectMenuItem.IsChecked = _projectPane?.IsVisible != false;
         if (_showInspectorMenuItem is not null) _showInspectorMenuItem.IsChecked = _inspectorPane?.IsVisible != false;
+        if (_showAssistantMenuItem is not null) _showAssistantMenuItem.IsChecked = _assistantPane?.IsVisible == true;
         if (_showStatsMenuItem is not null) _showStatsMenuItem.IsChecked = _statsOverlay is not null;
         if (_showProxyStatusMenuItem is not null) _showProxyStatusMenuItem.IsChecked = _proxyWindow is not null;
         if (_fullScreenMenuItem is not null) _fullScreenMenuItem.IsChecked = WindowState == WindowState.FullScreen;
@@ -3638,6 +3668,22 @@ public partial class MainWindow : Window
             FocusWorkArea(WorkAreaFocus.Advance(hidden, forward: true, IsWorkAreaAvailable));
     }
 
+    /// <summary>Shows or hides the AI assistant column (Etapa D) — the same collapse pattern as the Inspector's,
+    /// over columns 5 (splitter) and 6 (pane).</summary>
+    private void SetAssistantPaneVisible(bool visible)
+    {
+        if (_workspaceGrid is null)
+            return;
+        if (!visible && _assistantPane?.IsVisible != false)
+            _assistantPaneWidth = PixelSize(_workspaceGrid.ColumnDefinitions[6].Width, _workspaceGrid.ColumnDefinitions[6].ActualWidth, _assistantPaneWidth);
+        if (_assistantPane is not null) _assistantPane.IsVisible = visible;
+        if (_assistantSplitter is not null) _assistantSplitter.IsVisible = visible;
+        _workspaceGrid.ColumnDefinitions[5].Width = visible ? new GridLength(6) : new GridLength(0);
+        _workspaceGrid.ColumnDefinitions[6].Width = visible ? new GridLength(_assistantPaneWidth) : new GridLength(0);
+        if (!visible && _activeArea == WorkArea.Assistant)
+            FocusWorkArea(WorkAreaFocus.Advance(WorkArea.Assistant, forward: true, IsWorkAreaAvailable));
+    }
+
     /// <summary>Window ▸ Reset Layout: restore the pane splitters to their default sizes and show all panes.</summary>
     private void ResetLayout()
     {
@@ -3650,11 +3696,15 @@ public partial class MainWindow : Window
             _workspaceGrid.ColumnDefinitions[2].Width = new GridLength(1, GridUnitType.Star);
             _workspaceGrid.ColumnDefinitions[3].Width = new GridLength(6);
             _workspaceGrid.ColumnDefinitions[4].Width = new GridLength(300);
+            _workspaceGrid.ColumnDefinitions[5].Width = new GridLength(6);
+            _workspaceGrid.ColumnDefinitions[6].Width = new GridLength(ProjectLayoutStore.DefaultAssistantWidth);
         }
         if (_outerGrid is not null)
             _outerGrid.RowDefinitions[2].Height = new GridLength(240);
         SetPanelVisible(project: true, true);
         SetPanelVisible(project: false, true);
+        _assistantPaneWidth = ProjectLayoutStore.DefaultAssistantWidth;
+        SetAssistantPaneVisible(false); // the default arrangement keeps the assistant out of the way
         SetStatus("Disposição reposta.");
     }
 
@@ -3668,16 +3718,19 @@ public partial class MainWindow : Window
     {
         _projectPaneWidth = layout.ProjectWidth;
         _inspectorPaneWidth = layout.InspectorWidth;
+        _assistantPaneWidth = layout.AssistantWidth;
         if (_workspaceGrid is not null)
         {
             // Write the columns first: hiding a pane remembers its current column width as the one to restore.
             _workspaceGrid.ColumnDefinitions[0].Width = new GridLength(layout.ProjectWidth);
             _workspaceGrid.ColumnDefinitions[4].Width = new GridLength(layout.InspectorWidth);
+            _workspaceGrid.ColumnDefinitions[6].Width = new GridLength(layout.AssistantWidth);
         }
         if (_outerGrid is not null)
             _outerGrid.RowDefinitions[2].Height = new GridLength(layout.TimelineHeight);
         SetPanelVisible(project: true, layout.ProjectVisible);
         SetPanelVisible(project: false, layout.InspectorVisible);
+        SetAssistantPaneVisible(layout.AssistantVisible);
         RefreshViewMenu();
     }
 
@@ -3710,13 +3763,16 @@ public partial class MainWindow : Window
     {
         bool projectVisible = _projectPane?.IsVisible != false;
         bool inspectorVisible = _inspectorPane?.IsVisible != false;
-        double projectWidth = _projectPaneWidth, inspectorWidth = _inspectorPaneWidth;
+        bool assistantVisible = _assistantPane?.IsVisible == true;
+        double projectWidth = _projectPaneWidth, inspectorWidth = _inspectorPaneWidth, assistantWidth = _assistantPaneWidth;
         if (_workspaceGrid is not null)
         {
             if (projectVisible)
                 projectWidth = PixelSize(_workspaceGrid.ColumnDefinitions[0].Width, _workspaceGrid.ColumnDefinitions[0].ActualWidth, projectWidth);
             if (inspectorVisible)
                 inspectorWidth = PixelSize(_workspaceGrid.ColumnDefinitions[4].Width, _workspaceGrid.ColumnDefinitions[4].ActualWidth, inspectorWidth);
+            if (assistantVisible)
+                assistantWidth = PixelSize(_workspaceGrid.ColumnDefinitions[6].Width, _workspaceGrid.ColumnDefinitions[6].ActualWidth, assistantWidth);
         }
         double timelineHeight = _outerGrid is null
             ? _layout.TimelineHeight
@@ -3726,8 +3782,8 @@ public partial class MainWindow : Window
         string? sourcePath = _source is not null ? _source.Media?.AbsolutePath : _layout.SourceMediaPath;
 
         return new ProjectLayout(
-            projectWidth, inspectorWidth, timelineHeight, projectVisible, inspectorVisible,
-            _timeline?.PxPerSecond ?? _layout.TimelinePxPerSecond, sourceActive, sourcePath);
+            projectWidth, inspectorWidth, assistantWidth, timelineHeight, projectVisible, inspectorVisible,
+            assistantVisible, _timeline?.PxPerSecond ?? _layout.TimelinePxPerSecond, sourceActive, sourcePath);
     }
 
     /// <summary>Writes this project's per-user layout (<see cref="ProjectLayoutStore"/>), on close and before a
@@ -5883,6 +5939,7 @@ public partial class MainWindow : Window
                 c.IsEnabled = enabled;
         if (_exportButton is not null)
             _exportButton.IsEnabled = enabled;
+        _assistantPanel?.SetExportBlocked(!enabled); // the controller blocks the work; this stops the buttons promising it
     }
 
     private void SetStatus(string text)

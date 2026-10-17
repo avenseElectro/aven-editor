@@ -16,11 +16,17 @@ public partial class App : Application
     private ProxyService? _proxy;    // the live session's proxy service (PLAN.md step 18); swapped alongside the engine
     private StabilizationService? _stab; // the live session's stabilization analysis service; swapped alongside the engine
     private McpServerService? _mcp;  // app-scoped MCP server controller (PLAN.md step 38); survives session swaps
+    private Sprocket.Mcp.InProcessToolHost? _assistantHost; // the in-app assistant's tool surface (Etapa D); survives session swaps
+    private Sprocket.Mcp.IEditorSession? _assistantSession; // the live window's session, re-attached on every swap
     private UpdateService? _updates;  // app-scoped Velopack updater (PLAN.md steps 36 + 45); survives session swaps
     private bool _tornDown;          // the session teardown has run; it must not run twice
 
     /// <summary>The MCP server controller, for the shell's status-bar indicator.</summary>
     internal McpServerService? McpService => _mcp;
+
+    /// <summary>The assistant's in-process tool host (Etapa D), or <see langword="null"/> while it is still
+    /// starting (the panel re-resolves this per ask and says so in PT-PT rather than crashing).</summary>
+    internal Sprocket.Mcp.InProcessToolHost? AssistantHost => _assistantHost;
 
     /// <summary>The updater, for the shell's status-bar badge and Help ▸ Check for Updates.</summary>
     internal UpdateService? UpdateService => _updates;
@@ -40,6 +46,7 @@ public partial class App : Application
             // project rather than throwing, so this can't strand the user.
             _mcp = new McpServerService();
             _updates = new UpdateService(); // before BuildWindow, so the first window can wire its badge
+            _ = StartAssistantHostAsync(); // fire-and-forget like the update check; the panel resolves it per ask
             CliOptions cli = CliOptions.Parse(desktop.Args ?? []);
             if (cli.Error is not null)
                 Console.Error.WriteLine($"mcp: {cli.Error}");
@@ -74,7 +81,23 @@ public partial class App : Application
         var window = new MainWindow(engine, project, status, projectPath, proxy, audioClock, stab, placement);
         window.SessionRequested += OnSessionRequested;
         _mcp?.AttachSession(window.CreateMcpSession()); // re-point the MCP server at the new session
+        _assistantSession = window.CreateMcpSession(); // and the assistant's in-process host likewise (Etapa D)
         return window;
+    }
+
+    /// <summary>Builds the assistant's in-process tool host once (Etapa D) — the same filtered tool surface a
+    /// plan may draw from, over the SDK's in-memory transport. A startup failure is logged and leaves the
+    /// assistant unavailable (its panel reports it), never blocks the editor.</summary>
+    private async Task StartAssistantHostAsync()
+    {
+        try
+        {
+            _assistantHost = await Sprocket.Mcp.InProcessToolHost.CreateAsync(() => _assistantSession);
+        }
+        catch (Exception ex)
+        {
+            CrashLog.Write("Assistant tool host failed to start", ex);
+        }
     }
 
     /// <summary>
@@ -219,6 +242,8 @@ public partial class App : Application
 
         if (_mcp is { } mcp)
             await mcp.DisposeAsync();
+        if (_assistantHost is { } assistantHost)
+            await assistantHost.DisposeAsync();
         _proxy?.Dispose();
         _stab?.Dispose();
         if (_engine is { } engine)
