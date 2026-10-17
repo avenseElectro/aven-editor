@@ -97,6 +97,9 @@ frames never touch the managed heap per frame.
 - **AI control & scripting** — an opt-in, loopback-only MCP server (~65 tools) lets AI assistants
   edit the timeline — undoably, through the same command stack — plus headless CLI flags for
   diagnostics and scripting.
+- **In-app AI assistant** — pick Gemini or GLM (your own subscription key, stored encrypted with
+  Windows DPAPI, never in plain text), describe an edit in plain words, review the proposed plan
+  step by step, approve it, and one Ctrl+Z undoes everything (Ver ▸ Painel Assistente IA).
 
 The full per-feature inventory lives in [FEATURES.md](FEATURES.md); per-step build status in
 [PLAN.md](PLAN.md).
